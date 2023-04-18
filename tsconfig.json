@@ -1,0 +1,10 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "module": "CommonJS",
+        "target": "ESNext",
+        "baseUrl": ".",
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+    }
+}

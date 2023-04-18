@@ -1,0 +1,14 @@
+{
+    "source": {
+        "version": "https://nodejs.org/dist/index.json",
+        "download": "https://nodejs.org/dist"
+    },
+    "path": {
+        "node": "node",
+        "cache": "cache",
+        "local": "local"
+    },
+    "version": {
+        "len": 389
+    }
+}

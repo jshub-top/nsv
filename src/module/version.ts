@@ -1,0 +1,75 @@
+
+import { delimiter, join } from "path";
+import { context } from "../context";
+import { remote_version_list } from "../lib/version"
+import { format_shell_content, get_temp_shell_content, set_temp_shell } from "../lib/env"
+import { source } from "../../config.json"
+import { remoteNodeFileExtension } from "../../local.json"
+import { download } from "../lib/download"
+import { existsSync, readdirSync, remove, removeSync, renameSync, symlinkSync, emptyDirSync } from "fs-extra"
+import { progress } from "../lib/progress"
+import { unzip_file } from "../lib/version"
+
+export function test_local_node_version(version: string): [ string, boolean ] {
+    if (version[0] === "v") version = version.substring(1, version.length)
+    const regex = new RegExp(`^${ version }`)
+    const local_version_list = readdirSync(context.get("dir").node)
+    const local_version = Object.values(local_version_list).find(v => regex.test(v)) || ""
+    return [ local_version as string, !!local_version ]
+}
+
+
+export function use_path_node_version(version: string): string {
+    const [ local_version, is_have ] = test_local_node_version(version)
+    if ( !is_have ) return
+    const { node, home } = context.get("dir")
+    const local_node_abs_dir = join(node, local_version)
+    const path = process.env["PATH"]
+    const path_list = path.split(delimiter)
+    const first_path = path_list[0]
+    if ((new RegExp(home)).test(first_path)) path_list.shift()
+    path_list.unshift(local_node_abs_dir)
+    const content = format_shell_content(get_temp_shell_content(), {
+        content: path_list.join(delimiter)
+    })
+    set_temp_shell(content)
+    return local_version
+
+}
+
+export function use_local_node_version(version: string): string {
+    if (!context.get("is_admin")) {
+        console.error("Please run this command with administrator privileges. rey again")
+        process.exit(0)
+    }
+    const [ local_version, is_have ] = test_local_node_version(version)
+    if ( !is_have ) return
+    const { node, local, home } = context.get("dir")
+    const local_node_abs_dir = join(node, local_version)
+    emptyDirSync(local)
+    symlinkSync(local_node_abs_dir, join(home, "local/node"), "dir")
+    return local_version
+}
+
+
+export async function use_remote_node_version(version: string) {
+    const remote_node_list = await remote_version_list()
+    const { cache, node } = context.get("dir")
+    const active_node = remote_node_list.find(v => v.matchVersion(version))
+    const remote_node_file_name = `${active_node.remoteFileName}.${remoteNodeFileExtension}`
+    const download_url = `${source.download}/v${active_node.version}/${remote_node_file_name}`
+    const save_dir = `${cache}/${remote_node_file_name}`
+    if (!existsSync(save_dir)) {
+        await download(download_url, save_dir, progress("Downloading".padEnd(12, " "))).catch((err) => {
+            removeSync(save_dir)
+            throw new Error(err.toString())
+        })
+    }
+
+    const node_abs_dir = join(node, active_node.version)
+    if (!existsSync(node_abs_dir)) {
+        await unzip_file(save_dir, context.get("dir").node, progress("Extracting".padEnd(12, " ")))
+    }
+    renameSync(join(node, active_node.remoteFileName), node_abs_dir)
+}
+
