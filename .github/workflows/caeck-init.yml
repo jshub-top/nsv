@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} npm install i -g nsv 🚀
 on:
     push:
         branches:
-            - main
+            - test
 jobs:
     windows:
         runs-on: [macos-latest]
@@ -12,6 +12,6 @@ jobs:
         steps:
             -   uses: actions/checkout@v2
                 with:
-                    ref: main
+                    ref: test
             -   run: npm install
             -   run: ./nsv use 16
