@@ -9,7 +9,7 @@
         "serve": "node ./serve/index.js",
         "build": "swc src -d dist",
         "dev": "swc src -d dist --watch",
-        "init": "npm run build && node ./dist/init.js",
+        "init": "node ./dist/init.js",
         "postinstall": "npm run init"
     },
     "keywords": [

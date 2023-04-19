@@ -14,4 +14,15 @@ jobs:
                 with:
                     ref: main
             -   run: npm install
-            -   run: ./nsv use 16
+                continue-on-error: true
+            -   run: npm run build
+            -   run: npm run init
+            -   run: ./nsv use 14.17.1
+            -   run: node -v
+            -   run: |
+                    result=$(echo "$OUTPUT" | grep "v14.17.1")
+                    if [ -z "$result" ]; then
+                      echo "node version is not match"
+                      exit 1
+                    fi
+                    echo "node version match ok"
