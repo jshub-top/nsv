@@ -19,6 +19,7 @@ jobs:
             -   run: npm run build
             -   run: npm run init
             -   run: ./nsv use 14.17.1
+            -   run: node -v
             -   run: |
                     echo $OUTPUT
                     result=$(echo "$OUTPUT" | grep "v14.17.1")
