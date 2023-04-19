@@ -22,6 +22,8 @@ jobs:
             -   name: Dump GitHub context
                 id: github_context_step
                 run: echo '${{ toJSON(github) }}'
+            -   name: Dump env context
+                run: echo '${{ toJSON(env) }}'
             -   name: Dump job context
                 run: echo '${{ toJSON(job) }}'
             -   name: Dump steps context
@@ -30,8 +32,12 @@ jobs:
                 run: echo '${{ toJSON(runner) }}'
             -   name: Dump strategy context
                 run: echo '${{ toJSON(strategy) }}'
+                
             -   name: Dump matrix context
                 run: echo '${{ toJSON(matrix) }}'
+                
+            -   name: Dump needs context
+                run: echo '${{ toJSON(needs) }}'
             -   run: |
                     echo $OUTPUT
                     result=$(echo "$OUTPUT" | grep "v14.17.1")
