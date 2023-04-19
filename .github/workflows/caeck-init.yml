@@ -19,9 +19,8 @@ jobs:
             -   run: npm run build
             -   run: npm run init
             -   run: ./nsv use 14.17.1 && $Env:Path
-            -   run: node -v
-            -   run: "node -v"
-                shell: bash
+            -   run: ${{ job }}
+            -   run: ${{ env }}
             -   run: |
                     echo $OUTPUT
                     result=$(echo "$OUTPUT" | grep "v14.17.1")
