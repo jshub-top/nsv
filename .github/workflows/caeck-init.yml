@@ -18,7 +18,7 @@ jobs:
                 continue-on-error: true
             -   run: npm run build
             -   run: npm run init
-            -   run: ./nsv use 14.17.1 && $Env:Path
+            -   run: ./nsv use 14.17.1 && echo "eenv=$($Env:Path)"
             -   name: Dump GitHub context
                 id: github_context_step
                 run: echo '${{ toJSON(github) }}'
@@ -32,7 +32,7 @@ jobs:
                 run: echo '${{ toJSON(runner) }}'
             -   name: Dump strategy context
                 run: echo '${{ toJSON(strategy) }}'
-                
+
             -   name: Dump matrix context
                 run: echo '${{ toJSON(matrix) }}'
                 
