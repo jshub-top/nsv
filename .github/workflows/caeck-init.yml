@@ -27,3 +27,4 @@ jobs:
                       exit 1
                     fi
                     echo "node version match ok"
+                shell: bash
