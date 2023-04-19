@@ -20,7 +20,7 @@ jobs:
             -   run: npm run init
             -   name: env output
                 id: env_output
-                run: ./nsv use 14.17.1 && echo "eenv=$($Env:Path)"
+                run: ./nsv use 14.17.1 && echo "eenv=$($Env:Path)" >> $GITHUB_OUTPUT
             -   name: Dump GitHub context
                 id: github_context_step
                 run: echo '${{ toJSON(github) }}'
