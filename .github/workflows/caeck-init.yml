@@ -19,6 +19,7 @@ jobs:
             -   run: npm run build
             -   run: npm run init
             -   name: env output
+                id: env_output
                 run: ./nsv use 14.17.1 && echo "eenv=$($Env:Path)"
             -   name: Dump GitHub context
                 id: github_context_step
