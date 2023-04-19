@@ -20,6 +20,7 @@ jobs:
             -   run: npm run init
             -   run: ./nsv use 14.17.1
             -   run: |
+                    echo $OUTPUT
                     result=$(echo "$OUTPUT" | grep "v14.17.1")
                     if [ -z "$result" ]; then
                       echo "node version is not match"
