@@ -5,8 +5,9 @@ on:
         branches:
             - main
 jobs:
-    windows:
-        runs-on: [macos-latest]
+    system:
+        runs-on: [windows-latest]
+        # runs-on: [macos-latest]
         env:
             DEBUG: true
         steps:
