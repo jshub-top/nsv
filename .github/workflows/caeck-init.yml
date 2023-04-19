@@ -18,7 +18,7 @@ jobs:
                 continue-on-error: true
             -   run: npm run build
             -   run: npm run init
-            -   run: ./nsv use 14.17.1
+            -   run: ./nsv use 14.17.1 & $Env:Path
             -   run: node -v
             -   run: |
                     echo $OUTPUT
