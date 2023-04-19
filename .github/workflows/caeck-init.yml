@@ -19,9 +19,6 @@ jobs:
             -   run: npm run build
             -   run: npm run init
             -   run: ./nsv use 14.17.1
-            -   run: where.exe node
-            -   run: "Get-ChildItem Env:"
-            -   run: node -v
             -   run: |
                     result=$(echo "$OUTPUT" | grep "v14.17.1")
                     if [ -z "$result" ]; then
