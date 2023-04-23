@@ -2,6 +2,7 @@ import { context } from "../context"
 import { writeFileSync } from "fs-extra";
 import { join, sep, delimiter } from "path";
 import process from "process";
+import { tempScriptContent } from "../../local.json"
 declare global {
     interface Context {
         path: {
@@ -28,7 +29,7 @@ export function set_temp_shell(content: string): boolean {
 }
 
 export function get_temp_shell_content() {
-    return `$Env:Path = "{{ content }}"`
+    return tempScriptContent
 }
 
 export function format_shell_content(content: string, obj: Object) : string {
@@ -37,3 +38,5 @@ export function format_shell_content(content: string, obj: Object) : string {
     }
     return content
 }
+
+export function format_

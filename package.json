@@ -53,7 +53,7 @@
     },
     "files": [
         "dist",
-        "nsv.*",
+        "nsv*",
         "tools",
         "LICENSE",
         "script/*.prod.js",

@@ -18,11 +18,17 @@ function set_local_env() {
         "default": "tar"
     }
 
+    const ditc_temp_script_content = {
+        "win": `$Env:Path = "{{ content }}"`,
+        "default": `export PATH="{{ content }}"`
+    }
+
     const local = {
         system,
         arch,
         remoteNodeFileExtension: ditc_system[system] || ditc_system["default"],
         unzipOrder: ditc_unzip_order[system] || ditc_unzip_order["default"],
+        tempScriptContent: ditc_temp_script_content[system] || ditc_temp_script_content["default"]
     }
     writeJSONSync(join(home, "./local.json"), local, {
         encoding: "utf-8"

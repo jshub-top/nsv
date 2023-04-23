@@ -49,9 +49,9 @@ function params_json() {
     local str=$1
     local key_list=("${@:2}")
     local value=""
-
     for el in "${key_list[@]}"; do
         str=$(getJsonValuesByAwk "$str" "$el" "")
     done
+    str=${str//\"/''}
     echo $str
 }

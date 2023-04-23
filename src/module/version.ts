@@ -2,9 +2,9 @@
 import { delimiter, join } from "path";
 import { context } from "../context";
 import { remote_version_list } from "../lib/version"
-import { format_shell_content, get_temp_shell_content, set_temp_shell } from "../lib/env"
+import { format_shell_content, set_temp_shell } from "../lib/env"
 import { source } from "../../config.json"
-import { remoteNodeFileExtension } from "../../local.json"
+import { remoteNodeFileExtension, tempScriptContent } from "../../local.json"
 import { download } from "../lib/download"
 import { existsSync, readdirSync, remove, removeSync, renameSync, symlinkSync, emptyDirSync } from "fs-extra"
 import { progress } from "../lib/progress"
@@ -29,7 +29,7 @@ export function use_path_node_version(version: string): string {
     const first_path = path_list[0]
     if ((new RegExp(home)).test(first_path)) path_list.shift()
     path_list.unshift(local_node_abs_dir)
-    const content = format_shell_content(get_temp_shell_content(), {
+    const content = format_shell_content(tempScriptContent, {
         content: path_list.join(delimiter)
     })
     set_temp_shell(content)

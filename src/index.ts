@@ -1,3 +1,4 @@
+
 function run_main1() {
     const argv_len = process.argv.length
 
@@ -11,4 +12,3 @@ function run_main1() {
 }
 
 run_main1()
-

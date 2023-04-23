@@ -4,7 +4,7 @@ import { readdirSync, statSync } from "fs-extra";
 import { source, version } from "../../config.json";
 import { get } from "./http";
 import { system, arch, unzipOrder } from "../../local.json";
-import { spawn, ChildProcessWithoutNullStreams } from "child_process";
+import { spawn, exec, ChildProcessWithoutNullStreams } from "child_process";
 
 export interface RemoteNodeVersion {
     version: string
@@ -79,14 +79,14 @@ export function unzip_file(file_dir: string, output_dir: string, cb: (info: Unzi
             return spawn(unzipOrder, ["x", "-bb1", `-o${output_dir}`, '-y', file_dir])
         },
         "default": () => {
-            return spawn(unzipOrder, ["e", file_dir, output_dir])
+            return spawn(unzipOrder, ["-xf", file_dir, "-C", output_dir])
         }
     }
 
-
+    console.log(`${unzipOrder} -xf ${file_dir} -C ${output_dir}`)
     return new Promise((resolve, reject) => {
         const total = statSync(file_dir).size
-        const cp: ChildProcessWithoutNullStreams = ditc_unzip[system]?.() || ditc_unzip["default"]
+        const cp: ChildProcessWithoutNullStreams = ditc_unzip[system]?.() || ditc_unzip["default"]()
         let current = 0
         cb({total, current, type: "start"})
         cp.stdout.on("data", (chunk) => {
