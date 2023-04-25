@@ -2,7 +2,7 @@
 import { delimiter, join } from "path";
 import { context } from "../context";
 import { remote_version_list } from "../lib/version"
-import { format_shell_content, set_temp_shell } from "../lib/env"
+import { format_shell_content, set_temp_shell, format_node_path } from "../lib/env"
 import { source } from "../../config.json"
 import { remoteNodeFileExtension, tempScriptContent } from "../../local.json"
 import { download } from "../lib/download"
@@ -22,15 +22,9 @@ export function test_local_node_version(version: string): [ string, boolean ] {
 export function use_path_node_version(version: string): string {
     const [ local_version, is_have ] = test_local_node_version(version)
     if ( !is_have ) return
-    const { node, home } = context.get("dir")
-    const local_node_abs_dir = join(node, local_version)
-    const path = process.env["PATH"]
-    const path_list = path.split(delimiter)
-    const first_path = path_list[0]
-    if ((new RegExp(home)).test(first_path)) path_list.shift()
-    path_list.unshift(local_node_abs_dir)
+    const path_list = format_node_path(local_version)
     const content = format_shell_content(tempScriptContent, {
-        content: path_list.join(delimiter)
+        content: path_list
     })
     set_temp_shell(content)
     return local_version

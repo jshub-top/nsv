@@ -2,7 +2,7 @@ import { context } from "../context"
 import { writeFileSync } from "fs-extra";
 import { join, sep, delimiter } from "path";
 import process from "process";
-import { tempScriptContent } from "../../local.json"
+import { tempScriptContent, system } from "../../local.json"
 declare global {
     interface Context {
         path: {
@@ -39,4 +39,18 @@ export function format_shell_content(content: string, obj: Object) : string {
     return content
 }
 
-export function format_
+export function format_node_path(version: string) {
+    const ditc_node_path = {
+        win: (dir: string) => dir,
+        default: (dir: string) => `${dir}/bin`
+    }
+    const { home, node } = context.get("dir")
+    const local_node_abs_dir = join(node, version)
+    const path = process.env["PATH"]
+    const path_list = path.split(delimiter)
+    const first_path = path_list[0]
+    if ((new RegExp(home)).test(first_path)) path_list.shift()
+    const format_dir_fun = ditc_node_path[system] || ditc_node_path["default"]
+    path_list.unshift(format_dir_fun(local_node_abs_dir))
+    return path_list.join(delimiter)
+}

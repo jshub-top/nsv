@@ -57,7 +57,7 @@ function get_node_abs() {
     if [[ -f $cache_dir ]]; then
         node_abs_dir=$cache_dir
         echo $node_abs_dir
-        return 
+        return
     fi
     echo $node_abs_dir
 }
@@ -74,7 +74,7 @@ function cache_node() {
         return
     fi
     source ./tools/json/json.sh
-    
+
     local arch="$(uname -m | sed -e 's/x86_64/x64/;s/i86pc/x64/;s/i686/x86/;s/aarch64/arm64/')"
     local base_download_uri=$(params_json "$(cat ./config.json)" "source" "download" )
     local base_node_version=$(params_json "$(cat ./package.json)" "baseNode" )
@@ -86,11 +86,12 @@ function cache_node() {
     download_file $base_node_download_uri "$ShScriptRoot/cache/$node_file_name"
     unzip_file $save_file_dir "$ShScriptRoot/cache"
     mv "$ShScriptRoot/cache/$base_node_name"  "cache/node"
-    
+
 }
 
 
 function run_js_main() {
+    echo "run js"
     local node_dir=$(get_node_abs)
     $node_dir "./dist/index.js" $args
 }
@@ -99,10 +100,13 @@ function run_js_main() {
 
 function run_temp_script() {
     local temp_script_dir="$ShScriptRoot/cache/temp_$$.sh"
-    if [[ ! -e $temp_script_dir ]]; then 
-        return 
+
+    if [[ ! -e $temp_script_dir ]]; then
+
+        return
     fi
     source $temp_script_dir
+
 }
 
 
