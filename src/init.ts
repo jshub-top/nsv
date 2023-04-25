@@ -3,6 +3,7 @@ import { join } from "path";
 import { system_and_arch } from "./lib/system"
 import { context } from "./context"
 import { exec } from "child_process"
+import { version } from "../package.json"
 
 
 const [system, arch] = system_and_arch()
@@ -24,6 +25,7 @@ function set_local_env() {
     }
 
     const local = {
+        version,
         system,
         arch,
         remoteNodeFileExtension: ditc_system[system] || ditc_system["default"],

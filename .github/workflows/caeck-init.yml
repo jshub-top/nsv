@@ -5,8 +5,9 @@ on:
         branches:
             - test
 jobs:
-    windows:
-        runs-on: [macos-latest]
+    system:
+        runs-on: [windows-latest]
+        # runs-on: [macos-latest]
         env:
             DEBUG: true
         steps:
@@ -14,4 +15,37 @@ jobs:
                 with:
                     ref: test
             -   run: npm install
-            -   run: ./nsv use 16
+                continue-on-error: true
+            -   run: npm run build
+            -   run: npm run init
+            -   name: env output
+                id: env_output
+                run: ./nsv use 14.17.1 && echo "eenv=$($Env:Path)" >> $GITHUB_OUTPUT
+            -   name: Dump GitHub context
+                id: github_context_step
+                run: echo '${{ toJSON(github) }}'
+            -   name: Dump env context
+                run: echo '${{ toJSON(env) }}'
+            -   name: Dump job context
+                run: echo '${{ toJSON(job) }}'
+            -   name: Dump steps context
+                run: echo '${{ toJSON(steps) }}'
+            -   name: Dump runner context
+                run: echo '${{ toJSON(runner) }}'
+            -   name: Dump strategy context
+                run: echo '${{ toJSON(strategy) }}'
+
+            -   name: Dump matrix context
+                run: echo '${{ toJSON(matrix) }}'
+                
+            -   name: Dump needs context
+                run: echo '${{ toJSON(needs) }}'
+            -   run: |
+                    echo $OUTPUT
+                    result=$(echo "$OUTPUT" | grep "v14.17.1")
+                    if [ -z "$result" ]; then
+                      echo "node version is not match"
+                      exit 1
+                    fi
+                    echo "node version match ok"
+                shell: bash
