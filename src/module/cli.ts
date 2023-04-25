@@ -1,9 +1,13 @@
 import { Command } from "commander";
-import {use_path_node_version, use_remote_node_version, use_local_node_version} from "./version"
-
+import { use_path_node_version, use_remote_node_version, use_local_node_version } from "./version"
+import { version } from "../../local.json"
 export function run() {
     const program = new Command()
 
+
+    program.option("-v --version").action(_ => {
+        console.log("nsv:", version)
+    })
 
     program
         .command("use")
