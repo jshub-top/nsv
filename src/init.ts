@@ -45,11 +45,13 @@ function run_init_shell() {
             return `Powershell ${dir}/nsv.ps1 --init`
         },
         default: (dir: string) => {
-            return `Powershell ${dir}.ps1 --init`
+            return `${home}/nsv.sh --init`
         }
     }
     const exec_order = ditc_init_shell[system]?.(home) || ditc_init_shell["default"](home)
-    exec(exec_order)
+    const cp = exec(exec_order)
+    cp.stdout.pipe(process.stdout)
+    cp.stderr.pipe(process.stdout)
 
 }
 

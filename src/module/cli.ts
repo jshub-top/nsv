@@ -30,19 +30,21 @@ export function run() {
 
     async function use(version: string, option: any) {
         let use_version = use_path_node_version(version)
-        if (use_version) return
-        await use_remote_node_version(version)
-        use_version = use_path_node_version(version)
-        if ( use_version === void 0 ) throw new Error(`use path node version ${use_version} error. please push issuse to https://github.com/1739616529/nsv/issues/new`)
+        if (!use_version) {
+            await use_remote_node_version(version)
+            use_version = use_path_node_version(version)
+            if ( use_version === void 0 ) throw new Error(`use path node version ${use_version} error. please push issuse to https://github.com/1739616529/nsv/issues/new`)
+        }
         console.log(`v${use_version}`)
     }
 
     async function local(version: string, option: any) {
         let use_version = use_local_node_version(version)
-        if (use_version) return
-        await use_remote_node_version(version)
-        use_version = use_local_node_version(version)
-        if ( use_version === void 0 ) throw new Error(`use local node version ${use_version} error. please push issuse to https://github.com/1739616529/nsv/issues/new`)
+        if (!use_version) {
+            await use_remote_node_version(version)
+            use_version = use_local_node_version(version)
+            if ( use_version === void 0 ) throw new Error(`use local node version ${use_version} error. please push issuse to https://github.com/1739616529/nsv/issues/new`)
+        }
         console.log(`v${use_version}`)
     }
 }

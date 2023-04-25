@@ -7,16 +7,19 @@ then
     export NSV_HOME=$ShScriptRoot
 fi
 init() {
+    echo $1
     if [[ $1 != "--init" ]]; then
         return
     fi
 
+    echo 111
     function set_env() {
 
         grep ".nsv" ~/.bashrc >/dev/null
         if [ $? -eq 1 ] ; then
             echo "export NSV_HOME=$ShScriptRoot" >> ~/.bashrc
-            echo "export PATH=\$NSV_HOME/.nsv:\$PATH" >> ~/.bashrc
+            echo "[ -s \"\$NSV_HOME/nsv.sh\" ] && . \"\$NSV_HOME/nsv.sh\"" >> ~/.bashrc
+
             source ~/.bashrc
             state+=1
 
@@ -26,6 +29,11 @@ init() {
     set_env
     exit 0
 }
+
+init $*
+
+
+
 
 
 
@@ -47,11 +55,11 @@ function get_node_abs() {
         return
     fi
 
-    # node_abs_dir=$(which "node")
-    # if [[ $node_abs_dir ]]; then
-    #     echo $node_abs_dir
-    #     return
-    # fi
+    node_abs_dir=$(which "node")
+    if [[ $node_abs_dir ]]; then
+        echo $node_abs_dir
+        return
+    fi
 
     local cache_dir=$NSV_HOME/cache/node/bin/node
     if [[ -f $cache_dir ]]; then
@@ -91,7 +99,6 @@ function cache_node() {
 
 
 function run_js_main() {
-    echo "run js"
     local node_dir=$(get_node_abs)
     $node_dir "./dist/index.js" $args
 }
@@ -106,7 +113,7 @@ function run_temp_script() {
         return
     fi
     source $temp_script_dir
-
+    echo $PATH
 }
 
 
