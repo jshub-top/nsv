@@ -44,8 +44,9 @@ function download_file() {
     uri=$1
     file_name=$(basename $1)
     save_dir=$2
-    curl $uri -O -#
-    mv "./$file_name" $save_dir
+    curl "$uri" -# -O
+    chmod 755 "$file_name"
+    mv "$file_name" "$save_dir"
 }
 
 node_abs_dir=""
@@ -82,7 +83,8 @@ function cache_node() {
         return
     fi
     source ./tools/json/json.sh
-
+    mkdir cache
+    mkdir node
     local arch="$(uname -m | sed -e 's/x86_64/x64/;s/i86pc/x64/;s/i686/x86/;s/aarch64/arm64/')"
     local base_download_uri=$(params_json "$(cat ./config.json)" "source" "download" )
     local base_node_version=$(params_json "$(cat ./package.json)" "baseNode" )
@@ -94,13 +96,12 @@ function cache_node() {
     download_file $base_node_download_uri "$ShScriptRoot/cache/$node_file_name"
     unzip_file $save_file_dir "$ShScriptRoot/cache"
     mv "$ShScriptRoot/cache/$base_node_name"  "cache/node"
-
 }
 
 
 function run_js_main() {
     local node_dir=$(get_node_abs)
-    $node_dir "./dist/index.js" $args
+    $node_dir "./dist/index.js" $@
 }
 
 
@@ -113,7 +114,6 @@ function run_temp_script() {
         return
     fi
     source $temp_script_dir
-    echo $PATH
 }
 
 
@@ -137,7 +137,7 @@ function run_js_brfore() {
 }
 
 function run_js() {
-    run_js_main
+    run_js_main $@
 }
 
 function run_js_after() {
@@ -145,6 +145,8 @@ function run_js_after() {
     run_temp_script
 }
 
-run_js_brfore
-run_js
-run_js_after
+nsv() {
+    run_js_brfore
+    run_js $@
+    run_js_after
+}

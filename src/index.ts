@@ -10,5 +10,4 @@ function run_main1() {
 
     // 否则调用 交互命令
 }
-console.log("js running")
 run_main1()

@@ -2,7 +2,7 @@
     "name": "nsv",
     "version": "1.0.0",
     "description": "",
-    "baseNode": "14.19.3",
+    "baseNode": "14.21.3",
     "minNode": "10.0.0",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
