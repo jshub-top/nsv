@@ -27,8 +27,7 @@ function nsv() {
     "./cache/node/bin/node" "./dist/index.js" $@
     local temp_shell_dir="./cache/$NSV_TEMP_SCRIPT_NAME"
     if [[ -f $temp_shell_dir ]]; then
-
-        source $temp_shell_dir
+        . $temp_shell_dir
         rm $temp_shell_dir
     fi
     unset NSV_TEMP_SCRIPT_NAME

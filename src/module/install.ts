@@ -7,6 +7,7 @@ import { context } from "../context"
 export async function install () {
     let content = ""
     if ("NSV_HOME" in process.env) return console.log("nsv: installed")
+    
     if (system === "linux") {
         const shell_config_file_content = await readFile(shellConfigFileDir, { encoding: "utf-8" }).then(v => v.toString().split(EOL))
         shell_config_file_content.push(`export NSV_HOME=$HOME/.nsv`)
@@ -55,6 +56,7 @@ export async function install () {
         
     }
     
+    console.log("111")
     content && writeFile(`${context.get("dir").cache}/${context.get("temp_file_name")}`, content)
     
 }
