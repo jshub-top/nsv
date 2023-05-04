@@ -5,18 +5,18 @@ import { system, shell, shellConfigFileDir } from "../../local.json"
 import { readFile, writeFile } from "fs-extra";
 import { context } from "../context"
 export async function install () {
-    let env_path = ""
     let content = ""
+    if ("NSV_HOME" in process.env) return console.log("nsv: installed")
     if (system === "linux") {
         const shell_config_file_content = await readFile(shellConfigFileDir, { encoding: "utf-8" }).then(v => v.toString().split(EOL))
         shell_config_file_content.push(`export NSV_HOME=$HOME/.nsv`)
         shell_config_file_content.push(`[ -s "$NSV_HOME/nsv.sh" ] && . "$NSV_HOME/nsv.sh"`)
         shell_config_file_content.push(`export PATH=$NSV_HOME/local/bin:$PATH`)
+        shell_config_file_content.push(``)
         content = `source ${shellConfigFileDir}`
         await writeFile(shellConfigFileDir, shell_config_file_content.join(EOL), { encoding: "utf-8" })
     } 
     else if (system === "windows") {
-        env_path = context.get("temp_file_name")
         content = `
             $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
 

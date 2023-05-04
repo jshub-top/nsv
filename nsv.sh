@@ -1,7 +1,9 @@
 #!/bin/bash
 OS=$(uname | sed 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/')
 
-if [[ ! -d "$NSV_HOME/cache/node" ]]; then
+
+
+if [[ ! -d "./cache/node" ]]; then
     source ./tools/json/json.sh
     mkdir -p cache
     mkdir -p node
@@ -11,20 +13,21 @@ if [[ ! -d "$NSV_HOME/cache/node" ]]; then
     base_node_name="node-v${base_node_version}-${OS}-${arch}"
     node_file_name="$base_node_name.tar.gz"
     base_node_download_uri="${base_download_uri}/v${base_node_version}/${node_file_name}"
-    save_file_dir="$NSV_HOME/cache/$node_file_name"
+    save_file_dir="./cache/$node_file_name"
     curl "$base_node_download_uri" -# -O
     chmod 755 "$node_file_name"
     mv "$node_file_name"  "$save_file_dir"
-    tar -xf $save_file_dir -C "$NSV_HOME/cache"
+    tar -xf $save_file_dir -C "./cache"
     mv "cache/$base_node_name"  "cache/node"
 fi
 
 
 function nsv() {
     export NSV_TEMP_SCRIPT_NAME="temp_$$.sh"
-    "$NSV_HOME/cache/node/bin/node" "./dist/index.js" $@
-    local temp_shell_dir="$NSV_HOME/cache/$NSV_TEMP_SCRIPT_NAME"
+    "./cache/node/bin/node" "./dist/index.js" $@
+    local temp_shell_dir="./cache/$NSV_TEMP_SCRIPT_NAME"
     if [[ -f $temp_shell_dir ]]; then
+
         source $temp_shell_dir
     fi
     unset NSV_TEMP_SCRIPT_NAME
