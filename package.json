@@ -13,15 +13,11 @@
         "postinstall": "npm run init"
     },
     "keywords": [
-        "node",
-        "version",
         "nvs",
         "nsv",
         "nvm",
         "n",
-        "fnm",
-        "cli",
-        "lcv"
+        "fnm"
     ],
     "author": "",
     "license": "MIT",
