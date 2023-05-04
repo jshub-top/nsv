@@ -29,6 +29,7 @@ function nsv() {
     if [[ -f $temp_shell_dir ]]; then
 
         source $temp_shell_dir
+        rm $temp_shell_dir
     fi
     unset NSV_TEMP_SCRIPT_NAME
 }
