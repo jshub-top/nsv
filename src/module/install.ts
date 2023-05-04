@@ -12,8 +12,8 @@ export async function install () {
         shell_config_file_content.push(`export NSV_HOME=$HOME/.nsv`)
         shell_config_file_content.push(`[ -s "$NSV_HOME/nsv.sh" ] && . "$NSV_HOME/nsv.sh"`)
         shell_config_file_content.push(`export PATH=$NSV_HOME/local/bin:$PATH`)
-        content = shell_config_file_content.join(EOL)
-        writeFile(shellConfigFileDir, content, { encoding: "utf-8" })
+        content = `source ${shellConfigFileDir}`
+        await writeFile(shellConfigFileDir, shell_config_file_content.join(EOL), { encoding: "utf-8" })
     } 
     else if (system === "windows") {
         env_path = context.get("temp_file_name")
@@ -53,8 +53,9 @@ export async function install () {
             exit 0
         `
         
-        writeFile(`${context.get("dir").cache}/${context.get("temp_file_name")}`, content)
     }
+    
+    content && writeFile(`${context.get("dir").cache}/${context.get("temp_file_name")}`, content)
     
 }
 
@@ -62,6 +63,7 @@ export async function uninstall () {
     let content = ""
     if (system === "linux") {
         const shell_config_file_content = await readFile(shellConfigFileDir, { encoding: "utf-8" }).then(v => v.toString().split(EOL).filter(v => !/NSV_HOME/.test(v)))
+        content = `source ${shellConfigFileDir}`
         writeFile(shellConfigFileDir, shell_config_file_content.join(EOL), { encoding: "utf-8" })
     } 
     else if (system === "windows") {
@@ -108,6 +110,6 @@ export async function uninstall () {
             exit 0
         `
         
-        writeFile(`${context.get("dir").cache}/${context.get("temp_file_name")}`, content)
     }
+    writeFile(`${context.get("dir").cache}/${context.get("temp_file_name")}`, content)
 }
