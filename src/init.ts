@@ -24,10 +24,31 @@ function set_local_env() {
         "default": `export PATH="{{ content }}"`
     }
 
+    let shell = "powershell"
+    let shellConfigFileDir = ""
+    if (system === "linux") {
+        const shell_name = process.env.SHELL
+        if (/bash/.test(shell_name)) {
+            shell = "bash"
+            shellConfigFileDir = ".bashrc"
+        } else
+        if (/zsh/.test(shell_name)) {
+            shell = ".zshrc"
+            shellConfigFileDir = ".zshrc"
+        } else
+        if (/fish/.test(shell_name)) {
+            shell = "fish"
+            shellConfigFileDir = ".config/fish/config.fish"
+        }
+        shellConfigFileDir = `${process.env.HOME}/${shellConfigFileDir}`
+    }
+
     const local = {
         version,
         system,
         arch,
+        shell,
+        shellConfigFileDir,
         remoteNodeFileExtension: ditc_system[system] || ditc_system["default"],
         unzipOrder: ditc_unzip_order[system] || ditc_unzip_order["default"],
         tempScriptContent: ditc_temp_script_content[system] || ditc_temp_script_content["default"]
@@ -42,10 +63,10 @@ function run_init_shell() {
     if (process.env["GITHUB_ENV"] !== void 0) return
     const ditc_init_shell = {
         win: (dir: string) => {
-            return `Powershell ${dir}/nsv.ps1 --init`
+            return `Powershell ${dir}/nsv.ps1 install`
         },
         default: (dir: string) => {
-            return `${home}/nsv.sh --init`
+            return `${dir}/nsv.sh install`
         }
     }
     const exec_order = ditc_init_shell[system]?.(home) || ditc_init_shell["default"](home)
