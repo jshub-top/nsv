@@ -1,5 +1,5 @@
 
-import { resolve } from "path";
+import { join, resolve } from "path";
 import { EOL } from "os";
 import { system, shell, shellConfigFileDir } from "../../local.json"
 import { readFile, writeFile } from "fs-extra";
@@ -7,7 +7,7 @@ import { context } from "../context"
 export async function install () {
     let content = ""
     if ("NSV_HOME" in process.env) return console.log("nsv: installed")
-    
+
     if (system === "linux") {
         const shell_config_file_content = await readFile(shellConfigFileDir, { encoding: "utf-8" }).then(v => v.toString().split(EOL))
         shell_config_file_content.push(`export NSV_HOME=$HOME/.nsv`)
@@ -16,9 +16,10 @@ export async function install () {
         shell_config_file_content.push(``)
         content = `source ${shellConfigFileDir}`
         await writeFile(shellConfigFileDir, shell_config_file_content.join(EOL), { encoding: "utf-8" })
-    } 
-    else if (system === "windows") {
+    }
+    else if (system === "win") {
         content = `
+            $NSV_HOME = "${context.get("dir").home}"
             $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
 
             if (-not $isAdmin) {
@@ -26,22 +27,38 @@ export async function install () {
                 Exit 0
             }
 
+            function Get-Path-Crs ($path) {
+
+                $local_env =  Get-Item -Path $path
+                $local_env.GetValue(
+                    "Path",
+                    "",
+                    [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
+                )
+            }
+
+            $state = 0
+
             $user_path_dir = "HKCU:\\Environment"
             $user_path_value = Get-Path-Crs $user_path_dir
+            Write-Output $user_path_value
             if ( $user_path_value -notmatch "%NSV_HOME%" ) {
-                Set-ItemProperty -Path $user_path_dir -Name 'NSV_HOME' -Value $env:NSV_HOME -Type String
-                Set-ItemProperty -Path $user_path_dir -Name 'Path' -Value "%NSV_HOME%;$user_path_value" -Type ExpandString
-                $state_num += 1
+                 Set-ItemProperty -Path $user_path_dir -Name 'NSV_HOME' -Value $NSV_HOME -Type String
+                 Set-ItemProperty -Path $user_path_dir -Name 'Path' -Value "%NSV_HOME%;$user_path_value" -Type ExpandString
+                $state += 1
             }
 
 
             $system_path_dir = "HKLM:\\SYSTEM\\ControlSet001\\Control\\Session Manager\\Environment\\"
             $system_path_value = Get-Path-Crs $system_path_dir
+            Write-Output $system_path_value
             if ($system_path_value -notmatch "%NSV_LOCAL_NODE%") {
-                Set-ItemProperty -Path $system_path_dir -Name 'NSV_LOCAL_NODE' -Value "$env:NSV_HOME\\local\\node" -Type String
-                Set-ItemProperty -Path $system_path_dir -Name 'Path' -Value "%NSV_LOCAL_NODE%;$system_path_value" -Type ExpandString
-                $state_num += 2
+                 Set-ItemProperty -Path $system_path_dir -Name 'NSV_LOCAL_NODE' -Value "$NSV_HOME\\local\\node" -Type String
+                 Set-ItemProperty -Path $system_path_dir -Name 'Path' -Value "%NSV_LOCAL_NODE%;$system_path_value" -Type ExpandString
+                $state += 2
             }
+
+            Write-Output "$state"
 
             if ($state -eq 0) {
                 return
@@ -53,12 +70,11 @@ export async function install () {
             Logoff
             exit 0
         `
-        
+
     }
-    
-    console.log("111")
-    content && writeFile(`${context.get("dir").cache}/${context.get("temp_file_name")}`, content)
-    
+
+    content && writeFile(join(context.get("dir").cache, context.get("temp_file_name")), content)
+
 }
 
 export async function uninstall () {
@@ -67,14 +83,24 @@ export async function uninstall () {
         const shell_config_file_content = await readFile(shellConfigFileDir, { encoding: "utf-8" }).then(v => v.toString().split(EOL).filter(v => !/NSV_HOME/.test(v)))
         content = `source ${shellConfigFileDir}`
         writeFile(shellConfigFileDir, shell_config_file_content.join(EOL), { encoding: "utf-8" })
-    } 
-    else if (system === "windows") {
+    }
+    else if (system === "win") {
         content = `
             $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
 
             if (-not $isAdmin) {
                 Start-Process powershell.exe "-File $PSCommandPath" -Verb RunAs
                 Exit 0
+            }
+
+            function Get-Path-Crs ($path) {
+
+                $local_env =  Get-Item -Path $path
+                $local_env.GetValue(
+                    "Path",
+                    "",
+                    [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames
+                )
             }
 
             $user_path_dir = "HKCU:\\Environment"
@@ -92,11 +118,11 @@ export async function uninstall () {
             $system_path_dir = "HKLM:\\SYSTEM\\ControlSet001\\Control\\Session Manager\\Environment\\"
             $system_path_value = Get-Path-Crs $system_path_dir
             if ($system_path_value -match "%NSV_LOCAL_NODE%") {
-                Remove-ItemProperty -Path $system_path_dir -Name 'NSV_LOCAL_NODE' -Value "$env:NSV_HOME\\local\\node" -Type String
+                Remove-ItemProperty -Path $system_path_dir -Name 'NSV_LOCAL_NODE'
                 $new_system_path_value = $system_path_value.Split(';') |  Where-Object {
                     $_ -notlike "NSV_LOCAL_NODE"
                 }
-                Remove-ItemProperty -Path $system_path_dir -Name 'Path' -Value "$new_system_path_value" -Type ExpandString
+                Set-ItemProperty -Path $system_path_dir -Name 'Path' -Value "$new_system_path_value" -Type ExpandString
                 $state_num += 2
             }
 
@@ -111,7 +137,7 @@ export async function uninstall () {
             Logoff
             exit 0
         `
-        
+
     }
     writeFile(`${context.get("dir").cache}/${context.get("temp_file_name")}`, content)
 }

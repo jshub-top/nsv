@@ -1,4 +1,4 @@
-import { writeJSONSync, readJSONSync } from "fs-extra";
+import { writeJSONSync, readJSONSync, ensureDir } from "fs-extra";
 import { join } from "path";
 import { system_and_arch } from "./lib/system"
 import { context } from "./context"
@@ -8,6 +8,7 @@ import { version } from "../package.json"
 
 const [system, arch] = system_and_arch()
 const {home} = context.get("dir")
+
 function set_local_env() {
     const ditc_system = {
         "win": "7z",
@@ -59,8 +60,10 @@ function set_local_env() {
 }
 
 
-function run_init_shell() {
+
+async function run_init_shell() {
     if (process.env["GITHUB_ENV"] !== void 0) return
+    await Promise.all([ensureDir(join(home, "cache")), ensureDir(join(home, "node")), ensureDir(join(home, "local"))])
     const ditc_init_shell = {
         win: (dir: string) => {
             return `Powershell ${dir}/nsv.ps1 install`

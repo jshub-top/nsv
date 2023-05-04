@@ -49,7 +49,7 @@ export function format_node_path(version: string) {
     const path = process.env["PATH"]
     const path_list = path.split(delimiter)
     const first_path = path_list[0]
-    if ((new RegExp(home)).test(first_path)) path_list.shift()
+    if ((new RegExp(home.replace(/\\/g, "\\\\"))).test(first_path)) path_list.shift()
     const format_dir_fun = ditc_node_path[system] || ditc_node_path["default"]
     path_list.unshift(format_dir_fun(local_node_abs_dir))
     return path_list.join(delimiter)
