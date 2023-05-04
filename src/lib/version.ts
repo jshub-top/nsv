@@ -79,7 +79,7 @@ export function unzip_file(file_dir: string, output_dir: string, cb: (info: Unzi
             return spawn(unzipOrder, ["x", "-bb1", `-o${output_dir}`, '-y', file_dir])
         },
         "default": () => {
-            return spawn(unzipOrder, ["-xf", file_dir, "-C", output_dir])
+            return spawn(unzipOrder, ["-xvf", file_dir, "-C", output_dir])
         }
     }
 
