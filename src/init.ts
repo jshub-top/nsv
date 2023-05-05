@@ -2,7 +2,6 @@ import { writeJSONSync, readJSONSync, ensureDir } from "fs-extra";
 import { join } from "path";
 import { system_and_arch } from "./lib/system"
 import { context } from "./context"
-import { exec } from "child_process"
 import { version } from "../package.json"
 
 
@@ -59,25 +58,4 @@ function set_local_env() {
     })
 }
 
-
-
-async function run_init_shell() {
-    if (process.env["GITHUB_ENV"] !== void 0) return
-    await Promise.all([ensureDir(join(home, "cache")), ensureDir(join(home, "node")), ensureDir(join(home, "local"))])
-    const ditc_init_shell = {
-        win: (dir: string) => {
-            return `Powershell ${dir}/nsv.ps1 install`
-        },
-        default: (dir: string) => {
-            return `${dir}/nsv.sh install`
-        }
-    }
-    const exec_order = ditc_init_shell[system]?.(home) || ditc_init_shell["default"](home)
-    const cp = exec(exec_order)
-    cp.stdout.pipe(process.stdout)
-    cp.stderr.pipe(process.stdout)
-
-}
-
 set_local_env()
-run_init_shell()
