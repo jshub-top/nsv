@@ -6,3 +6,4 @@ dist
 *local*
 !script/*.prod.js
 *.d.ts
+user*.json
