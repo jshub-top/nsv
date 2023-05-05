@@ -18,8 +18,8 @@ export async function install () {
         await writeFile(shellConfigFileDir, shell_config_file_content.join(EOL), { encoding: "utf-8" })
     }
     else if (system === "win") {
+        const home = context.get("dir").home
         content = `
-            $NSV_HOME = "${context.get("dir").home}"
             $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
 
             if (-not $isAdmin) {
@@ -43,7 +43,7 @@ export async function install () {
             $user_path_value = Get-Path-Crs $user_path_dir
             Write-Output $user_path_value
             if ( $user_path_value -notmatch "%NSV_HOME%" ) {
-                 Set-ItemProperty -Path $user_path_dir -Name 'NSV_HOME' -Value $NSV_HOME -Type String
+                 Set-ItemProperty -Path $user_path_dir -Name 'NSV_HOME' -Value ${home} -Type String
                  Set-ItemProperty -Path $user_path_dir -Name 'Path' -Value "%NSV_HOME%;$user_path_value" -Type ExpandString
                 $state += 1
             }
@@ -53,7 +53,7 @@ export async function install () {
             $system_path_value = Get-Path-Crs $system_path_dir
             Write-Output $system_path_value
             if ($system_path_value -notmatch "%NSV_LOCAL_NODE%") {
-                 Set-ItemProperty -Path $system_path_dir -Name 'NSV_LOCAL_NODE' -Value "$NSV_HOME\\local\\node" -Type String
+                 Set-ItemProperty -Path $system_path_dir -Name 'NSV_LOCAL_NODE' -Value "${join(home, "local/node")}" -Type String
                  Set-ItemProperty -Path $system_path_dir -Name 'Path' -Value "%NSV_LOCAL_NODE%;$system_path_value" -Type ExpandString
                 $state += 2
             }
@@ -108,8 +108,9 @@ export async function uninstall () {
             if ( $user_path_value -match "%NSV_HOME%" ) {
                 Remove-ItemProperty -Path $user_path_dir -Name 'NSV_HOME'
                 $new_user_path_value = $user_path_value.Split(';') |  Where-Object {
-                    $_ -notlike "NSV_HOME"
+                    $_ -notlike "%NSV_HOME%"
                 }
+                $new_user_path_value = $new_user_path_value -join ";"
                 Set-ItemProperty -Path $user_path_dir -Name 'Path' -Value "$new_user_path_value" -Type ExpandString
                 $state_num += 1
             }
@@ -120,8 +121,9 @@ export async function uninstall () {
             if ($system_path_value -match "%NSV_LOCAL_NODE%") {
                 Remove-ItemProperty -Path $system_path_dir -Name 'NSV_LOCAL_NODE'
                 $new_system_path_value = $system_path_value.Split(';') |  Where-Object {
-                    $_ -notlike "NSV_LOCAL_NODE"
+                    $_ -notlike "%NSV_LOCAL_NODE%"
                 }
+                $new_system_path_value = $new_system_path_value -join ";"
                 Set-ItemProperty -Path $system_path_dir -Name 'Path' -Value "$new_system_path_value" -Type ExpandString
                 $state_num += 2
             }
