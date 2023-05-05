@@ -4,9 +4,9 @@ import { context } from "../context";
 import { remote_version_list } from "../lib/version"
 import { format_shell_content, set_temp_shell, format_node_path } from "../lib/env"
 import { source } from "../../config.json"
-import { remoteNodeFileExtension, tempScriptContent } from "../../local.json"
+import { remoteNodeFileExtension, tempScriptContent, tempLocalScriptContent } from "../../local.json"
 import { download } from "../lib/download"
-import { existsSync, readdirSync, remove, removeSync, renameSync, symlinkSync, emptyDirSync } from "fs-extra"
+import { existsSync, readdirSync, remove, removeSync, renameSync, symlinkSync, emptyDirSync, linkSync } from "fs-extra"
 import { progress } from "../lib/progress"
 import { unzip_file } from "../lib/version"
 
@@ -32,16 +32,17 @@ export function use_path_node_version(version: string): string {
 }
 
 export function use_local_node_version(version: string): string {
-    if (!context.get("is_admin")) {
-        console.error("Please run this command with administrator privileges. rey again")
-        process.exit(0)
-    }
     const [ local_version, is_have ] = test_local_node_version(version)
     if ( !is_have ) return
     const { node, local, home } = context.get("dir")
     const local_node_abs_dir = join(node, local_version)
+    const output_dir = join(local, "node")
+    const content = format_shell_content(tempLocalScriptContent, {
+        target: local_node_abs_dir,
+        output: output_dir,
+    })
+    set_temp_shell(content, true)
     emptyDirSync(local)
-    symlinkSync(local_node_abs_dir, join(home, "local/node"), "dir")
     return local_version
 }
 

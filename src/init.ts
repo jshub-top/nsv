@@ -24,6 +24,21 @@ function set_local_env() {
         "default": `export PATH="{{ content }}"`
     }
 
+    const ditc_temp_local_script_content = {
+        "win": `New-Item -ItemType SymbolicLink -Value "{{ target }}" -Path "{{ output }}"`,
+        "default": `ln -s "{{ target }}" "{{ output }}"`
+    }
+
+    const ditc_sudo_shell_content = {
+        "win": `$isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+
+        if (-not $isAdmin) {
+            Start-Process powershell.exe "-File $PSCommandPath" -Verb RunAs
+            Exit 0
+        }\n`,
+        "default": "sudo",
+    }
+
     let shell = "powershell"
     let shellConfigFileDir = ""
     if (system === "linux") {
@@ -51,7 +66,9 @@ function set_local_env() {
         shellConfigFileDir,
         remoteNodeFileExtension: ditc_system[system] || ditc_system["default"],
         unzipOrder: ditc_unzip_order[system] || ditc_unzip_order["default"],
-        tempScriptContent: ditc_temp_script_content[system] || ditc_temp_script_content["default"]
+        sudoShellContent: ditc_sudo_shell_content[system] || ditc_sudo_shell_content["default"],
+        tempScriptContent: ditc_temp_script_content[system] || ditc_temp_script_content["default"],
+        tempLocalScriptContent: ditc_temp_local_script_content[system] || ditc_temp_local_script_content["default"]
     }
     writeJSONSync(join(home, "./local.json"), local, {
         encoding: "utf-8"

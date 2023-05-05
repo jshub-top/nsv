@@ -26,14 +26,14 @@ function unzip_file_by_7z($zip_dir, $out_put) {
 function use_base_node () {
 
     if (Test-Path "./cache/node") {
-        return 
+        return
     }
 
     $system_bit = "x86"
     if ($env:PROCESSOR_ARCHITECTURE -ieq "AMD64" -or $env:PROCESSOR_ARCHITEW6432 -ieq "AMD64") {
         $system_bit = "x64"
     }
-    
+
     $package = Get-Content -Path "package.json" | ConvertFrom-Json
     $config = Get-Content -Path "config.json" | ConvertFrom-Json
     $base_node_file_name = "node-v$($package.baseNode)-win-$system_bit"

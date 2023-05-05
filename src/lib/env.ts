@@ -2,7 +2,7 @@ import { context } from "../context"
 import { writeFileSync } from "fs-extra";
 import { join, sep, delimiter } from "path";
 import process from "process";
-import { tempScriptContent, system } from "../../local.json"
+import { system, sudoShellContent } from "../../local.json"
 declare global {
     interface Context {
         path: {
@@ -18,18 +18,15 @@ context.set("path", {
 
 
 
-export function set_temp_shell(content: string): boolean {
+export function set_temp_shell(content: string, sudo = false): boolean {
     const temp_file_dir = join(context.get("dir").cache, context.get("temp_file_name"))
+    if (sudo) content = sudoShellContent + content
     try {
         writeFileSync(temp_file_dir, content, { encoding: "utf-8" })
         return true
     } catch (err) {
         return false
     }
-}
-
-export function get_temp_shell_content() {
-    return tempScriptContent
 }
 
 export function format_shell_content(content: string, obj: Object) : string {
