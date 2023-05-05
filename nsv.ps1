@@ -3,7 +3,6 @@
 
 $argv = $args
 $scriptDir = $PSScriptRoot
-
 function download_file($url, $out_put) {
     $proxySettings = Get-ItemProperty -Path "Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyServer -ErrorAction SilentlyContinue
     if($proxySettings.ProxyServer) {
@@ -54,7 +53,7 @@ function nsv () {
     $temp_ps_file = "./cache/$NSV_TEMP_SCRIPT_NAME"
     if (Test-Path $temp_ps_file) {
         & $temp_ps_file
-        # Remove-item $temp_ps_file
+        Remove-item $temp_ps_file
     }
 
 }

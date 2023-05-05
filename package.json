@@ -5,12 +5,12 @@
     "baseNode": "14.21.3",
     "minNode": "10.0.0",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
         "serve": "node ./serve/index.js",
+        "type": "tsc --declaration --outFile types.d.ts",
         "build": "swc src -d dist",
         "dev": "swc src -d dist --watch",
         "init": "node ./dist/init.js",
-        "postinstall": "npm run init"
+        "postinstall": "node ./script/postinstall.prod.js"
     },
     "keywords": [
         "nvs",
@@ -53,6 +53,7 @@
         "tools",
         "LICENSE",
         "script/*.prod.js",
-        "*.json"
+        "*.json",
+        "*.d.ts"
     ]
 }

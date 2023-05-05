@@ -5,3 +5,4 @@ dist
 *-lock.*
 *local*
 script/*.prod.js
+*.d.ts
