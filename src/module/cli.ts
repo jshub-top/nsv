@@ -1,5 +1,6 @@
 import { Command } from "commander";
-import { use_path_node_version, use_remote_node_version, use_local_node_version } from "./version"
+import { use, local } from "./version"
+import { discern } from "./discern"
 import { version as app_version } from "../../local.json"
 import { install, uninstall } from "./install"
 export function run() {
@@ -24,6 +25,14 @@ export function run() {
         .action(local);
 
     program
+        .command("discern")
+        .option("-e --enable", "enable auto discern node version")
+        .option("-d --disable", "disable auto discern node version")
+        .option("-s --status", "discern status")
+        .description("discern your project node config version.")
+        .action(discern);
+
+    program
         .command("install")
         .description("install")
         .action(install);
@@ -44,26 +53,5 @@ export function run() {
     function version() {
         console.log(app_version)
     }
-
-    async function use(version: string, option: any) {
-        let use_version = use_path_node_version(version)
-        if (!use_version) {
-            await use_remote_node_version(version)
-            use_version = use_path_node_version(version)
-            if ( use_version === void 0 ) throw new Error(`use path node version ${use_version} error. please push issuse to https://github.com/1739616529/nsv/issues/new`)
-        }
-        console.log(`v${use_version}`)
-    }
-
-    async function local(version: string, option: any) {
-        let use_version = use_local_node_version(version)
-        if (!use_version) {
-            await use_remote_node_version(version)
-            use_version = use_local_node_version(version)
-            if ( use_version === void 0 ) throw new Error(`use local node version ${use_version} error. please push issuse to https://github.com/1739616529/nsv/issues/new`)
-        }
-        console.log(`v${use_version}`)
-    }
-
 }
 

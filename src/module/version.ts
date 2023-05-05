@@ -1,15 +1,34 @@
 
-import { delimiter, join } from "path";
+import { join } from "path";
 import { context } from "../context";
 import { remote_version_list } from "../lib/version"
 import { format_shell_content, set_temp_shell, format_node_path } from "../lib/env"
 import { source } from "../../config.json"
 import { remoteNodeFileExtension, tempScriptContent, tempLocalScriptContent } from "../../local.json"
 import { download } from "../lib/download"
-import { existsSync, readdirSync, remove, removeSync, renameSync, symlinkSync, emptyDirSync, linkSync } from "fs-extra"
+import { existsSync, readdirSync, removeSync, renameSync, emptyDirSync } from "fs-extra"
 import { progress } from "../lib/progress"
 import { unzip_file } from "../lib/version"
 
+export async function use(version: string) {
+    let use_version = use_path_node_version(version)
+    if (!use_version) {
+        await use_remote_node_version(version)
+        use_version = use_path_node_version(version)
+        if ( use_version === void 0 ) throw new Error(`use path node version ${use_version} error. please push issuse to https://github.com/1739616529/nsv/issues/new`)
+    }
+    console.log(`v${use_version}`)
+}
+
+export async function local(version: string) {
+    let use_version = use_local_node_version(version)
+    if (!use_version) {
+        await use_remote_node_version(version)
+        use_version = use_local_node_version(version)
+        if ( use_version === void 0 ) throw new Error(`use local node version ${use_version} error. please push issuse to https://github.com/1739616529/nsv/issues/new`)
+    }
+    console.log(`v${use_version}`)
+}
 export function test_local_node_version(version: string): [ string, boolean ] {
     if (version[0] === "v") version = version.substring(1, version.length)
     const regex = new RegExp(`^${ version }`)

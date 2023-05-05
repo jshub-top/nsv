@@ -8,7 +8,8 @@ export async function install () {
     let content = ""
     if ("NSV_HOME" in process.env) return console.log("nsv: installed")
 
-    if (system === "linux") {
+    // linux macos
+    if (system === "linux" || system === "darwin") {
         const shell_config_file_content = await readFile(shellConfigFileDir, { encoding: "utf-8" }).then(v => v.toString().split(EOL))
         shell_config_file_content.push(`export NSV_HOME=$HOME/.nsv`)
         shell_config_file_content.push(`[ -s "$NSV_HOME/nsv.sh" ] && . "$NSV_HOME/nsv.sh"`)
@@ -16,8 +17,8 @@ export async function install () {
         shell_config_file_content.push(``)
         content = `source ${shellConfigFileDir}`
         await writeFile(shellConfigFileDir, shell_config_file_content.join(EOL), { encoding: "utf-8" })
-    }
-    else if (system === "win") {
+    } else
+    if (system === "win") {
         const home = context.get("dir").home
         content = `
             $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
@@ -79,7 +80,7 @@ export async function install () {
 
 export async function uninstall () {
     let content = ""
-    if (system === "linux") {
+    if (system === "linux" || system === "darwin") {
         const shell_config_file_content = await readFile(shellConfigFileDir, { encoding: "utf-8" }).then(v => v.toString().split(EOL).filter(v => !/NSV_HOME/.test(v)))
         content = `source ${shellConfigFileDir}`
         writeFile(shellConfigFileDir, shell_config_file_content.join(EOL), { encoding: "utf-8" })

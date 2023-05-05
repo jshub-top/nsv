@@ -41,7 +41,10 @@ function set_local_env() {
 
     let shell = "powershell"
     let shellConfigFileDir = ""
-    if (system === "linux") {
+    if (system === "win") {
+        shellConfigFileDir = join(process.env.USERPROFILE, "Documents/WindowsPowerShell", "Microsoft.PowerShell_profile.ps1")
+    } else
+    if (system === "linux" || system === "darwin") {
         const shell_name = process.env.SHELL
         if (/bash/.test(shell_name)) {
             shell = "bash"
@@ -75,4 +78,18 @@ function set_local_env() {
     })
 }
 
+
+function set_user_config() {
+    const config = {
+        discern: false
+    }
+
+    writeJSONSync(join(home, "./user-config.json"), config, {
+        encoding: "utf-8"
+    })
+}
+
+
+
 set_local_env()
+set_user_config()

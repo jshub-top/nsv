@@ -4,6 +4,9 @@
     "description": "",
     "baseNode": "14.21.3",
     "minNode": "10.0.0",
+    "nsv": {
+        "version": "16"
+    },
     "scripts": {
         "serve": "node ./serve/index.js",
         "type": "tsc --declaration --outFile types.d.ts",
