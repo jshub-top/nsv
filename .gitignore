@@ -4,5 +4,5 @@ node
 dist
 *-lock.*
 *local*
-script/*.prod.js
+!script/*.prod.js
 *.d.ts
