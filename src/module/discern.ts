@@ -42,7 +42,8 @@ function discern_enable() {
     const discern_reg = /nsv discern/
     if (discern_reg.test(profile_content)) return console.log("nsv: discern enabled")
     const profile_content_list = profile_content.split(EOL)
-    profile_content_list.push("nsv discern")
+    if (system === "win") profile_content_list.push(`if (Path-Test "$PWD/package.json") { nsv discern }`)
+    else if (system === "linux" || system === "darwin") profile_content_list.push(`if [ -f "$PWD/package.json" ]; then . nsv discern; fi`)
     writeFileSync(shellConfigFileDir, profile_content_list.join(EOL), {encoding: "utf-8"})
 
 }
