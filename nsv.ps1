@@ -33,9 +33,9 @@ function use_base_node () {
     $system_bit = ""
     if ($env:PROCESSOR_ARCHITECTURE -ieq "AMD64" -or $env:PROCESSOR_ARCHITEW6432 -ieq "AMD64") {
         $system_bit = "x64"
-    } else if ($env:PROCESSOR_ARCHITECTURE -ieq "x86" -or $env:PROCESSOR_ARCHITEW6432 -ieq "x86") {
+    } elseif ($env:PROCESSOR_ARCHITECTURE -ieq "x86" -or $env:PROCESSOR_ARCHITEW6432 -ieq "x86") {
         $system_bit = "x86"
-    } else if ($env:PROCESSOR_ARCHITECTURE -ieq "ARM64" -or $env:PROCESSOR_ARCHITEW6432 -ieq "ARM64") {
+    } elseif ($env:PROCESSOR_ARCHITECTURE -ieq "ARM64" -or $env:PROCESSOR_ARCHITEW6432 -ieq "ARM64") {
         $system_bit = "arm64"
     }
 
