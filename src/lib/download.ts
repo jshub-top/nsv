@@ -1,4 +1,4 @@
-import { request, globalAgent } from "https";
+import { request, Agent } from "https";
 import { context } from "../context";
 import url from "url";
 import { createWriteStream } from "fs-extra";
@@ -14,8 +14,8 @@ export function download(uri: string, save_dir: string, cb: (r: DownloadFileCall
     const url_option = url.parse(uri)
     const proxy = context.get("proxy")
     if (proxy) {
-        url_option["agent"] = globalAgent
-        globalAgent["proxy"] = proxy
+        url_option["agent"] = Agent
+        Agent["proxy"] = proxy
     }
     return new Promise((resolve, reject) => {
         request(url_option, (res => {

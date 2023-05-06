@@ -40,7 +40,7 @@ function main_context() {
     const dir_local = join(dir_home, config.path.local)
     const context_data = {
         temp_file_name: process.env["NSV_TEMP_SCRIPT_NAME"],
-        proxy: process.env["http_proxy"] || process.env["https_proxy"] || process.env["HTTP_PROXY"] || process.env["HTTPS_PROXY"] || "",
+        proxy: process.env["https_proxy"] || process.env["HTTPS_PROXY"] || process.env["http_proxy"] || process.env["HTTP_PROXY"] || "",
         dir: {
             home: dir_home,
             cache: dir_cache,
@@ -48,6 +48,7 @@ function main_context() {
             local: dir_local,
         }
     }
+    console.log(context_data)
     return new ContextClass<Context>(context_data)
 }
 export const context = main_context()

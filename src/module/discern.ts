@@ -30,7 +30,7 @@ export function discern(opt: any) {
     let version = ""
     if (config_file_name) version = readFileSync(config_file_name, {encoding: "utf-8"}).toString().trim()
     else version = readJsonSync("package.json")?.nsv?.version || ""
-    if (!version) return
+    if (!version) return console.log("nsv: please set config file. ( .nsvrc | .nvmrc | package.json[nsv][version])")
     use(version)
 
 }
@@ -42,8 +42,8 @@ function discern_enable() {
     const discern_reg = /nsv discern/
     if (discern_reg.test(profile_content)) return console.log("nsv: discern enabled")
     const profile_content_list = profile_content.split(EOL)
-    if (system === "win") profile_content_list.push(`if (Path-Test "$PWD/package.json") { nsv discern }`)
-    else if (system === "linux" || system === "darwin") profile_content_list.push(`if [ -f "$PWD/package.json" ]; then . nsv discern; fi`)
+    if (system === "win") profile_content_list.push(`if (Path-Test "$PWD/package.json") { & nsv discern }`)
+    else if (system === "linux" || system === "darwin") profile_content_list.push(`[ -s "$PWD/package.json" ] && . nsv discern`)
     writeFileSync(shellConfigFileDir, profile_content_list.join(EOL), {encoding: "utf-8"})
 
 }

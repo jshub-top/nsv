@@ -8,7 +8,7 @@ import { remoteNodeFileExtension, tempScriptContent, tempLocalScriptContent } fr
 import { download } from "../lib/download"
 import { existsSync, readdirSync, removeSync, renameSync, emptyDirSync } from "fs-extra"
 import { progress } from "../lib/progress"
-import { unzip_file } from "../lib/version"
+import { unzip_file, get_local_node_version_list } from "../lib/version"
 
 export async function use(version: string) {
     let use_version = use_path_node_version(version)
@@ -32,8 +32,7 @@ export async function local(version: string) {
 export function test_local_node_version(version: string): [ string, boolean ] {
     if (version[0] === "v") version = version.substring(1, version.length)
     const regex = new RegExp(`^${ version }`)
-    const local_version_list = readdirSync(context.get("dir").node)
-    const local_version = Object.values(local_version_list).find(v => regex.test(v)) || ""
+    const local_version = get_local_node_version_list().find(v => regex.test(v)) || ""
     return [ local_version as string, !!local_version ]
 }
 
@@ -43,7 +42,8 @@ export function use_path_node_version(version: string): string {
     if ( !is_have ) return
     const path_list = format_node_path(local_version)
     const content = format_shell_content(tempScriptContent, {
-        content: path_list
+        content: path_list,
+        current_version: local_version,
     })
     set_temp_shell(content)
     return local_version

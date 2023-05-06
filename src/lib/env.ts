@@ -3,6 +3,7 @@ import { writeFileSync } from "fs-extra";
 import { join, sep, delimiter } from "path";
 import process from "process";
 import { system, sudoShellContent } from "../../local.json"
+import { version_regexp, get_current_node_version } from "./version"
 // declare global {
 //     interface Context {
 //         path: {
@@ -45,9 +46,7 @@ export function format_node_path(version: string) {
     const local_node_abs_dir = join(node, version)
     const path = process.env["PATH"]
     const path_list = path.split(delimiter)
-    const first_path = path_list[0]
-    const _home = home.replace(/\\/g, "\\\\")
-    if ((new RegExp(_home)).test(first_path)) path_list.shift()
+    if (get_current_node_version()) path_list.shift()
     const format_dir_fun = ditc_node_path[system] || ditc_node_path["default"]
     path_list.unshift(format_dir_fun(local_node_abs_dir))
     return path_list.join(delimiter)

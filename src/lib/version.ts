@@ -5,7 +5,7 @@ import { source, version } from "../../config.json";
 import { get } from "./http";
 import { system, arch, unzipOrder } from "../../local.json";
 import { spawn, exec, ChildProcessWithoutNullStreams } from "child_process";
-
+import { delimiter, sep } from "path";
 export interface RemoteNodeVersion {
     version: string
     files: string[]
@@ -19,8 +19,8 @@ export interface UnzipFileInfoCallback {
     type: "start"|"end"|"update"
 }
 
-
-export const version_regex = regex_vanilla_string(/\d+\.\d+\.\d+/)
+export const version_regexp = "\\d+\\.\\d+\.\\d+"
+export const version_regexp_test = regex_vanilla_string(new RegExp(version_regexp))
 
 export const remote_version_list = (remote_url: string = source.version) => {
     return memo("remote_version_list", async () => {
@@ -32,6 +32,20 @@ export const remote_version_list = (remote_url: string = source.version) => {
         })
         return ret
     })
+}
+
+export const get_local_node_version_list = () => {
+    const local_version_list = readdirSync(context.get("dir").node)
+    return local_version_list.filter(version_regexp_test)
+}
+
+export const get_current_node_version = () => {
+    const path = process.env["PATH"]
+    const first_path = path.split(delimiter)[0]
+    let current_version = ""
+    const env_current_version = process.env["NSV_CURRENT_VERSION"]
+    if (env_current_version && new RegExp(env_current_version).test(first_path)) current_version = env_current_version
+    return current_version
 }
 
 

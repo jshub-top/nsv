@@ -69,7 +69,7 @@ function nsv () {
     $temp_ps_file = "$scriptDir/cache/$NSV_TEMP_SCRIPT_NAME"
     if (Test-Path $temp_ps_file) {
         & $temp_ps_file
-        Remove-item $temp_ps_file
+        # Remove-item $temp_ps_file
     }
 }
 

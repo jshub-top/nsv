@@ -20,8 +20,14 @@ function set_local_env() {
     }
 
     const ditc_temp_script_content = {
-        "win": `$Env:Path = "{{ content }}"`,
-        "default": `export PATH="{{ content }}"`
+        "win": `
+            $Env:Path = "{{ content }}"
+            $Env:NSV_CURRENT_VERSION = "{{ current_version }}"
+        `,
+        "default": `
+            export PATH="{{ content }}"
+            export NSV_CURRENT_VERSION="{{ current_version }}"
+        `
     }
 
     const ditc_temp_local_script_content = {
@@ -32,10 +38,12 @@ function set_local_env() {
     const ditc_sudo_shell_content = {
         "win": `$isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
 
-        if (-not $isAdmin) {
-            Start-Process powershell.exe "-File $PSCommandPath" -Verb RunAs
-            Exit 0
-        }\n`,
+            if (-not $isAdmin) {
+                Start-Process powershell.exe "-File $PSCommandPath" -Verb RunAs
+                Exit 0
+            }
+            Read-Host "debug"
+        `,
         "default": "sudo",
     }
 
