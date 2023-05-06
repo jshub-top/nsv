@@ -3,18 +3,18 @@ import { writeFileSync } from "fs-extra";
 import { join, sep, delimiter } from "path";
 import process from "process";
 import { system, sudoShellContent } from "../../local.json"
-declare global {
-    interface Context {
-        path: {
-            user: string
-            system: string
-        },
-    }
-}
-context.set("path", {
-    user: process.env["NSV_USER_PATH"],
-    system: process.env["NSV_SYSTEM_PATH"],
-})
+// declare global {
+//     interface Context {
+//         path: {
+//             user: string
+//             system: string
+//         },
+//     }
+// }
+// context.set("path", {
+//     user: process.env["NSV_USER_PATH"],
+//     system: process.env["NSV_SYSTEM_PATH"],
+// })
 
 
 

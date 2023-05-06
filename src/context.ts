@@ -5,8 +5,7 @@ import * as process from "process";
 declare global {
     interface Context {
         temp_file_name: string
-        proxy: string,
-        is_admin: boolean
+        proxy: string
         dir: {
             home: string
             cache: string
@@ -39,9 +38,7 @@ function main_context() {
     const dir_cache = join(dir_home, config.path.cache)
     const dir_node = join(dir_home, config.path.node)
     const dir_local = join(dir_home, config.path.local)
-    const is_admin = process.env["isAdmin"] === "True"
     const context_data = {
-        is_admin,
         temp_file_name: process.env["NSV_TEMP_SCRIPT_NAME"],
         proxy: process.env["http_proxy"] || process.env["https_proxy"] || process.env["HTTP_PROXY"] || process.env["HTTPS_PROXY"] || "",
         dir: {

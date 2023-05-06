@@ -78,18 +78,4 @@ function set_local_env() {
     })
 }
 
-
-function set_user_config() {
-    const config = {
-        discern: false
-    }
-
-    writeJSONSync(join(home, "./user-config.json"), config, {
-        encoding: "utf-8"
-    })
-}
-
-
-
 set_local_env()
-set_user_config()

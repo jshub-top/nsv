@@ -22,8 +22,8 @@ class JSONDB<T extends Object = Object> {
     private init(): T {
         const is_exist_db = existsSync(this._path)
         if (!is_exist_db) {
-            if (!this._config.sync) return
-            const db_data = this._config.data || {}
+            let db_data = {}
+            if (this._config.sync) db_data = this._config.data
             writeJSONSync(this._path, db_data)
         }
         return readJSONSync(this._path)
