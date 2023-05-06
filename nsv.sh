@@ -23,6 +23,14 @@ fi
 
 
 function nsv() {
+    export NSV_STATUS=0
+
+    if [[ ! -d "./node_modules" ]]; then
+        export NSV_STATUS=2
+        . "./cache/node/bin/npm" install --production
+    fi
+
+
     export NSV_TEMP_SCRIPT_NAME="temp_$$.sh"
     "./cache/node/bin/node" "./dist/index.js" $@
     local temp_shell_dir="./cache/$NSV_TEMP_SCRIPT_NAME"
@@ -31,4 +39,5 @@ function nsv() {
         rm $temp_shell_dir
     fi
     unset NSV_TEMP_SCRIPT_NAME
+    unset NSV_STATUS
 }
