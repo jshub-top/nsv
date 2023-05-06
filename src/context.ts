@@ -48,7 +48,6 @@ function main_context() {
             local: dir_local,
         }
     }
-    console.log(context_data)
     return new ContextClass<Context>(context_data)
 }
 export const context = main_context()
