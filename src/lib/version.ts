@@ -93,7 +93,7 @@ export function unzip_file(file_dir: string, output_dir: string, cb: (info: Unzi
             return spawn(unzipOrder, ["x", "-bb1", `-o${output_dir}`, '-y', file_dir])
         },
         "default": () => {
-            return spawn(unzipOrder, ["-xvf", file_dir, "-C", output_dir])
+            return exec(`${unzipOrder} -xvf ${file_dir} -C ${output_dir}`)
         }
     }
 
@@ -103,6 +103,7 @@ export function unzip_file(file_dir: string, output_dir: string, cb: (info: Unzi
         let current = 0
         cb({total, current, type: "start"})
         cp.stdout.on("data", (chunk) => {
+            console.log(chunk)
             current += chunk.length * 98
             cb({ total, current, type: "update" })
         })

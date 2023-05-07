@@ -18,12 +18,16 @@ function parse_json() {
     for ((i=1; i<=key_list_len; i++))
     do
         local item=${key_list[$(($i - 1))]}
+        echo $item
         if [ $key_list_len == $i ]; then
             value=$(get_json_value "$json" "$item")
         else
             json=$(get_next_json "$json" "$item")
+            echo $json
         fi
     done
 
     echo $value
 }
+
+parse_json "$(cat tt.json)" "address" "city"

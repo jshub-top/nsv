@@ -2,8 +2,12 @@
     "name": "nsv",
     "version": "1.0.0",
     "description": "",
-    "baseNode": "14.21.3",
-    "minNode": "10.0.0",
+    "baseNode": {
+        "default": "14.21.3",
+        "darwin": {
+            "arm64": "16.20.0"
+        }
+    },
     "nsv": {
         "version": "16"
     },
