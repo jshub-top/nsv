@@ -16,7 +16,7 @@ export function use_proxy<T extends RequestOptions | url.URL>(opt: T) {
             host: _proxy.host,
         }
         if(_proxy.auth) proxy_option["auth"] = _proxy.auth
-        opt["agent"] = new Agent()
+        opt["agent"] = new Agent(proxy_option)
     }
     return opt
 }

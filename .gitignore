@@ -5,4 +5,5 @@ dist
 *-lock.*
 *local*
 *.d.ts
+!types/*.d.ts
 user*.json
