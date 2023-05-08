@@ -12,6 +12,7 @@ declare global {
             node: string
             local: string
         }
+        currentVersion: string
     }
 }
 
@@ -27,7 +28,7 @@ class ContextClass<T extends Object> {
         return get(this._cache, key)
     }
 
-    public set<K extends keyof T>(key: K | string, data: any) {
+    public set<K extends keyof T>(key: K, data: any) {
         set(this._cache, key, data)
     }
 

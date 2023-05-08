@@ -4,7 +4,7 @@ import { context } from "../context";
 import { remote_version_list } from "../lib/version"
 import { format_shell_content, set_temp_shell, format_node_path } from "../lib/env"
 import { source } from "../../config.json"
-import { remoteNodeFileExtension, tempScriptContent, tempLocalScriptContent } from "../../local.json"
+import { remoteNodeFileExtension, tempScriptContent, tempLocalScriptContent, mainNode } from "../../local.json"
 import { download } from "../lib/download"
 import { existsSync, readdirSync, removeSync, renameSync, emptyDirSync } from "fs-extra"
 import { progress } from "../lib/progress"

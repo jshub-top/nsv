@@ -3,7 +3,7 @@ import { context } from "../context";
 import { readdirSync, statSync } from "fs-extra";
 import { source, version } from "../../config.json";
 import { get } from "./http";
-import { system, arch, unzipOrder } from "../../local.json";
+import { system, arch, unzipOrder, mainNode } from "../../local.json";
 import { spawn, exec, ChildProcessWithoutNullStreams } from "child_process";
 import { delimiter, sep } from "path";
 export interface RemoteNodeVersion {
@@ -116,4 +116,20 @@ export function unzip_file(file_dir: string, output_dir: string, cb: (info: Unzi
 
     })
 
+}
+
+
+export function is_le_mine_node_version(version: string): boolean {
+    return mainNode > version
+}
+
+export function check_valid_version(version: string, cb: (...args: any[]) => any) {
+    const _version = version.replace("v", "")
+
+    const is_ok =  (new RegExp(version_regexp)).test(_version)
+    if (is_ok) throw new Error("nsv: Please enter the valid version number.")
+
+    if (is_le_mine_node_version(_version)) throw new Error("nsv: Your computer does not support the lower version")
+    context.set("currentVersion", _version)
+    cb(_version)
 }

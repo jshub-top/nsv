@@ -2,7 +2,7 @@ import { writeJSONSync, readJSONSync, ensureDir } from "fs-extra";
 import { join } from "path";
 import { system_and_arch } from "./lib/system"
 import { context } from "./context"
-import { version } from "../package.json"
+import { version, mainNode } from "../package.json"
 
 
 const [system, arch] = system_and_arch()
@@ -75,11 +75,12 @@ function set_local_env() {
         arch,
         shell,
         shellConfigFileDir,
+        mainNode: mainNode[system]?.[arch] || mainNode["default"],
         remoteNodeFileExtension: ditc_system[system] || ditc_system["default"],
         unzipOrder: ditc_unzip_order[system] || ditc_unzip_order["default"],
         sudoShellContent: ditc_sudo_shell_content[system] || ditc_sudo_shell_content["default"],
         tempScriptContent: ditc_temp_script_content[system] || ditc_temp_script_content["default"],
-        tempLocalScriptContent: ditc_temp_local_script_content[system] || ditc_temp_local_script_content["default"]
+        tempLocalScriptContent: ditc_temp_local_script_content[system] || ditc_temp_local_script_content["default"],
     }
     writeJSONSync(join(home, "./local.json"), local, {
         encoding: "utf-8"

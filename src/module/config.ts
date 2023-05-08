@@ -4,16 +4,16 @@ import { get, set } from "lodash";
 import { join } from "path";
 import { context } from "../context";
 
-export interface JSONDBConfig {
+export interface JSONDBConfig<T extends Object> {
     sync?: true
-    data?: Object
+    data?: T
 }
 
 class JSONDB<T extends Object = Object> {
     private _db: T
     private _path: string
-    private _config: JSONDBConfig = {sync: true, data: {}}
-    constructor(path: string, config?: JSONDBConfig) {
+    private _config: JSONDBConfig<T> = {sync: true, data: {} as T}
+    constructor(path: string, config?: JSONDBConfig<T>) {
         this._path = path
         this._config = {...this._config, ...config}
         this._db = this.init()
@@ -33,15 +33,15 @@ class JSONDB<T extends Object = Object> {
         writeJson(this._path, this._db)
     }
 
-    public get(dir: string) {
+    public get(dir: keyof T) {
         return get(this._db, dir)
     }
 
-    public set(dir: string, data: any) {
+    public set(dir: keyof T, data: any) {
         return set(this._db, dir, data)
     }
 
-    public setSync(dir: string, data: any) {
+    public setSync(dir: keyof T, data: any) {
         this.set(dir, data)
         this.sync()
     }
@@ -50,5 +50,6 @@ class JSONDB<T extends Object = Object> {
 export const user_db = new JSONDB(join(context.get("dir").home, "user-config.json"), {
     data: {
         discern: false,
+        logger: false,
     }
 })

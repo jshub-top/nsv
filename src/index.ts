@@ -1,4 +1,5 @@
 
+// import "./module/log"
 function run_main1() {
     const argv_len = process.argv.length
 

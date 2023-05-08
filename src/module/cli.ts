@@ -3,6 +3,7 @@ import { use, local } from "./version"
 import { discern } from "./discern"
 import { version as app_version } from "../../local.json"
 import { install, uninstall } from "./install"
+import { check_valid_version } from "../lib/version"
 export function run() {
     const program = new Command()
 
@@ -16,13 +17,13 @@ export function run() {
         .command("use")
         .description("use node version")
         .argument("<string>", "use node version. (v14, 14, v14.xx.xx, 14.xx.xx)")
-        .action(use);
+        .action((version) => check_valid_version(version, use));
 
     program
         .command("local")
         .description("lasting you select node version")
         .argument("<string>", "use node version. (v14, 14, v14.xx.xx, 14.xx.xx)")
-        .action(local);
+        .action((version) => check_valid_version(version, local));
 
     program
         .command("discern")
