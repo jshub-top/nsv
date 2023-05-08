@@ -6,6 +6,7 @@ import { get } from "./http";
 import { system, arch, unzipOrder, mainNode } from "../../local.json";
 import { spawn, exec, ChildProcessWithoutNullStreams } from "child_process";
 import { delimiter, sep } from "path";
+import { compare, validate } from "compare-versions";
 export interface RemoteNodeVersion {
     version: string
     files: string[]
@@ -18,9 +19,6 @@ export interface UnzipFileInfoCallback {
     total: number
     type: "start"|"end"|"update"
 }
-
-export const version_regexp = "\\d+\\.\\d+\.\\d+"
-export const version_regexp_test = regex_vanilla_string(new RegExp(version_regexp))
 
 export const remote_version_list = (remote_url: string = source.version) => {
     return memo("remote_version_list", async () => {
@@ -36,7 +34,7 @@ export const remote_version_list = (remote_url: string = source.version) => {
 
 export const get_local_node_version_list = () => {
     const local_version_list = readdirSync(context.get("dir").node)
-    return local_version_list.filter(version_regexp_test)
+    return local_version_list.filter(validate)
 }
 
 export const get_current_node_version = () => {
@@ -120,16 +118,16 @@ export function unzip_file(file_dir: string, output_dir: string, cb: (info: Unzi
 
 
 export function is_le_mine_node_version(version: string): boolean {
-    return mainNode > version
+    return compare(mainNode, version, "<=")
 }
 
 export function check_valid_version(version: string, cb: (...args: any[]) => any) {
     const _version = version.replace("v", "")
 
-    const is_ok =  (new RegExp(version_regexp)).test(_version)
-    if (is_ok) throw new Error("nsv: Please enter the valid version number.")
+    const is_ok = validate(_version)
+    if (!is_ok) throw new Error("nsv: Please enter the valid version number.")
 
-    if (is_le_mine_node_version(_version)) throw new Error("nsv: Your computer does not support the lower version")
+    if (!is_le_mine_node_version(_version)) throw new Error(`nsv: Your computer does not support the lower version.  low version is: ==> ${mainNode} <==`)
     context.set("currentVersion", _version)
     cb(_version)
 }

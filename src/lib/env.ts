@@ -3,7 +3,7 @@ import { writeFileSync } from "fs-extra";
 import { join, sep, delimiter } from "path";
 import process from "process";
 import { system, sudoShellContent } from "../../local.json"
-import { version_regexp, get_current_node_version } from "./version"
+import { get_current_node_version } from "./version"
 // declare global {
 //     interface Context {
 //         path: {

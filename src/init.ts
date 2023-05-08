@@ -44,7 +44,7 @@ function set_local_env() {
             }
             Read-Host "debug"
         `,
-        "default": "sudo",
+        "default": "sudo ",
     }
 
     let shell = "powershell"
