@@ -52,6 +52,7 @@ function get_node_abs() {
         return
     fi
 
+
     local cache_dir=$NSV_HOME/cache/node/node
     if [[ -f $cache_dir ]]; then
         node_abs_dir=$cache_dir
