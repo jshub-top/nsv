@@ -7,11 +7,16 @@ import { system, arch, unzipOrder, mainNode } from "../../local.json";
 import { spawn, exec, ChildProcessWithoutNullStreams } from "child_process";
 import { delimiter, sep } from "path";
 import { compare, validate } from "compare-versions";
+import { which } from "shelljs";
 export interface RemoteNodeVersion {
     version: string
     files: string[]
     lts: string | boolean
     security: boolean
+}
+
+export interface VersionCommandOption {
+    remove?: boolean
 }
 
 export interface UnzipFileInfoCallback {
@@ -20,6 +25,7 @@ export interface UnzipFileInfoCallback {
     type: "start"|"end"|"update"
 }
 
+export const version_reg = /\d+\.\d+\.\d+/
 export const remote_version_list = (remote_url: string = source.version) => {
     return memo("remote_version_list", async () => {
         const { data } = await get<RemoteNodeVersion[]>(remote_url)
@@ -41,11 +47,15 @@ export const get_current_node_version = () => {
     const path = process.env["PATH"]
     const first_path = path.split(delimiter)[0]
     let current_version = ""
-    const env_current_version = process.env["NSV_CURRENT_VERSION"]
-    if (env_current_version && new RegExp(env_current_version).test(first_path)) current_version = env_current_version
+    if (new RegExp(context.get("dir").node).test(first_path)) current_version = git_version_by_dir(first_path)
     return current_version
 }
 
+
+export function git_version_by_dir(dir: string) {
+    const dir_arr = dir.split(sep)
+    return dir_arr.find(v => version_reg.test(v))
+}
 
 export class NodeVersion {
     private _vs: RemoteNodeVersion
@@ -121,12 +131,28 @@ export function is_le_mine_node_version(version: string): boolean {
 }
 
 export function check_valid_version(version: string, cb: (...args: any[]) => any) {
-    const _version = version.replace("v", "")
+    console.log(version)
 
-    const is_ok = validate(_version)
-    if (!is_ok) throw new Error("nsv: Please enter the valid version number.")
+}
+export function vaild_version(version: string, option: VersionCommandOption, version_cb: (...args: any) => void, option_cb: (...args: any[]) => void) {
 
-    if (!is_le_mine_node_version(_version)) throw new Error(`nsv: Your computer does not support the lower version.  low version is: ==> ${mainNode} <==`)
-    context.set("currentVersion", _version)
-    cb(_version)
+    // remove
+    if (option.remove) {
+        option_cb(version, option)
+
+
+    } else
+    {
+        const _version = version.replace("v", "")
+
+        const is_ok = validate(_version)
+        if (!is_ok) throw new Error("nsv: Please enter the valid version number.")
+
+        if (!is_le_mine_node_version(_version)) throw new Error(`nsv: Your computer does not support the lower version.  low version is: ==> ${mainNode} <==`)
+        context.set("currentVersion", _version)
+        version_cb(_version)
+    }
+
+
+
 }
