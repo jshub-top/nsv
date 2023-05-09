@@ -51,7 +51,7 @@ function discern_disable() {
     user_db.setSync("discern", false)
     ensureFileSync(shellConfigFileDir)
     const profile_content = readFileSync(shellConfigFileDir, {encoding: "utf-8"})
-    const discern_reg = /nsv discern|NSV_HOME/
+    const discern_reg = /nsv discern/
     if (!discern_reg.test(profile_content)) return console.log("nsv: discern disabled")
     const profile_content_list = profile_content.split(EOL).filter(v => !discern_reg.test(v))
     writeFileSync(shellConfigFileDir, profile_content_list.join(EOL), {encoding: "utf-8"})

@@ -1,14 +1,18 @@
 
-import { join, resolve } from "path";
+import { join, dirname } from "path";
 import { EOL } from "os";
 import { system, shell, shellConfigFileDir } from "../../local.json"
-import { copyFile, ensureFileSync, readFile, writeFile, constants } from "fs-extra";
+import { copyFile, ensureFileSync, readFileSync, writeFile, constants } from "fs-extra";
 import { context } from "../context"
-export async function install () {
+import { rm } from "shelljs";
+
+const test_reg = /NSV_HOME|nsv discern/
+export function install () {
     let content = ""
-    if ("NSV_HOME" in process.env) return console.log("nsv: installed")
+    const shellConfigFileStr = readFileSync(shellConfigFileDir, {encoding: "utf-8"})
+    if (test_reg.test(shellConfigFileStr)) return console.log("nsv: installed")
     ensureFileSync(shellConfigFileDir)
-    const shell_config_file_content = await readFile(shellConfigFileDir, { encoding: "utf-8" }).then(v => v.toString().split(EOL))
+    const shell_config_file_content = shellConfigFileStr.split(EOL)
     // linux macos
     if (system === "linux" || system === "darwin") {
 
@@ -35,8 +39,11 @@ export async function install () {
     content && writeFile(join(context.get("dir").cache, context.get("temp_file_name")), content)
 }
 
-export async function uninstall () {
+export function uninstall () {
     ensureFileSync(shellConfigFileDir)
-    let shell_config_file_content = await readFile(shellConfigFileDir, { encoding: "utf-8" }).then(v => v.toString().split(EOL).filter(v => !/NSV_HOME/.test(v)))
+    let shell_config_file_content = readFileSync(shellConfigFileDir, { encoding: "utf-8" }).toString().split(EOL).filter(v => !test_reg.test(v))
     writeFile(shellConfigFileDir, shell_config_file_content.join(EOL), { encoding: "utf-8" })
+    if(shell === "fish") {
+        rm(join(dirname(shellConfigFileDir), "functions", "nsv.fish"))
+    }
 }

@@ -41,7 +41,7 @@ function nsv() {
     if [[ -f $temp_shell_dir ]]; then
         . $temp_shell_dir
         rm $temp_shell_dir
-    file
+    fi
     
     unset NSV_STATUS
 }
