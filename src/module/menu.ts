@@ -1,6 +1,5 @@
 
 import inquirer from "inquirer";
-import console_menu from "console-menu";
 import { readdirSync} from "fs-extra";
 import { context } from "../context"
 import { get_current_node_version, get_local_node_version_list } from "../lib/version";

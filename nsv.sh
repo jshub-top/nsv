@@ -20,8 +20,8 @@ if [[ ! -d "./cache/node" ]]; then
     save_file_dir="$dir/cache/$node_file_name"
     curl "$base_node_download_uri" -# -O
     chmod 755 "$dir/$node_file_name"
-    mv "$dir$node_file_name"  "$dir/$save_file_dir"
-    tar -xf "$dir/$save_file_dir" -C "$dir/cache"
+    mv "$node_file_name"  "$save_file_dir"
+    tar -xf "$save_file_dir" -C "$dir/cache"
     mv "$dir/cache/$base_node_name"  "$dir/cache/node"
 fi
 
@@ -36,13 +36,12 @@ function nsv() {
     fi
 
 
-    export NSV_TEMP_SCRIPT_NAME="temp_$$.sh"
     "$dir/cache/node/bin/node" "$dir/dist/index.js" $@
-    local temp_shell_dir="$dir/cache/$NSV_TEMP_SCRIPT_NAME"
+    local temp_shell_dir="$dir/cache/nsv_temp_one_off_file.sh"
     if [[ -f $temp_shell_dir ]]; then
         . $temp_shell_dir
         rm $temp_shell_dir
-    fi
-    unset NSV_TEMP_SCRIPT_NAME
+    file
+    
     unset NSV_STATUS
 }

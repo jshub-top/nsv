@@ -61,12 +61,9 @@ function check_node_modules () {
 }
 
 function nsv () {
-    $NSV_TEMP_SCRIPT_NAME = "temp_$Pid.ps1"
-    $Env:NSV_TEMP_SCRIPT_NAME = $NSV_TEMP_SCRIPT_NAME
     . "$scriptDir/cache/node/node.exe" "$scriptDir/dist/index.js" $argv
-    $Env:NSV_TEMP_SCRIPT_NAME = ""
 
-    $temp_ps_file = "$scriptDir/cache/$NSV_TEMP_SCRIPT_NAME"
+    $temp_ps_file = "$scriptDir/cache/nsv_temp_one_off_file.ps1"
     if (Test-Path $temp_ps_file) {
         & $temp_ps_file
         # Remove-item $temp_ps_file

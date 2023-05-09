@@ -9,6 +9,7 @@ import { download } from "../lib/download"
 import { existsSync, readdirSync, removeSync, renameSync, emptyDirSync } from "fs-extra"
 import { progress } from "../lib/progress"
 import { unzip_file, get_local_node_version_list } from "../lib/version"
+import { mv } from "shelljs"
 
 export async function use(version: string) {
     let use_version = use_path_node_version(version)
@@ -86,6 +87,6 @@ export async function use_remote_node_version(version: string) {
             console.log(err)
         })
     }
-    renameSync(join(node, active_node.remoteFileName), node_abs_dir)
+    mv(join(node, active_node.remoteFileName), active_node.version)
 }
 

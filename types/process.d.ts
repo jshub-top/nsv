@@ -5,6 +5,7 @@ declare namespace NodeJS {
         NSV_TEMP_SCRIPT_NAME: string
         NSV_CURRENT_VERSION?: string
 
+        HOME: string
         PATH: string
         http_proxy: string
         https_proxy: string

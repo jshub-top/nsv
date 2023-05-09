@@ -11,3 +11,4 @@ function run_main1() {
     // 否则调用 交互命令
 }
 run_main1()
+console.log(process.env)

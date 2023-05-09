@@ -2,6 +2,7 @@ import config from "../config.json";
 import { join } from "path";
 import { get, set } from "lodash";
 import * as process from "process";
+import { shellTempOneOffFile } from "../local.json"
 declare global {
     interface Context {
         temp_file_name: string
@@ -40,7 +41,7 @@ function main_context() {
     const dir_node = join(dir_home, config.path.node)
     const dir_local = join(dir_home, config.path.local)
     const context_data = {
-        temp_file_name: process.env["NSV_TEMP_SCRIPT_NAME"],
+        temp_file_name: shellTempOneOffFile,
         proxy: process.env["https_proxy"] || process.env["HTTPS_PROXY"] || process.env["http_proxy"] || process.env["HTTP_PROXY"] || "",
         dir: {
             home: dir_home,

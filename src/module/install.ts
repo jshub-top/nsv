@@ -2,7 +2,7 @@
 import { join, resolve } from "path";
 import { EOL } from "os";
 import { system, shell, shellConfigFileDir } from "../../local.json"
-import { ensureFileSync, readFile, writeFile } from "fs-extra";
+import { copyFile, ensureFileSync, readFile, writeFile, constants } from "fs-extra";
 import { context } from "../context"
 export async function install () {
     let content = ""
@@ -11,11 +11,18 @@ export async function install () {
     const shell_config_file_content = await readFile(shellConfigFileDir, { encoding: "utf-8" }).then(v => v.toString().split(EOL))
     // linux macos
     if (system === "linux" || system === "darwin") {
-        shell_config_file_content.push(`export NSV_HOME=$HOME/.nsv`)
-        shell_config_file_content.push(`[ -s "$NSV_HOME/nsv.sh" ] && . "$NSV_HOME/nsv.sh"`)
-        shell_config_file_content.push(`export PATH=$NSV_HOME/local/node/bin:$PATH`)
-        shell_config_file_content.push(``)
-        content = `source ${shellConfigFileDir}`
+
+        // fish
+        if (shell === "fish") {
+            shell_config_file_content.push(`set NSV_HOME $HOME/.nsv`)
+            shell_config_file_content.push(`set PATH $NSV_HOME/local/node/bin $PATH`)
+            copyFile(join(__dirname, "../../nsv.fish"), join(process.env["HOME"], ".config/fish/functions/nsv.fish"))
+        } else {
+            shell_config_file_content.push(`export NSV_HOME=$HOME/.nsv`)
+            shell_config_file_content.push(`[ -s "$NSV_HOME/nsv.sh" ] && . "$NSV_HOME/nsv.sh"`)
+            shell_config_file_content.push(`export PATH=$NSV_HOME/local/node/bin:$PATH`)
+        }
+        
     } else
     if (system === "win") {
         const home = context.get("dir").home
