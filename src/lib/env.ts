@@ -30,7 +30,12 @@ export function set_temp_shell(content: string, sudo = false): boolean {
     }
 }
 
-export function format_shell_content(content: string, obj: Object) : string {
+export function get_path_to_array() {
+    const path = process.env["PATH"]
+    return path.split(delimiter)
+}
+
+export function format_shell_content(content: string, obj: {[key: string]: string}) : string {
     for (const key in obj) {
         content = content.replace(`{{ ${key} }}`, obj[key])
     }
@@ -44,8 +49,7 @@ export function format_node_path(version: string) {
     }
     const { home, node } = context.get("dir")
     const local_node_abs_dir = join(node, version)
-    const path = process.env["PATH"]
-    const path_list = path.split(delimiter)
+    const path_list = get_path_to_array()
     if (get_current_node_version()) path_list.shift()
     const format_dir_fun = ditc_node_path[system] || ditc_node_path["default"]
     path_list.unshift(format_dir_fun(local_node_abs_dir))

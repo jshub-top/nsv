@@ -1,15 +1,15 @@
 
-import { join } from "path";
+import { delimiter, join } from "path";
 import { context } from "../context";
-import { remote_version_list } from "../lib/version"
-import { format_shell_content, set_temp_shell, format_node_path } from "../lib/env"
+import { get_current_node_version, remote_version_list } from "../lib/version"
+import { format_shell_content, set_temp_shell, format_node_path, get_path_to_array } from "../lib/env"
 import { source } from "../../config.json"
 import { remoteNodeFileExtension, tempScriptContent, tempLocalScriptContent, mainNode } from "../../local.json"
 import { download } from "../lib/download"
 import { existsSync, readdirSync, removeSync, renameSync, emptyDirSync } from "fs-extra"
 import { progress } from "../lib/progress"
 import { unzip_file, get_local_node_version_list } from "../lib/version"
-import { mv } from "shelljs"
+import { mv, rm } from "shelljs"
 
 
 
@@ -23,6 +23,18 @@ export async function use(version: string) {
     console.log(`v${use_version}`)
 }
 
+export function unuse() {
+    const path_list = get_path_to_array()
+    const is_have_current_node = get_current_node_version()
+    if (!is_have_current_node) return console.log("nsv: no use any node version")
+    path_list.shift()
+    const content = format_shell_content(tempScriptContent, {
+        content: path_list.join(delimiter),
+        current_version: "",
+    })
+    set_temp_shell(content)
+}
+
 export async function local(version: string) {
     let use_version = use_local_node_version(version)
     if (!use_version) {
@@ -32,6 +44,12 @@ export async function local(version: string) {
     }
     console.log(`v${use_version}`)
 }
+
+export function unlocal() {
+    rm("-rf", `${context.get("dir").local}/*`)
+}
+
+
 export function test_local_node_version(version: string): [ string, boolean ] {
     if (version[0] === "v") version = version.substring(1, version.length)
     const regex = new RegExp(`^${ version }`)
