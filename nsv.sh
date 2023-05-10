@@ -4,7 +4,7 @@ dir=$(dirname $(readlink -f "$0"))
 
 
 
-if [[ ! -d "./cache/node" ]]; then
+if [[ ! -d "$dir/cache/node" ]]; then
     source "$dir/tools/json/json.sh"
     mkdir -p cache
     mkdir -p node
@@ -12,7 +12,7 @@ if [[ ! -d "./cache/node" ]]; then
     base_download_uri=$(parse_json "$(cat $dir/config.json)" "source" "download" )
     base_node_version=$(parse_json "$(cat $dir/package.json)" "baseNode" $OS $arch )
     if [ -z $base_node_version ]; then
-        base_node_version=$(parse_json "$(cat ./package.json)" "baseNode" "default")
+        base_node_version=$(parse_json "$(cat $dir/package.json)" "baseNode" "default")
     fi
     base_node_name="node-v${base_node_version}-${OS}-${arch}"
     node_file_name="$base_node_name.tar.gz"

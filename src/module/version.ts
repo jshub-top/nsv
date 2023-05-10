@@ -103,6 +103,7 @@ export async function use_remote_node_version(version: string) {
 
     const node_abs_dir = join(node, active_node.version)
     if (!existsSync(node_abs_dir)) {
+        // rm("-rf", join(node, active_node.remoteFileName))
         await unzip_file(save_dir, context.get("dir").node, progress("Extracting".padEnd(12, " "))).catch(err => {
             console.log(err)
         })

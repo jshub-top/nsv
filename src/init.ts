@@ -63,7 +63,7 @@ function set_local_env() {
     let shellConfigFileDir = ""
     let shellTempOneOffFile = "nsv_temp_one_off_file"
     if (system === "win") {
-        shellConfigFileDir = join(process.env.USERPROFILE, "Documents/WindowsPowerShell", "Microsoft.PowerShell_profile.ps1")
+        shellConfigFileDir = join(process.env.USERPROFILE, "Documents", "WindowsPowerShell", "Microsoft.PowerShell_profile.ps1")
         shellTempOneOffFile += ".ps1"
     } else
     if (system === "linux" || system === "darwin") {
@@ -80,7 +80,7 @@ function set_local_env() {
         } else
         if (/fish/.test(shell_name)) {
             shell = "fish"
-            shellConfigFileDir = ".config/fish/config.fish"
+            shellConfigFileDir = ".config/fish/functions/nsv.fish"
             shellTempOneOffFile += ".fish"
         }
         shellConfigFileDir = `${process.env.HOME}/${shellConfigFileDir}`

@@ -1,4 +1,4 @@
 #!/bin/sh
-
-source "./nsv.sh"
+dir=$(dirname $(readlink -f "$0"))
+source "$dir/nsv.sh"
 nsv $@
