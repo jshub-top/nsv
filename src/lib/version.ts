@@ -1,12 +1,19 @@
 import { memo, regex_vanilla_string } from "../util";
-import { context } from "../context";
+import { RunStatus, context } from "../context";
 import { readdirSync, statSync } from "fs-extra";
 import { source, version } from "../../config.json";
 import { get } from "./http";
 import { system, arch, unzipOrder, mainNode } from "../../local.json";
-import { spawn, exec, ChildProcessWithoutNullStreams } from "child_process";
+import { spawn, exec, ChildProcessWithoutNullStreams, ChildProcess  } from "child_process";
 import { delimiter, sep } from "path";
 import { compare, validate } from "compare-versions";
+
+declare global {
+    interface Context {
+        extract_process: ChildProcess|null
+        extract_dir: string
+    }
+}
 export interface RemoteNodeVersion {
     version: string
     files: string[]
@@ -94,7 +101,6 @@ export function unzip_file(file_dir: string, output_dir: string, cb: (info: Unzi
             return exec(`${unzipOrder} -xvf ${file_dir} -C ${output_dir}`)
         }
     }
-
     return new Promise((resolve, reject) => {
         const total = statSync(file_dir).size
         const cp: ChildProcessWithoutNullStreams = ditc_unzip[system]?.() || ditc_unzip["default"]()
@@ -106,13 +112,16 @@ export function unzip_file(file_dir: string, output_dir: string, cb: (info: Unzi
         })
 
         cp.stdout.on("close", () => {
+            context.set("runStatus", RunStatus.normal)
             cb({ total, current, type: "end" })
             resolve({ total, current: total, type: "end" })
         })
         cp.stdout.on("error", reject)
-
+        
+        context.set("runStatus", RunStatus.extract)
+        context.set("extract_dir", output_dir)
+        context.set("extract_process", cp)
     })
-
 }
 
 

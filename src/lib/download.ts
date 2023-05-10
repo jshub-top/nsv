@@ -1,7 +1,16 @@
 import { request, Agent } from "https";
-import { context } from "../context";
+import { ClientRequest } from "http"
+import { RunStatus, context } from "../context";
 import url from "url";
 import { createWriteStream } from "fs-extra";
+
+declare global {
+    interface Context {
+        download_request: ClientRequest|null
+        download_temp_dir: string
+    }
+}
+
 
 export interface DownloadFileCallback {
     total: number
@@ -10,7 +19,7 @@ export interface DownloadFileCallback {
     type: "start"|"update"|"end"
 }
 
-export function download(uri: string, save_dir: string, cb: (r: DownloadFileCallback) => void = () => {}): Promise<Error | void> {
+export function download(uri: string, save_dir: string, cb: (r: DownloadFileCallback) => void = () => {}): Promise<void> {
     const url_option = url.parse(uri)
     const proxy = context.get("proxy")
     if (proxy) {
@@ -18,7 +27,8 @@ export function download(uri: string, save_dir: string, cb: (r: DownloadFileCall
         Agent["proxy"] = proxy
     }
     return new Promise((resolve, reject) => {
-        request(url_option, (res => {
+
+        const req = request(url_option, (res => {
             const file_total = +res.headers["content-length"]
             let current = 0
             cb({total: file_total, current, size: 0, type: "start"})
@@ -32,6 +42,8 @@ export function download(uri: string, save_dir: string, cb: (r: DownloadFileCall
                 })
             })
             res.on("close", () => {
+                context.set("runStatus", RunStatus.normal)
+                context.set("download_request", null)
                 cb({
                     total: file_total,
                     size: 0,
@@ -44,7 +56,11 @@ export function download(uri: string, save_dir: string, cb: (r: DownloadFileCall
             const file_write_stream = createWriteStream(save_dir)
             file_write_stream.on("error", reject)
             res.pipe(file_write_stream)
-        })).end()
-    })
+        }))
+        req.end()
+        context.set("runStatus", RunStatus.download)
+        context.set("download_temp_dir", save_dir)
+        context.set("download_request", req)
 
+    })
 }

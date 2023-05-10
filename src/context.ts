@@ -3,6 +3,7 @@ import { join } from "path";
 import { get, set } from "lodash";
 import * as process from "process";
 import { shellTempOneOffFile } from "../local.json"
+
 declare global {
     interface Context {
         temp_file_name: string
@@ -14,7 +15,14 @@ declare global {
             local: string
         }
         currentVersion: string
+        runStatus: RunStatus
     }
+}
+
+export enum RunStatus {
+    normal = 0,
+    download = 1,
+    extract = 2,
 }
 
 class ContextClass<T extends Object> {
@@ -43,6 +51,7 @@ function main_context() {
     const context_data = {
         temp_file_name: shellTempOneOffFile,
         proxy: process.env["https_proxy"] || process.env["HTTPS_PROXY"] || process.env["http_proxy"] || process.env["HTTP_PROXY"] || "",
+        runStatus: RunStatus.normal,
         dir: {
             home: dir_home,
             cache: dir_cache,

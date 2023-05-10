@@ -1,3 +1,4 @@
+import { sleep } from "./util"
 
 // import "./module/log"
 function run_main1() {
