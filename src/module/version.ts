@@ -108,6 +108,6 @@ export async function use_remote_node_version(version: string) {
             console.log(err)
         })
     }
-    mv(join(node, active_node.remoteFileName), active_node.version)
+    mv(join(node, active_node.remoteFileName), join(node, active_node.version))
 }
 
