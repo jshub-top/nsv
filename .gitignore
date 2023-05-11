@@ -7,3 +7,4 @@ dist
 *.d.ts
 !types/*.d.ts
 user*.json
+prefix

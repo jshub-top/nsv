@@ -1,8 +1,9 @@
-import { writeJSONSync, readJSONSync, ensureDir } from "fs-extra";
-import { join } from "path";
+import { writeJSONSync, readJSONSync, ensureDir, ensureFileSync, existsSync, readFileSync } from "fs-extra";
+import { join, sep } from "path";
 import { system_and_arch } from "./util/system"
 import { version, mainNode } from "../package.json"
 import { execSync } from "child_process"
+import { EOL } from "os";
 
 const [system, arch] = system_and_arch()
 const home = join(__dirname, "../")
@@ -84,12 +85,20 @@ function set_local_env() {
         shellConfigFileDir = `${process.env.HOME}/${shellConfigFileDir}`
     }
 
+    let prefix = ""
+    const npmrc_file_dir = join(process.env["HOME"], ".npmrc")
+    if (existsSync(npmrc_file_dir)) {
+        const npmrc_content = readFileSync(npmrc_file_dir, {encoding: "utf-8"})
+        if (/prefix/.test(npmrc_content)) prefix = npmrc_content.split(EOL).find(v => /prefix/.test(v)).split("=")[1]
+    }
+
 
 
     const local = {
         version,
         system,
         arch,
+        prefix,
         shell,
         shellConfigFileDir,
         shellTempOneOffFile,
