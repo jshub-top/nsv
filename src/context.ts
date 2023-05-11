@@ -2,18 +2,27 @@ import config from "../config.json";
 import { join } from "path";
 import { get, set } from "lodash";
 import * as process from "process";
+import { shellTempOneOffFile } from "../local.json"
+
 declare global {
     interface Context {
         temp_file_name: string
-        proxy: string,
-        is_admin: boolean
+        proxy: string
         dir: {
             home: string
             cache: string
             node: string
             local: string
         }
+        currentVersion: string
+        runStatus: RunStatus
     }
+}
+
+export enum RunStatus {
+    normal = 0,
+    download = 1,
+    extract = 2,
 }
 
 class ContextClass<T extends Object> {
@@ -28,7 +37,7 @@ class ContextClass<T extends Object> {
         return get(this._cache, key)
     }
 
-    public set<K extends keyof T>(key: K | string, data: any) {
+    public set<K extends keyof T>(key: K, data: any) {
         set(this._cache, key, data)
     }
 
@@ -39,11 +48,10 @@ function main_context() {
     const dir_cache = join(dir_home, config.path.cache)
     const dir_node = join(dir_home, config.path.node)
     const dir_local = join(dir_home, config.path.local)
-    const is_admin = process.env["isAdmin"] === "True"
     const context_data = {
-        is_admin,
-        temp_file_name: process.env["NSV_TEMP_SCRIPT_NAME"],
-        proxy: process.env["http_proxy"] || process.env["https_proxy"] || process.env["HTTP_PROXY"] || process.env["HTTPS_PROXY"] || "",
+        temp_file_name: shellTempOneOffFile,
+        proxy: process.env["https_proxy"] || process.env["HTTPS_PROXY"] || process.env["http_proxy"] || process.env["HTTP_PROXY"] || "",
+        runStatus: RunStatus.normal,
         dir: {
             home: dir_home,
             cache: dir_cache,

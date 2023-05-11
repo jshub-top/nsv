@@ -4,4 +4,6 @@ node
 dist
 *-lock.*
 *local*
-script/*.prod.js
+*.d.ts
+!types/*.d.ts
+user*.json

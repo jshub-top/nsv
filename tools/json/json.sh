@@ -1,57 +1,29 @@
-function getJsonValuesByAwk() {
-    awk -v json="$1" -v key="$2" -v defaultValue="$3" 'BEGIN{
-        foundKeyCount = 0
-        while (length(json) > 0) {
-            # pos = index(json, "\""key"\""); ## 这行更快一些，但是如果有value是字符串，且刚好与要查找的key相同，会被误认为是key而导致值获取错误
-            pos = match(json, "\""key"\"[ \\t]*?:[ \\t]*");
-            if (pos == 0) {if (foundKeyCount == 0) {print defaultValue;} exit 0;}
+function get_json_value {
+    temp=$(echo "$1" | grep -o "\"$2\": \"[^\"]*\"" | sed "s/\"$2\": \"\(.*\)\"/\1/")
+    echo $temp
+}
 
-            ++foundKeyCount;
-            start = 0; stop = 0; layer = 0;
-            for (i = pos + length(key) + 1; i <= length(json); ++i) {
-                lastChar = substr(json, i - 1, 1)
-                currChar = substr(json, i, 1)
-
-                if (start <= 0) {
-                    if (lastChar == ":") {
-                        start = currChar == " " ? i + 1: i;
-                        if (currChar == "{" || currChar == "[") {
-                            layer = 1;
-                        }
-                    }
-                } else {
-                    if (currChar == "{" || currChar == "[") {
-                        ++layer;
-                    }
-                    if (currChar == "}" || currChar == "]") {
-                        --layer;
-                    }
-                    if ((currChar == "," || currChar == "}" || currChar == "]") && layer <= 0) {
-                        stop = currChar == "," ? i : i + 1 + layer;
-                        break;
-                    }
-                }
-            }
-
-            if (start <= 0 || stop <= 0 || start > length(json) || stop > length(json) || start >= stop) {
-                if (foundKeyCount == 0) {print defaultValue;} exit 0;
-            } else {
-                print substr(json, start, stop - start);
-            }
-
-            json = substr(json, stop + 1, length(json) - stop)
-        }
-    }'
+function get_next_json() {
+    value=$(echo "$1" | grep -o "\"$2\": {[^}]*}" | sed "s/\"$2\": //")
+    echo $value
 }
 
 
-function params_json() {
-    local str=$1
-    local key_list=("${@:2}")
-    local value=""
 
-    for el in "${key_list[@]}"; do
-        str=$(getJsonValuesByAwk "$str" "$el" "")
+function parse_json() {
+    local json=$(echo "$1" | tr -d '\n')
+    local key_list=("${@:2}")
+    local key_list_len=${#key_list[@]}
+    local value=""
+    for ((i=1; i<=key_list_len; i++))
+    do
+        local item=${key_list[$(($i - 1))]}
+        if [ $key_list_len == $i ]; then
+            value=$(get_json_value "$json" "$item")
+        else
+            json=$(get_next_json "$json" "$item")
+        fi
     done
-    echo $str
+
+    echo $value
 }

@@ -2,26 +2,35 @@
     "name": "nsv",
     "version": "1.0.0",
     "description": "",
-    "baseNode": "14.19.3",
-    "minNode": "10.0.0",
+    "baseNode": {
+        "default": "14.21.3",
+        "darwin": {
+            "arm64": "16.20.0"
+        }
+    },
+    "mainNode": {
+        "default": "10.0.0",
+        "darwin": {
+            "arm64": "16.0.0"
+        }
+    },
+    "nsv": {
+        "version": "16"
+    },
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
         "serve": "node ./serve/index.js",
+        "type": "tsc --declaration --outFile types.d.ts",
         "build": "swc src -d dist",
         "dev": "swc src -d dist --watch",
         "init": "node ./dist/init.js",
-        "postinstall": "npm run init"
+        "postinstall": "node ./script/postinstall.prod.js"
     },
     "keywords": [
-        "node",
-        "version",
         "nvs",
         "nsv",
         "nvm",
         "n",
-        "fnm",
-        "cli",
-        "lcv"
+        "fnm"
     ],
     "author": "",
     "license": "MIT",
@@ -30,21 +39,22 @@
         "@swc/core": "^1.3.50",
         "@types/cli-progress": "^3.11.0",
         "@types/fs-extra": "^11.0.1",
+        "@types/inquirer": "^9.0.3",
         "@types/lodash": "^4.14.192",
         "@types/node": "^18.15.11",
         "@types/shelljs": "^0.8.11",
         "chokidar": "^3.5.3",
-        "consola": "^2.15.3",
         "express": "^4.18.2",
-        "ts-watch": "^1.0.8",
         "typescript": "^5.0.4"
     },
     "dependencies": {
         "cli-progress": "^3.12.0",
         "commander": "^10.0.0",
+        "compare-versions": "6.0.0-rc.1",
         "enquirer": "^2.3.6",
         "fs-extra": "^11.1.1",
         "inquirer": "^9.1.5",
+        "listr2": "^6.4.2",
         "lodash": "^4.17.21",
         "shelljs": "^0.8.5"
     },
@@ -53,10 +63,11 @@
     },
     "files": [
         "dist",
-        "nsv.*",
+        "nsv*",
         "tools",
         "LICENSE",
         "script/*.prod.js",
-        "*.json"
+        "*.json",
+        "*.d.ts"
     ]
 }
