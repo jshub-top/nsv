@@ -6,6 +6,7 @@ $scriptDir = $PSScriptRoot
 $Env:NSV_STATUS = 0
 function download_file($url, $out_put) {
     $proxySettings = Get-ItemProperty -Path "Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyServer -ErrorAction SilentlyContinue
+    write-Output "nsv: use proxy with--> $($proxySettings.ProxyServer)"
     if($proxySettings.ProxyServer) {
         $proxy_serve = "http://$($proxySettings.ProxyServer)"
         Invoke-WebRequest $url -OutFile $out_put -Proxy $proxy_serve
@@ -19,13 +20,20 @@ function nsv_root_dir($dir) {
 }
 
 function unzip_file_by_7z($zip_dir, $out_put) {
-    . "$scriptDir/tools/7-Zip/7zr.exe" x "-o$zip_dir" -y $out_put
+    . "$scriptDir\tools\7-Zip\7zr.exe" x "-o$zip_dir" -y $out_put
 }
 
 function use_base_node () {
 
-    if (Test-Path "$scriptDir/cache/node") {
+    if (Test-Path "$scriptDir\cache\node") {
         return
+    }
+
+    if (!(Test-Path "$scriptDir\node")) {
+        New-Item -Path "$scriptDir\node" -ItemType Directory
+    }
+    if (!(Test-Path "$scriptDir\cache")) {
+        New-Item -Path "$scriptDir\cache" -ItemType Directory
     }
 
     $Env:NSV_STATUS = 1
@@ -39,15 +47,18 @@ function use_base_node () {
         $system_bit = "arm64"
     }
 
-    $package = Get-Content -Path "$scriptDir/package.json" | ConvertFrom-Json
-    $config = Get-Content -Path "$scriptDir/config.json" | ConvertFrom-Json
-    $base_node_file_name = "node-v$($package.baseNode)-win-$system_bit"
+    $package = Get-Content -Path "$scriptDir\package.json" | ConvertFrom-Json
+    $config = Get-Content -Path "$scriptDir\config.json" | ConvertFrom-Json
+    $base_node_version = $package.baseNode.win."$system_bit"
+    if (! $base_node_version) {$base_node_version  = $package.baseNode.default}
+    Write-Output $base_node_version
+    $base_node_file_name = "node-v$base_node_version-win-$system_bit"
     $base_node_file_name_suffix = "$base_node_file_name.7z"
-    $base_node_download_url = "$($config.source.download)/v$($package.baseNode)/$base_node_file_name_suffix"
-    $base_node_file_abs_dir = "$($config.path.cache)/$base_node_file_name_suffix"
+    $base_node_download_url = "$($config.source.download)\v$base_node_version\$base_node_file_name_suffix"
+    $base_node_file_abs_dir = "$($config.path.cache)\$base_node_file_name_suffix"
     download_file $base_node_download_url $base_node_file_abs_dir
-    unzip_file_by_7z cache "$scriptDir/cache/$base_node_file_name_suffix"
-    Rename-Item "$scriptDir/cache/$base_node_file_name" "node"
+    unzip_file_by_7z cache "$scriptDir\cache\$base_node_file_name_suffix"
+    Rename-Item "$scriptDir\cache\$base_node_file_name" "node"
 
 }
 
