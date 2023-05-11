@@ -80,7 +80,7 @@ function set_local_env() {
         } else
         if (/fish/.test(shell_name)) {
             shell = "fish"
-            shellConfigFileDir = ".config/fish/functions/nsv.fish"
+            shellConfigFileDir = ".config/fish/config.fish"
             shellTempOneOffFile += ".fish"
         }
         shellConfigFileDir = `${process.env.HOME}/${shellConfigFileDir}`

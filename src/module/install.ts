@@ -23,7 +23,9 @@ export function install () {
 
         // fish
         if (shell === "fish") {
-            writeFile(shellConfigFileDir, readFileSync(join(home, "nsv.fish")))
+            shell_config_file_content.push("set NSV_HOME $HOME/.nsv")
+            shell_config_file_content.push("set PATH $NSV_HOME/local/node/bin $PATH")
+            copyFile(join(home, "nsv.fish"), join(dirname(shellConfigFileDir), "functions", "nsv.fish"))
         } else {
             // bash zsh
             shell_config_file_content.push(`export NSV_HOME=$HOME/.nsv`)
@@ -44,17 +46,14 @@ export function install () {
 
 export function uninstall () {
 
+    ensureFileSync(shellConfigFileDir)
+    let shell_config_file_content = readFileSync(shellConfigFileDir, { encoding: "utf-8" }).toString().split(EOL).filter(v => !test_reg.test(v))
+    writeFile(shellConfigFileDir, shell_config_file_content.join(EOL), { encoding: "utf-8" })
 
     /**
      * 如果用的是fish  需要删除 fish functions 中的环境变量
      */
     if(shell === "fish") {
-        rm(shellConfigFileDir)
-    } else
-    {
-        ensureFileSync(shellConfigFileDir)
-        let shell_config_file_content = readFileSync(shellConfigFileDir, { encoding: "utf-8" }).toString().split(EOL).filter(v => !test_reg.test(v))
-        writeFile(shellConfigFileDir, shell_config_file_content.join(EOL), { encoding: "utf-8" })
-
-    }
+        rm(join(dirname(shellConfigFileDir), "functions", "nsv.fish"))
+    } 
 }
