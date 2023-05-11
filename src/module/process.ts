@@ -1,6 +1,7 @@
 import { context, RunStatus } from "../context"
 import { rm } from "shelljs"
-process.on("beforeExit", async () => {
+
+async function chean_nsv_local_file() {
     const status = context.get("runStatus")
 
     if (status !== RunStatus.normal) {
@@ -21,9 +22,11 @@ process.on("beforeExit", async () => {
         }
 
 
-        
 
-    } 
+
+    }
 
     process.exit(0)
-})
+}
+process.on("beforeExit", chean_nsv_local_file)
+process.on("SIGINT", chean_nsv_local_file)

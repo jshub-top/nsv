@@ -15,7 +15,7 @@
         }
     },
     "nsv": {
-        "version": "16"
+        "version": "17"
     },
     "scripts": {
         "serve": "node ./serve/index.js",
