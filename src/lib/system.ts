@@ -1,14 +1,7 @@
-import { context } from "../context";
+import { system_and_arch as _system_and_arch } from "../util/system"
 
 
-export function system_and_arch(): [string, string] {
-    let arch = process.arch as string
-    if (! /arm|x(32|64)/.test(arch)) arch = ""
-
-    let system = process.platform as string
-    if (! /win32|linux|darwin/.test(system)) system = ""
-    return [ system.replace(/\d+/, ""), arch ]
-}
+export const system_and_arch = _system_and_arch
 
 export function remoteNodeFileExtension () {
 

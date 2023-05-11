@@ -1,13 +1,11 @@
 import { writeJSONSync, readJSONSync, ensureDir } from "fs-extra";
 import { join } from "path";
-import { system_and_arch } from "./lib/system"
-import { context } from "./context"
+import { system_and_arch } from "./util/system"
 import { version, mainNode } from "../package.json"
 import { execSync } from "child_process"
 
 const [system, arch] = system_and_arch()
-const {home} = context.get("dir")
-
+const home = join(__dirname, "../")
 function set_local_env() {
     const ditc_system = {
         "win": () => "7z",
