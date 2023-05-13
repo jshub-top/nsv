@@ -67,7 +67,7 @@
         "tools",
         "LICENSE",
         "script/*.prod.js",
-        "*.json",
+        "config.json",
         "*.d.ts"
     ]
 }
