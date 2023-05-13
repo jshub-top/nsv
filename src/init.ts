@@ -108,6 +108,7 @@ function set_local_env() {
         sudoShellContent: ditc_sudo_shell_content[system] || ditc_sudo_shell_content["default"],
         tempScriptContent: ditc_temp_script_content[shell],
         tempLocalScriptContent: ditc_temp_local_script_content[system] || ditc_temp_local_script_content["default"],
+        isPackaged: !existsSync(join(__dirname, "../src"))
     }
     writeJSONSync(join(home, "./local.json"), local, {
         encoding: "utf-8"

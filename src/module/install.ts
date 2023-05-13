@@ -1,7 +1,7 @@
 
 import { join, dirname } from "path";
 import { EOL } from "os";
-import { system, shell, shellConfigFileDir, prefix } from "../../local.json"
+import { system, shell, shellConfigFileDir, prefix, isPackaged } from "../../local.json"
 import { copyFile, ensureFileSync, readFileSync, writeFile, constants, existsSync } from "fs-extra";
 import { context } from "../context"
 import { rm, cp } from "shelljs";
@@ -23,15 +23,16 @@ export function install () {
     let _prefix = prefix || config_prefix.name
     // linux macos
     if (system === "linux" || system === "darwin") {
+        const NSV_HOME = isPackaged ? "$HOME/.nsv" : home
         // _prefix = join(_prefix, "bin")
         // fish
         if (shell === "fish") {
-            shell_config_file_content.push("set NSV_HOME $HOME/.nsv")
+            shell_config_file_content.push(`set NSV_HOME ${NSV_HOME}`)
             shell_config_file_content.push(`set PATH $NSV_HOME/local/node/bin $NSV_HOME/${_prefix}/bin $PATH`)
             copyFile(join(home, "nsv.fish"), join(dirname(shellConfigFileDir), "functions", "nsv.fish"))
         } else {
             // bash zsh
-            shell_config_file_content.push(`export NSV_HOME=$HOME/.nsv`)
+            shell_config_file_content.push(`export NSV_HOME=${NSV_HOME}`)
             shell_config_file_content.push(`[ -s "$NSV_HOME/nsv.sh" ] && . "$NSV_HOME/nsv.sh"`)
             shell_config_file_content.push(`export PATH=$NSV_HOME/local/node/bin:$NSV_HOME/${_prefix}/bin:$PATH`)
         }
