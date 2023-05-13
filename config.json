@@ -10,5 +10,8 @@
     },
     "version": {
         "len": 389
+    },
+    "prefix": {
+        "name": "prefix"
     }
 }
