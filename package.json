@@ -1,6 +1,6 @@
 {
     "name": "nsv",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "description": "",
     "baseNode": {
         "default": "14.21.3",
