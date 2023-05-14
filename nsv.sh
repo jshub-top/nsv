@@ -18,22 +18,36 @@ if [[ ! -d "$dir/cache/node" ]]; then
     node_file_name="$base_node_name.tar.gz"
     base_node_download_uri="${base_download_uri}/v${base_node_version}/${node_file_name}"
     save_file_dir="$dir/cache/$node_file_name"
-    echo $save_file_dir
-    curl "$base_node_download_uri" -# -o $save_file_dir
+
+    proxy_url=""
+    if [ $http_proxy ]; then
+        proxy_url=$http_proxy
+    elif [ $HTTP_PROXY ]; then
+        proxy_url=$HTTP_PROXY
+    elif [ $https_proxy ]; then
+        proxy_url=$https_proxy
+    elif [ $HTTPS_PROXY ]; then
+        proxy_url=$HTTPS_PROXY
+    fi
+    if [ $proxy_url ]; then
+        curl "$base_node_download_uri" -# -o $save_file_dir --proxy "$proxy_url"
+    else
+        curl "$base_node_download_uri" -# -o $save_file_dir
+    fi
+
     chmod 755 "$save_file_dir"
-    # mv "$node_file_name"  "$save_file_dir"
     tar -xf "$save_file_dir" -C "$dir/cache"
     mv "$dir/cache/$base_node_name"  "$dir/cache/node"
 fi
 
 
 function nsv() {
-    export NSV_STATUS=0
 
     if [[ ! -d "$dir/node_modules" ]]; then
-        export NSV_STATUS=2
         export PATH="$dir/cache/node/bin":$PATH
-        npm install
+        cd $dir
+        sudo npm install --production
+        npm run init
     fi
 
 
@@ -43,6 +57,5 @@ function nsv() {
         . $temp_shell_dir
         rm $temp_shell_dir
     fi
-
-    unset NSV_STATUS
+    exit 0
 }

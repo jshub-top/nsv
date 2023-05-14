@@ -3,7 +3,6 @@
 
 $argv = $args
 $scriptDir = $PSScriptRoot
-$Env:NSV_STATUS = 0
 function download_file($url, $out_put) {
     $proxySettings = Get-ItemProperty -Path "Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyServer -ErrorAction SilentlyContinue
     write-Output "nsv: use proxy with--> $($proxySettings.ProxyServer)"
@@ -36,7 +35,6 @@ function use_base_node () {
         New-Item -Path "$scriptDir\cache" -ItemType Directory
     }
 
-    $Env:NSV_STATUS = 1
 
     $system_bit = ""
     if ($env:PROCESSOR_ARCHITECTURE -ieq "AMD64" -or $env:PROCESSOR_ARCHITEW6432 -ieq "AMD64") {
@@ -67,7 +65,9 @@ function check_node_modules () {
     if (Test-Path "$scriptDir/node_modules") {
         return
     }
-    $Env:NSV_STATUS = 2
+    cd "$scriptDir"
+    $Env:PATH = ""
+    Start-Process "$scriptDir/cache/node/npm.cmd" "install --production" -NoNewWindow -Wait
     Start-Process "$scriptDir/cache/node/npm.cmd" "install --production" -NoNewWindow -Wait
 }
 
@@ -85,5 +85,4 @@ use_base_node
 check_node_modules
 nsv
 
-$Env:NSV_STATUS = ""
 exit 0
