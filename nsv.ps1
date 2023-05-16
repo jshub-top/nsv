@@ -3,6 +3,9 @@
 
 $argv = $args
 $scriptDir = $PSScriptRoot
+$_pwd = $PWD
+$is_inital_nsv = $False
+cd $scriptDir
 function download_file($url, $out_put) {
     $proxySettings = Get-ItemProperty -Path "Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyServer -ErrorAction SilentlyContinue
     write-Output "nsv: use proxy with--> $($proxySettings.ProxyServer)"
@@ -19,20 +22,19 @@ function nsv_root_dir($dir) {
 }
 
 function unzip_file_by_7z($zip_dir, $out_put) {
-    . "$scriptDir\tools\7-Zip\7zr.exe" x "-o$zip_dir" -y $out_put
+    . "tools\7-Zip\7zr.exe" x "-o$out_put" -y $zip_dir
 }
 
 function use_base_node () {
-
-    if (Test-Path "$scriptDir\cache\node") {
+    if (Test-Path "cache\node") {
         return
     }
 
-    if (!(Test-Path "$scriptDir\node")) {
-        New-Item -Path "$scriptDir\node" -ItemType Directory
+    if (!(Test-Path "node")) {
+        New-Item -Path "node" -ItemType Directory
     }
-    if (!(Test-Path "$scriptDir\cache")) {
-        New-Item -Path "$scriptDir\cache" -ItemType Directory
+    if (!(Test-Path "cache")) {
+        New-Item -Path "cache" -ItemType Directory
     }
 
 
@@ -45,36 +47,35 @@ function use_base_node () {
         $system_bit = "arm64"
     }
 
-    $package = Get-Content -Path "$scriptDir\package.json" | ConvertFrom-Json
-    $config = Get-Content -Path "$scriptDir\config.json" | ConvertFrom-Json
+    $package = Get-Content -Path "package.json" | ConvertFrom-Json
+    $config = Get-Content -Path "config.json" | ConvertFrom-Json
     $base_node_version = $package.baseNode.win."$system_bit"
     if (! $base_node_version) {$base_node_version  = $package.baseNode.default}
-    Write-Output $base_node_version
     $base_node_file_name = "node-v$base_node_version-win-$system_bit"
     $base_node_file_name_suffix = "$base_node_file_name.7z"
     $base_node_download_url = "$($config.source.download)\v$base_node_version\$base_node_file_name_suffix"
     $base_node_file_abs_dir = "$($config.path.cache)\$base_node_file_name_suffix"
     download_file $base_node_download_url $base_node_file_abs_dir
-    unzip_file_by_7z cache "$scriptDir\cache\$base_node_file_name_suffix"
-    Rename-Item "$scriptDir\cache\$base_node_file_name" "node"
+    unzip_file_by_7z "cache\$base_node_file_name_suffix" "cache"
+    Rename-Item "cache\$base_node_file_name" "node"
 
+    $is_inital_nsv = $True
 }
 
 
 function check_node_modules () {
-    if (Test-Path "$scriptDir/node_modules") {
+    if (Test-Path "node_modules") {
         return
     }
-    cd "$scriptDir"
-    $Env:PATH = ""
-    Start-Process "$scriptDir/cache/node/npm.cmd" "install --production" -NoNewWindow -Wait
-    Start-Process "$scriptDir/cache/node/npm.cmd" "install --production" -NoNewWindow -Wait
+    $Env:PATH = "cache/node;$Env:PATH"
+    Start-Process "npm" "install --production" -NoNewWindow -Wait
+    Start-Process "npm" "run init" -NoNewWindow -Wait
 }
 
 function nsv () {
-    . "$scriptDir/cache/node/node.exe" "$scriptDir/dist/index.js" $argv
+    . "cache/node/node.exe" "dist/index.js" $argv
 
-    $temp_ps_file = "$scriptDir/cache/nsv_temp_one_off_file.ps1"
+    $temp_ps_file = "cache/nsv_temp_one_off_file.ps1"
     if (Test-Path $temp_ps_file) {
         & $temp_ps_file
         # Remove-item $temp_ps_file
@@ -84,5 +85,5 @@ function nsv () {
 use_base_node
 check_node_modules
 nsv
-
+cd $_pwd
 exit 0

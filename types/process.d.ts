@@ -6,6 +6,7 @@ declare namespace NodeJS {
 
         HOME: string
         PATH: string
+        USERPROFILE: string
         http_proxy: string
         https_proxy: string
         HTTP_PROXY: string

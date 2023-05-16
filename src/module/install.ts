@@ -1,7 +1,7 @@
 
 import { join, dirname } from "path";
 import { EOL } from "os";
-import { system, shell, shellConfigFileDir, prefix, isPackaged } from "../../local.json"
+import { system, shell, shellConfigFileDir, prefix, isPackaged, userHome } from "../../local.json"
 import { copyFile, ensureFileSync, readFileSync, writeFile, constants, existsSync } from "fs-extra";
 import { context } from "../context"
 import { rm, cp } from "shelljs";
@@ -41,10 +41,10 @@ export function install () {
     if (system === "win") {
 
         shell_config_file_content.push(`$Env:NSV_HOME = "${home}"`)
-        shell_config_file_content.push(`$Env:PATH = "$Env:NSV_HOME;$Env:NSV_HOME\\local\\node;$Env:$NSV_HOME\\${_prefix};$Env:PATH"`)
+        shell_config_file_content.push(`$Env:PATH = "$Env:NSV_HOME;$Env:NSV_HOME\\local\\node;$Env:NSV_HOME\\${_prefix};$Env:PATH"`)
     }
 
-    const npmrc_file_dir = join(process.env["HOME"], ".npmrc")
+    const npmrc_file_dir = join(userHome, ".npmrc")
     !prefix && writeFile(npmrc_file_dir, readFileSync(npmrc_file_dir, {encoding: "utf-8"}) + `${EOL}prefix=${join(home, _prefix )}`)
     shell_config_file_content.length && writeFile(shellConfigFileDir, shell_config_file_content.join(EOL), { encoding: "utf-8" })
     content && writeFile(join(context.get("dir").cache, context.get("temp_file_name")), content)
@@ -56,7 +56,7 @@ export function uninstall () {
     let shell_config_file_content = readFileSync(shellConfigFileDir, { encoding: "utf-8" }).toString().split(EOL).filter(v => !test_reg.test(v))
     writeFile(shellConfigFileDir, shell_config_file_content.join(EOL), { encoding: "utf-8" })
 
-    const npmrc_file_dir = join(process.env["HOME"], ".npmrc")
+    const npmrc_file_dir = join(userHome, ".npmrc")
     if (existsSync(npmrc_file_dir)) {
         const { home } = context.get("dir")
         const prefix_reg = new RegExp(`=.*(${home}).*(prefix)`)
