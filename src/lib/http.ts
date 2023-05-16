@@ -1,5 +1,6 @@
 // import { request, RequestOptions, globalAgent } from "http";
 import { request, RequestOptions, Agent, AgentOptions } from "https";
+import { HttpsProxyAgent } from "https-proxy-agent"
 import { context } from "../context";
 import url from "url";
 export function get<T>(uri: string,) {
@@ -10,13 +11,7 @@ export function get<T>(uri: string,) {
 export function use_proxy<T extends RequestOptions | url.URL>(opt: T) {
     const proxy = context.get("proxy")
     if (proxy) {
-        const _proxy = url.parse(proxy)
-        const proxy_option = {
-            port: +_proxy.port,
-            host: _proxy.host,
-        }
-        if(_proxy.auth) proxy_option["auth"] = _proxy.auth
-        opt["agent"] = new Agent(proxy_option)
+        opt["agent"] = new HttpsProxyAgent(proxy)
     }
     return opt
 }
