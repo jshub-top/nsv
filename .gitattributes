@@ -1,7 +1,1 @@
-*.js text eol=lf
-*.ts text eol=lf
-*.cmd text eol=lf
-*.ps1 text eol=lf
-*.sh text eol=lf
-*.fish text eol=lf
-*.json text eol=lf
+* text eol=lf
