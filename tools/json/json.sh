@@ -9,7 +9,6 @@ function get_next_json() {
 }
 
 
-
 function parse_json() {
     local json=$(echo "$1" | tr -d '\n')
     local key_list=("${@:2}")
