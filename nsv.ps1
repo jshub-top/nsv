@@ -67,15 +67,15 @@ function check_node_modules () {
     if (Test-Path "node_modules") {
         return
     }
-    $Env:PATH = "cache/node;$Env:PATH"
-    Start-Process "npm" "install --production" -NoNewWindow -Wait
-    Start-Process "npm" "run init" -NoNewWindow -Wait
+    $Env:PATH = "$scriptDir\cache\node;$Env:PATH"
+    npm install --production
+    npm run init
 }
 
 function nsv () {
-    . "cache/node/node.exe" "dist/index.js" $argv
+    . "cache\node\node.exe" "dist\index.js" $argv
 
-    $temp_ps_file = "cache/nsv_temp_one_off_file.ps1"
+    $temp_ps_file = "cache\nsv_temp_one_off_file.ps1"
     if (Test-Path $temp_ps_file) {
         & $temp_ps_file
         # Remove-item $temp_ps_file

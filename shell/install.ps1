@@ -2,7 +2,6 @@
 
 
 
-
 $proxy_url = "https://ghproxy.com"
 $nsv_tgz_file_name = "nsv.tgz"
 $nsv_tgz_file_url = "https://github.com/1739616529/nsv/releases/download/v0.0.1/$nsv_tgz_file_name"
@@ -25,16 +24,23 @@ function install_dir() {
 }
 
 $dir = install_dir
-Write-Output $dir
-# Invoke-WebRequest $nsv_tgz_file_url -OutFile "$dir\$nsv_tgz_file_name"
+$_pwd = $pwd
+cd "$dir"
+Invoke-WebRequest $nsv_tgz_file_url -OutFile "$nsv_tgz_file_name"
 
-# $tar_command = Get-Command "tar" -ErrorAction SilentlyContinue
+$tar_command = Get-Command "tar" -ErrorAction SilentlyContinue
 if (!$tar_command) {
     Write-Output "nsv: tar is not nonsupport"
-    Write-Output "1. nsv: cd $dir"
-    Write-Output "2. nsv: manual decompression ==> nsv.tgz <=="
-    Write-Output "3. nsv: $dir\package\nsv.ps1 install"
+    Write-Output "  1. cd $dir"
+    Write-Output "  2. manual decompression ==> nsv.tgz <=="
+    Write-Output "  3. $dir\package\nsv.ps1 install"
+    cd $_pwd
+    exit 0
 }
 
 
-# tar
+tar xf "$nsv_tgz_file_name"
+Rename-Item "package" "nsv"
+
+. "nsv\nsv.ps1" "install"
+cd $_pwd
