@@ -1,9 +1,10 @@
 import { request, Agent } from "https";
 import { ClientRequest } from "http"
 import { RunStatus, context } from "../context";
+import { use_proxy } from "./http"
 import url from "url";
 import { createWriteStream } from "fs-extra";
-
+import { HttpsProxyAgent } from "https-proxy-agent"
 declare global {
     interface Context {
         download_request: ClientRequest|null
@@ -21,13 +22,8 @@ export interface DownloadFileCallback {
 
 export function download(uri: string, save_dir: string, cb: (r: DownloadFileCallback) => void = () => {}): Promise<void> {
     const url_option = url.parse(uri)
-    const proxy = context.get("proxy")
-    if (proxy) {
-        url_option["agent"] = Agent
-        Agent["proxy"] = proxy
-    }
+    use_proxy(url_option)
     return new Promise((resolve, reject) => {
-
         const req = request(url_option, (res => {
             const file_total = +res.headers["content-length"]
             let current = 0

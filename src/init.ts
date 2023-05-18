@@ -94,6 +94,13 @@ function set_local_env() {
 
 
 
+    const ditc_user_home_dir = {
+        "win": process.env["USERPROFILE"],
+        "default": process.env["HOME"]
+    }
+
+
+
     const local = {
         version,
         system,
@@ -102,6 +109,7 @@ function set_local_env() {
         shell,
         shellConfigFileDir,
         shellTempOneOffFile,
+        userHome: ditc_user_home_dir[system] || ditc_user_home_dir["default"],
         mainNode: mainNode[system]?.[arch] || mainNode["default"],
         remoteNodeFileExtension: ditc_system[system]?.() || ditc_system["default"](),
         unzipOrder: ditc_unzip_order[system] || ditc_unzip_order["default"],
