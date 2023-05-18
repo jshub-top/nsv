@@ -100,11 +100,12 @@ function set_local_env() {
     }
 
 
-
+    let _arch = arch
+    if (system === "darwin") _arch = "x64"
     const local = {
         version,
         system,
-        arch,
+        arch: _arch,
         prefix,
         shell,
         shellConfigFileDir,
