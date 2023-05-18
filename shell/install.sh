@@ -14,5 +14,6 @@ fi
 
 curl "$nsv_tgz_url" -# -o "$nsv_temp_tgz_dir"
 tar -xf "$nsv_temp_tgz_dir" -C "$HOME"
+rm "$HOME/$nsv_tgz_file_name"
 mv "$HOME/package" "$HOME/.nsv"
 "$HOME/.nsv/nsv" install

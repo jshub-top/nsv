@@ -23,7 +23,8 @@
         "build": "swc src -d dist",
         "dev": "swc src -d dist --watch",
         "init": "node ./dist/init.js",
-        "postinstall": "node ./script/postinstall.prod.js"
+        "postinstall": "node ./script/postinstall.prod.js",
+        "prepack": "npm run build"
     },
     "keywords": [
         "nvs",
