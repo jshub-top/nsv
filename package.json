@@ -9,10 +9,7 @@
         }
     },
     "mainNode": {
-        "default": "10.0.0",
-        "darwin": {
-            "arm64": "16.0.0"
-        }
+        "default": "10.0.0"
     },
     "nsv": {
         "version": "17"
