@@ -86,4 +86,3 @@ use_base_node
 check_node_modules
 nsv
 cd $_pwd
-exit 0

@@ -57,5 +57,4 @@ function nsv() {
         . $temp_shell_dir
         rm $temp_shell_dir
     fi
-    exit 0
 }
