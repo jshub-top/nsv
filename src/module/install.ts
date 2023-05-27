@@ -6,7 +6,7 @@ import { copyFile, ensureFileSync, readFileSync, writeFile, constants, existsSyn
 import { context } from "../context"
 import { rm, cp } from "shelljs";
 import { prefix as config_prefix } from "../../config.json"
-
+import { set_temp_shell } from "src/lib/env";
 const test_reg = /NSV_HOME|nsv discern/
 export function install () {
     let content = ""
@@ -52,13 +52,13 @@ export function install () {
 
 export function uninstall () {
 
+    const { home } = context.get("dir")
     ensureFileSync(shellConfigFileDir)
     let shell_config_file_content = readFileSync(shellConfigFileDir, { encoding: "utf-8" }).toString().split(EOL).filter(v => !test_reg.test(v))
     writeFile(shellConfigFileDir, shell_config_file_content.join(EOL), { encoding: "utf-8" })
 
     const npmrc_file_dir = join(userHome, ".npmrc")
     if (existsSync(npmrc_file_dir)) {
-        const { home } = context.get("dir")
         const prefix_reg = new RegExp(`=.*(${home}).*(prefix)`)
         writeFile(npmrc_file_dir, readFileSync(npmrc_file_dir, {encoding: "utf-8"}).split(EOL).filter(v => !prefix_reg.test(v)).join(EOL))
     }
@@ -69,4 +69,6 @@ export function uninstall () {
     if(shell === "fish") {
         rm(join(dirname(shellConfigFileDir), "functions", "nsv.fish"))
     }
+
+    console.log(`nsv: uninstall nsv success. Please manually delete dir ==> ${home}`)
 }

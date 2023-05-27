@@ -110,6 +110,7 @@ function set_local_env() {
         shell,
         shellConfigFileDir,
         shellTempOneOffFile,
+        shellTempOneOffFileAbsDir: join(home, "cache", shellTempOneOffFile),
         userHome: ditc_user_home_dir[system] || ditc_user_home_dir["default"],
         mainNode: mainNode[system]?.[arch] || mainNode["default"],
         remoteNodeFileExtension: ditc_system[system]?.() || ditc_system["default"](),
