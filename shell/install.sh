@@ -18,4 +18,5 @@ rm "$HOME/$nsv_tgz_file_name"
 mkdir "$HOME/.nsv"
 mv ~/package/* ~/.nsv
 rm -rf "$HOME/.nsv/node_modules"
+rm -rf ~/package
 "$HOME/.nsv/nsv" install
