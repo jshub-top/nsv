@@ -55,9 +55,8 @@ function set_local_env() {
 
             if (-not $isAdmin) {
                 Start-Process powershell.exe "-File $PSCommandPath" -Verb RunAs
-                Exit 0
+                return
             }
-            Read-Host "debug"
         `,
         "default": "sudo ",
     }
