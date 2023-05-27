@@ -24,24 +24,19 @@ function set_local_env() {
 
     const ditc_temp_script_content = {
         "powershell": `
-            $Env:Path = "{{ content }}"
-            $Env:NSV_CURRENT_VERSION = "{{ current_version }}"
+            $Env:Path = "{{ content }}",
         `,
         "bash": `
-            export PATH="{{ content }}"
-            export NSV_CURRENT_VERSION="{{ current_version }}"
+            export PATH="{{ content }}",
         `,
         "zsh": `
-            export PATH="{{ content }}"
-            export NSV_CURRENT_VERSION="{{ current_version }}"
+            export PATH="{{ content }}",
         `,
         "fish": `
-            set PATH "{{ content }}"
-            set NSV_CURRENT_VERSION "{{ current_version }}"
+            set PATH "{{ content }}",
         `,
         "default": `
-            export PATH="{{ content }}"
-            export NSV_CURRENT_VERSION="{{ current_version }}"
+            export PATH="{{ content }}",
         `,
     }
 
@@ -103,6 +98,7 @@ function set_local_env() {
     }
 
 
+    // mac系统统一用cpu类型为 x86 的版本 不需要考虑32位系统 mac没有
     let _arch = arch
     if (system === "darwin") _arch = "x64"
     const local = {
