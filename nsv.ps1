@@ -78,7 +78,7 @@ function nsv () {
     $temp_ps_file = "cache\nsv_temp_one_off_file.ps1"
     if (Test-Path $temp_ps_file) {
         & $temp_ps_file
-        # Remove-item $temp_ps_file
+        Remove-item $temp_ps_file
     }
 }
 
