@@ -38,7 +38,11 @@ function set_local_env() {
         "fish": `
             set PATH "{{ content }}"
             set NSV_CURRENT_VERSION "{{ current_version }}"
-        `
+        `,
+        "default": `
+            export PATH="{{ content }}"
+            export NSV_CURRENT_VERSION="{{ current_version }}"
+        `,
     }
 
     const ditc_temp_local_script_content = {
@@ -73,7 +77,7 @@ function set_local_env() {
             shellTempOneOffFile += ".sh"
         } else
         if (/zsh/.test(shell_name)) {
-            shell = ".zshrc"
+            shell = "zsh"
             shellConfigFileDir = ".zshrc"
             shellTempOneOffFile += ".sh"
         } else
@@ -116,7 +120,7 @@ function set_local_env() {
         remoteNodeFileExtension: ditc_system[system]?.() || ditc_system["default"](),
         unzipOrder: ditc_unzip_order[system] || ditc_unzip_order["default"],
         sudoShellContent: ditc_sudo_shell_content[system] || ditc_sudo_shell_content["default"],
-        tempScriptContent: ditc_temp_script_content[shell],
+        tempScriptContent: ditc_temp_script_content[shell] || ditc_temp_script_content["default"],
         tempLocalScriptContent: ditc_temp_local_script_content[system] || ditc_temp_local_script_content["default"],
         isPackaged: !existsSync(join(__dirname, "../src"))
     }
