@@ -16,6 +16,6 @@ curl "$nsv_tgz_url" -# -o "$nsv_temp_tgz_dir"
 tar -xf "$nsv_temp_tgz_dir" -C "$HOME"
 rm "$HOME/$nsv_tgz_file_name"
 mkdir "$HOME/.nsv"
-mv "$HOME/package/*" "$HOME/.nsv"
+mv ~/package/* ~/.nsv
 rm -rf "$HOME/.nsv/node_modules"
 "$HOME/.nsv/nsv" install
