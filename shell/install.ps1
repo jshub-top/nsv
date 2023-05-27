@@ -44,5 +44,6 @@ tar xf "$nsv_tgz_file_name"
 mkdir -Force nsv
 Copy-Item -Path package\* -Recurse nsv -Force
 Remove-Item package -Recurse
+Remove-Item "$nsv_tgz_file_name"
 . "nsv\nsv.ps1" "install"
 cd $_pwd
