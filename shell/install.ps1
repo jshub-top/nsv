@@ -42,8 +42,8 @@ if (!$tar_command) {
 tar xf "$nsv_tgz_file_name"
 # Rename-Item "package" "nsv"
 mkdir -Force nsv
-Copy-Item -Path package\* -Recurse nsv -Force
-Remove-Item package -Recurse
-Remove-Item "$nsv_tgz_file_name"
+Copy-Item -Path $dir\package\* -Recurse $dir\nsv -Force
+Remove-Item "$dir\package" -Recurse
+Remove-Item "$dir\$nsv_tgz_file_name"
 . "nsv\nsv.ps1" "install"
 cd $_pwd
