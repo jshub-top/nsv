@@ -24,19 +24,19 @@ function set_local_env() {
 
     const ditc_temp_script_content = {
         "powershell": `
-            $Env:Path = "{{ content }}",
+            $Env:Path = "{{ content }}"
         `,
         "bash": `
-            export PATH="{{ content }}",
+            export PATH="{{ content }}"
         `,
         "zsh": `
-            export PATH="{{ content }}",
+            export PATH="{{ content }}"
         `,
         "fish": `
-            set PATH "{{ content }}",
+            set PATH "{{ content }}"
         `,
         "default": `
-            export PATH="{{ content }}",
+            export PATH="{{ content }}"
         `,
     }
 
