@@ -67,6 +67,7 @@
         "LICENSE",
         "script/*.prod.js",
         "config.json",
-        "*.d.ts"
+        "*.d.ts",
+        "package-lock.json"
     ]
 }
