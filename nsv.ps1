@@ -7,9 +7,11 @@ $_pwd = $PWD
 $is_inital_nsv = $False
 cd $scriptDir
 function download_file($url, $out_put) {
-    $proxySettings = Get-ItemProperty -Path "Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyServer -ErrorAction SilentlyContinue
-    write-Output "nsv: use proxy with--> $($proxySettings.ProxyServer)"
-    if($proxySettings.ProxyServer) {
+    $proxyStatus = Get-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings' -Name ProxyEnable -ErrorAction SilentlyContinue | Select-Object -ExpandProperty ProxyEnable
+    echo $proxyStatus
+    if ($proxyStatus) {
+        $proxySettings = Get-ItemProperty -Path "Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyServer -ErrorAction SilentlyContinue
+        write-Output "nsv: use proxy with--> $($proxySettings.ProxyServer)"
         $proxy_serve = "http://$($proxySettings.ProxyServer)"
         Invoke-WebRequest $url -OutFile $out_put -Proxy $proxy_serve
         return
