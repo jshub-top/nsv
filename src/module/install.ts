@@ -45,7 +45,7 @@ export function install () {
     }
 
     const npmrc_file_dir = join(userHome, ".npmrc")
-    !prefix && writeFile(npmrc_file_dir, readFileSync(npmrc_file_dir, {encoding: "utf-8"}) + `${EOL}prefix=${join(home, _prefix )}`)
+    if (!prefix) ensureFileSync(npmrc_file_dir); writeFile(npmrc_file_dir, readFileSync(npmrc_file_dir, {encoding: "utf-8"}) + `${EOL}prefix=${join(home, _prefix )}`)
     shell_config_file_content.length && writeFile(shellConfigFileDir, shell_config_file_content.join(EOL), { encoding: "utf-8" })
     content && writeFile(join(context.get("dir").cache, context.get("temp_file_name")), content)
 }
