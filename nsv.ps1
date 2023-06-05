@@ -2,10 +2,6 @@
 
 
 $argv = $args
-$scriptDir = $PSScriptRoot
-$_pwd = $PWD
-$is_inital_nsv = $False
-cd $scriptDir
 function download_file($url, $out_put) {
     $proxyStatus = Get-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings' -Name ProxyEnable -ErrorAction SilentlyContinue | Select-Object -ExpandProperty ProxyEnable
     echo $proxyStatus
@@ -61,7 +57,6 @@ function use_base_node () {
     unzip_file_by_7z "cache\$base_node_file_name_suffix" "cache"
     Rename-Item "cache\$base_node_file_name" "node"
 
-    $is_inital_nsv = $True
 }
 
 
@@ -75,16 +70,25 @@ function check_node_modules () {
 }
 
 function nsv () {
-    . "cache\node\node.exe" "dist\index.js" $argv
+    . "$scriptDir\cache\node\node.exe" "$scriptDir\dist\index.js" $argv
 
-    $temp_ps_file = "cache\nsv_temp_one_off_file.ps1"
+    $temp_ps_file = "$scriptDir\cache\nsv_temp_one_off_file.ps1"
     if (Test-Path $temp_ps_file) {
         & $temp_ps_file
         Remove-item $temp_ps_file
     }
 }
 
+
+# 运行 这些脚本需要进入 安装目录 运行完成之后返回用户当前目录
+$_pwd = $PWD
+$scriptDir = $PSScriptRoot
+cd $scriptDir
 use_base_node
 check_node_modules
-nsv
 cd $_pwd
+
+
+
+
+nsv
