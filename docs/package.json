@@ -1,16 +1,9 @@
 {
-    "name": "test-vitepress",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
     "scripts": {
         "dev": "vitepress dev",
         "build": "vitepress build",
         "preview": "vitepress preview"
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
     "devDependencies": {
         "@types/markdown-it": "^12.2.3",
         "@types/node": "^20.4.1",
@@ -19,7 +12,7 @@
     },
     "dependencies": {
         "@vue/repl": "^2.5.5",
-        "@vue/theme": "2.2.2",
+        "@vue/theme": "^2.2.2",
         "dynamics.js": "^1.1.5",
         "gsap": "^3.12.2",
         "vitepress": "^1.0.0-beta.5",
