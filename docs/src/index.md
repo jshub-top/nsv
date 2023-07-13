@@ -19,7 +19,7 @@ hero:
       link: /guide/start
     - theme: alt
       text: 在github上查看
-      link: /markdown-examples
+      link: https://github.com/1739616529/nsv
 
 features:
   - title: 轻量

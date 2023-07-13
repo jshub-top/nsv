@@ -8,3 +8,4 @@ dist
 !types/*.d.ts
 user*.json
 prefix
+!local.md

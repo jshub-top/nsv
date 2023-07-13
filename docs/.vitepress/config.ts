@@ -13,6 +13,10 @@ const nav: DefaultTheme.Config["nav"] = [
             {
                 text: "快速开始",
                 link: "/guide/start",
+            },
+            {
+                text: "cli 命令",
+                link: "/guide/cli/use",
             }
         ]
     },
@@ -31,6 +35,15 @@ const sidebar: DefaultTheme.Config["sidebar"] = [
             { text: '为什么选择nsv', link: '/guide/what-is-nsv' },
             { text: '简介', link: '/guide/intro' },
             { text: '开始', link: '/guide/start' }
+        ]
+    },
+    {
+        text: "cli",
+        collapsed: true,
+        items: [
+            { text: 'use', link: '/guide/cli/use' },
+            { text: 'local', link: '/guide/cli/local' },
+            { text: 'discern', link: '/guide/cli/discern' }
         ]
     }
 ]
