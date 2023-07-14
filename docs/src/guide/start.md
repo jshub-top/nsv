@@ -12,7 +12,7 @@ title: 开始
 #### windows
 
 ```PowerShell [windows]
-$ irm https://raw.githubusercontent.com/1739616529/nsv/main/shell/install.ps1 | iex
+irm https://raw.githubusercontent.com/1739616529/nsv/main/shell/install.ps1 | iex
 ```
 
 ::: tip
@@ -22,13 +22,13 @@ $ irm https://raw.githubusercontent.com/1739616529/nsv/main/shell/install.ps1 | 
 #### macos
 
 ```sh [macos]
-$ curl -fsSL https://raw.githubusercontent.com/1739616529/nsv/main/shell/install.sh | sh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/1739616529/nsv/main/shell/install.sh)"
 ```
 
 #### linux
 
 ```sh [linux]
-$ curl -fsSL https://raw.githubusercontent.com/1739616529/nsv/main/shell/install.sh | sh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/1739616529/nsv/main/shell/install.sh)"
 ```
 
 ### 2. 验证安装
