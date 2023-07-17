@@ -23,16 +23,11 @@ export function discern(opt: any) {
         return
     }
 
-    const is_node_project = existsSync("package.json");
-    if (is_node_project === false) return
-    const config_file_name_list = [".nsvrc", ".nvmrc"]
-    const config_file_name = config_file_name_list.find(existsSync)
+    const config_file_name = ".nsvrc"
+    if (!existsSync(config_file_name)) return
     let version = ""
     if (config_file_name) version = readFileSync(config_file_name, {encoding: "utf-8"}).toString().trim()
-    else version = readJsonSync("package.json")?.nsv?.version || ""
-    if (!version) return console.log("nsv: please set config file. ( .nsvrc | .nvmrc | package.json[nsv][version])")
     use(version)
-
 }
 
 function discern_enable() {
@@ -42,10 +37,9 @@ function discern_enable() {
     const discern_reg = /nsv discern/
     if (discern_reg.test(profile_content)) return console.log("nsv: discern enabled")
     const profile_content_list = profile_content.split(EOL)
-    if (system === "win") profile_content_list.push(`if (Test-Path "$PWD/package.json") { nsv discern }`)
-    else if (system === "linux" || system === "darwin") profile_content_list.push(`[ -s "$PWD/package.json" ] && nsv discern`)
+    if (system === "win") profile_content_list.push(`if (Test-Path "$PWD/.nsvrc") { nsv discern }`)
+    else if (system === "linux" || system === "darwin") profile_content_list.push(`[ -s "$PWD/.nsvrc" ] && nsv discern`)
     writeFileSync(shellConfigFileDir, profile_content_list.join(EOL), {encoding: "utf-8"})
-
 }
 function discern_disable() {
     user_db.setSync("discern", false)

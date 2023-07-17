@@ -70,12 +70,16 @@ function check_node_modules () {
 }
 
 function nsv () {
+    try {
+        Remove-item $temp_ps_file
+    } catch {
+
+    }
     . "$scriptDir\cache\node\node.exe" "$scriptDir\dist\index.js" $argv
 
     $temp_ps_file = "$scriptDir\cache\nsv_temp_one_off_file.ps1"
     if (Test-Path $temp_ps_file) {
         & $temp_ps_file
-        Remove-item $temp_ps_file
     }
 }
 
