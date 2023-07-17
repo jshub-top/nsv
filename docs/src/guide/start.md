@@ -98,7 +98,7 @@ v18.16.1
 
 有两种配置方式 需要预先添加配置
 
-第一种在 package.json 同级目录下创建 .nsvrc 文件 内容为 18
+在 `package.json` 同级目录下创建 `.nsvrc` 文件 内容为 18
 ```config
 .
 ├─ node_modules
@@ -110,26 +110,7 @@ v18.16.1
 
 18 // [!code ++]
 ```
-第二种在 package.json 中 设置 nsv 配置
-```json
-# package.json
 
-{
-    "name": "xxx",
-
-    ...
-
-    "nsv": { // [!code ++]
-        "version": "18" // [!code ++]
-    }, // [!code ++]
-
-    ...
-
-}
-
-```
-
-确保满足以上任一条件后 再继续接下来的操作
 ```sh
 # 打开 自动识别
 $ nsv discern -e

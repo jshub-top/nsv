@@ -1,5 +1,5 @@
 # 自动识别
-识别配置文件 自动切换 `node` 版本
+识别配置文件 自动切换 `node` 版本 默认为 `false` 状态
 
 ## 命令介绍
 ```sh
@@ -72,9 +72,8 @@ discern enable:  false
 
 ### 1. 添加配置
 
-有两种配制方法 任选其一即可
 
-#### 1. 添加 `.nsvrc` 文件的方式
+添加 `.nsvrc` 文件的方式
 
 ```config
 .
@@ -88,24 +87,6 @@ discern enable:  false
 # .nsvrc
 
 18 // [!code ++]
-```
-#### 2. 添加 `nsv` 配置的方式
-```json
-# package.json
-
-{
-    "name": "xxx",
-
-    ...
-
-    "nsv": { // [!code ++]
-        "version": "18" // [!code ++]
-    }, // [!code ++]
-
-    ...
-
-}
-
 ```
 
 ### 2. 通过命令行打开识别功能
