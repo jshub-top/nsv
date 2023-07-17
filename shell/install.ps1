@@ -42,7 +42,7 @@ if (!$tar_command) {
 tar xf "$nsv_tgz_file_name"
 # Rename-Item "package" "nsv"
 mkdir -Force nsv
-Remove-Item nsv\* -Recurse -Exclude cache,local,node
+Get-ChildItem -Path nsv\* -Exclude cache,local,node | Remove-Item -Recurse -Force
 Copy-Item -Path package\* -Recurse nsv -Force
 Remove-Item package -Recurse
 # Remove-Item "$nsv_tgz_file_name"
