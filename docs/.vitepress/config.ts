@@ -85,7 +85,7 @@ export default defineConfigWithTheme<DefaultTheme.Config>({
 
 
         editLink: {
-            pattern: 'https://github.com/1739616529/nsv/tree/main/docs/:path',
+            pattern: 'https://github.com/1739616529/nsv/blob/main/docs/src/:path',
             text: '在Github上修改此页'
         },
 
@@ -118,11 +118,9 @@ export default defineConfigWithTheme<DefaultTheme.Config>({
         },
         optimizeDeps: {
             include: ['gsap', 'dynamics.js'],
-            exclude: ['@vue/repl']
         },
         // @ts-ignore
         ssr: {
-            external: ['@vue/repl']
         },
         server: {
             host: true,
