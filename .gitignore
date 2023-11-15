@@ -9,3 +9,4 @@ dist
 user*.json
 prefix
 !local.md
+target
