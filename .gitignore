@@ -10,3 +10,4 @@ user*.json
 prefix
 !local.md
 target
+Cargo.lock
