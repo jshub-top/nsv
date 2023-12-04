@@ -1,8 +1,12 @@
 mod cli;
-use cli::Cli;
+mod command;
+mod config;
+use cli::parse;
+use root::{config::Config, core::NsvCore};
 
 #[tokio::main]
 async fn main() {
-    let cli_instance = Cli::build();
-    cli_instance.run();
+    let cli = parse();
+    let nsv_core = NsvCore::build(Config::build(Box::new(|_| {})));
+    cli.subcmd.call(cli.config, &nsv_core)
 }

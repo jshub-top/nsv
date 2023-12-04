@@ -1,16 +1,25 @@
-use root::{config::Config, core::NsvCore};
+use clap::Parser;
+use root::core::NsvCore;
 
+use crate::command::Commands;
+use crate::config::NsvConfig;
+
+
+
+#[derive(clap::Parser, Debug)]
+#[clap(name = "nsv", version = env!("CARGO_PKG_VERSION"), bin_name = "nsv")]
 pub struct Cli {
-    pub core: NsvCore,
+    // pub core: NsvCore,
+
+    #[clap(flatten)]
+    pub config: NsvConfig,
+
+    #[clap(subcommand)]
+    pub subcmd: Commands,
 }
 
-impl Cli {
-    pub fn build() -> Cli {
-        Cli {
-            core: NsvCore::build(Config::build(Box::new(|_config| {}))),
-        }
-    }
-    pub fn run(&self) {
-        println!("321")
-    }
+pub fn parse() -> Cli {
+    Cli::parse()
 }
+
+
