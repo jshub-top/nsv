@@ -1,5 +1,6 @@
 use std::env;
 use std::path::PathBuf;
+use crate::core::r#use::UseVersionTarget;
 
 #[derive(Debug, Clone)]
 pub struct Context {
@@ -42,6 +43,11 @@ pub struct Context {
      * node解压完成路径
      */
     pub node_dir: PathBuf,
+
+    /**
+     * node 版本标记
+     */
+    pub target: UseVersionTarget,
 }
 
 impl Context {
@@ -77,6 +83,7 @@ impl Context {
             temp,
             node_file,
             node_dir,
+            target: crate::core::r#use::UseVersionTarget::None,
         }
     }
 }

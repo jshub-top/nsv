@@ -6,7 +6,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn build(call_fn: Box<dyn FnOnce(&Config) -> ()>) -> Self {
+    pub fn build(call_fn: Box<dyn FnOnce(&mut Config) -> ()>) -> Self {
         let mut config = Config {
             origin: "https://nodejs.org/dist",
         };

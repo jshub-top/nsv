@@ -1,5 +1,4 @@
 use clap::Parser;
-use root::core::NsvCore;
 
 use crate::command::Commands;
 use crate::config::NsvConfig;
@@ -21,5 +20,3 @@ pub struct Cli {
 pub fn parse() -> Cli {
     Cli::parse()
 }
-
-
