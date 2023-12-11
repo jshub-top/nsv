@@ -30,19 +30,27 @@ impl UseVersion for NsvCore {
         // 验证 版本是否有效
         auth_version(&version)?;
 
+        let mut version_item = None;
+
         match version.as_str() {
             "lts" => {
                 self.context.target = UseVersionTarget::Lts;
-                let version = self.get_lts_version().await;
-                if let Some(item) = version {
-                    let version = item.version;
-                    println!("111 {}", version)
-                }
+                version_item = self.get_lts_version().await;
             }
-            "latest" => self.context.target = UseVersionTarget::Latest,
-            _ => self.context.target = UseVersionTarget::Assign,
+
+            "latest" => {
+                self.context.target = UseVersionTarget::Latest;
+                version_item = self.get_latest_version().await
+            },
+            _ => {
+                self.context.target = UseVersionTarget::Assign;
+
+            },
         }
 
+
+
+        println!("{:?}", version_item);
         Ok(())
     }
 }

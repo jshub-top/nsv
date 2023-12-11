@@ -19,7 +19,6 @@ impl NodeVersion for NsvCore {
             .await
             .unwrap();
         let version_list = res.json::<Vec<NodeVersionItem>>().await;
-        println!("111 {:?}", version_list);
         return version_list.unwrap();
     }
 
@@ -27,8 +26,9 @@ impl NodeVersion for NsvCore {
         let version_list = self.origin_node_version().await;
 
         for item in version_list {
-            if item.lts {
-                return Some(item);
+            match item.lts {
+                NodeVersionLts::Type(_) => return Some(item),
+                NodeVersionLts::Bool(_) => {},
             }
         }
 
@@ -45,13 +45,20 @@ impl NodeVersion for NsvCore {
 pub struct NodeVersionItem {
     pub version: String,
     pub date: String,
-    pub files: Vec<String>,
-    pub npm: Option<String>,
-    pub v8: String,
-    pub uv: Option<String>,
-    pub zlib: Option<String>,
-    pub openssl: Option<String>,
-    pub modules: Option<String>,
-    pub lts: bool,
-    pub security: bool,
+    // pub files: Vec<String>,
+    // pub npm: Option<String>,
+    // pub v8: String,
+    // pub uv: Option<String>,
+    // pub zlib: Option<String>,
+    // pub openssl: Option<String>,
+    // pub modules: Option<String>,
+    pub lts: NodeVersionLts,
+    // pub security: bool,
+}
+
+#[derive(Deserialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum NodeVersionLts {
+    Type(String),
+    Bool(bool),
 }
