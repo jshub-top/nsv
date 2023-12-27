@@ -6,14 +6,14 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn build(call_fn: Box<dyn FnOnce(&mut Config) -> ()>) -> Self {
-        let mut config = Config {
-            origin: "https://nodejs.org/dist",
+    pub fn build() -> Self {
+        let config = Config {
+            origin: "https://nodejs.org",
         };
-
-        call_fn(&mut config);
-
         config
     }
 
+    pub fn set_config(&mut self, call_fn: Box<dyn FnOnce(&mut Config) -> ()>)  {
+        call_fn(self);
+    }
 }
