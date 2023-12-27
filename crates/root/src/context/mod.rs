@@ -1,6 +1,6 @@
 use std::env;
 use std::path::PathBuf;
-use crate::core::r#use::UseVersionTarget;
+use crate::core::node::VersionTarget;
 
 #[derive(Debug, Clone)]
 pub struct Context {
@@ -47,7 +47,12 @@ pub struct Context {
     /**
      * node 版本标记
      */
-    pub target: UseVersionTarget,
+    pub target: VersionTarget,
+
+    /**
+     * 在本地已存在
+     */
+    pub local_exist: bool,
 }
 
 impl Context {
@@ -83,7 +88,8 @@ impl Context {
             temp,
             node_file,
             node_dir,
-            target: crate::core::r#use::UseVersionTarget::None,
+            target: VersionTarget::None,
+            local_exist: false,
         }
     }
 }

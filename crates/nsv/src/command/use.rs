@@ -16,11 +16,10 @@ pub struct Use {
 impl Command for Use {
     type Error = Error;
     async fn apply(&self, _config: &NsvConfig, core: &mut NsvCore) -> Result<(), Error> {
-        if let Err(_) = core.use_version(self.version.clone()).await {
-            println!("err")
+        if let Err(err) = core.use_version(self.version.clone()).await {
+            println!("err1: {:?}", err)
         }
 
-        println!("{}", self.version);
         Ok(())
     }
 }
