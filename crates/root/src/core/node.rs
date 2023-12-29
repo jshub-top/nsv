@@ -125,7 +125,6 @@ impl NodeVersion for NsvCore {
     }
 
     async fn search_local_node_version(&self, _version: &str) -> Option<NodeVersionItem> {
-        println!("111");
         let mut dir = read_dir(&self.context.node_dir).await.unwrap();
         while let Some(entry) = dir.next_entry().await.unwrap() {
             let file_type = entry.file_type().await.unwrap();
