@@ -11,3 +11,4 @@ prefix
 target
 Cargo.lock
 dist
+bun.lockb

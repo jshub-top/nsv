@@ -3,6 +3,7 @@ import { request, get } from "http"
 import { join } from "path"
 import { combineArrays, download_file } from "../util"
 import { arch } from "os";
+import dayjs from "dayjs";
 
 
 export interface SyncOption {
@@ -56,11 +57,15 @@ export const sync_node_version_json = async function (
         const json_info = await stat(json_dir)
 
         // 如果最后修改日期大于12小时 重新请求并写入
-        if ((Date.now() - json_info.mtimeMs) < 1000 * 60 * 60 * 12) return
+        if ((Date.now() - json_info.mtimeMs) < 1000 * 60 * 60 * 12) {
+            console.log(`node version json file latest update time is: ${dayjs(json_info.mtime).format("YYYY-MM-DD HH:mm:ss")}`)
+            return
+        }
     }
 
     const node_version_url = `${origin}/dist/index.json`
     const node_version_json = await fetch(node_version_url).then(res => res.json())
+
     await writeJSON(json_dir, node_version_json, { encoding: "utf-8" })
 }
 
@@ -88,12 +93,17 @@ export const sync_node_version_file = async function (
         const file_dir = join(static_dir, file_name)
 
 
-        if (await exists(file_dir)) return
+        if (await exists(file_dir)) {
+            console.log(`node ${version} exist`)
+            return
+        }
 
+        console.log(`node ${version} downloading`)
         await download_file(
             url,
             file_dir,
-        )
+            )
+        console.log(`node ${version} downloded`)
     }
 
     const version_info = combineArrays([
