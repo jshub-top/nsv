@@ -11,7 +11,7 @@ pub trait Init {
 
 #[async_trait]
 impl Init for NsvCore {
-    async fn init(&self) -> () {
+    async fn init(&self) {
         futures::future::join_all([
             ensure_dir(self.context.node_dir.as_path()),
             ensure_dir(self.context.node_file.as_path()),

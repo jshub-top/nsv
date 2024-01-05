@@ -12,3 +12,6 @@ reqwest = { version = "0.11.22", features = ["stream", "json"] }
 semver = "1.0.20"
 tokio = { version = "1.34.0", features = ["full"] }
 serde = { version = "1.0.193", features = ["derive"] }
+sha256 = "1.5.0"
+sevenz-rust = "0.5.4"
+regex = "1"

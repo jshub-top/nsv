@@ -2,27 +2,24 @@ use std::env;
 use std::path::PathBuf;
 use crate::core::node::VersionTarget;
 
+
+
 #[derive(Debug, Clone)]
 pub struct Context {
     /**
-     * node压缩包扩展名
+     * node压缩包扩展名 tar.xz 7z
      */
     pub rar_extension: &'static str,
 
     /**
-     * 远程node文件的下载地址
-     */
-    pub download_url: &'static str,
-
-    /**
      * node压缩包的文件名
      */
-    pub file_name: &'static str,
+    pub file_name: String,
 
     /**
      * 当前node版本
      */
-    pub node_version: &'static str,
+    pub node_version: String,
 
     /**
      * 工作目录
@@ -53,6 +50,16 @@ pub struct Context {
      * 在本地已存在
      */
     pub local_exist: bool,
+
+    /**
+     * 操作系统类型
+     */
+    pub os: String,
+
+    /**
+     * cpu类型
+     */
+    pub arch: String,
 }
 
 impl Context {
@@ -62,6 +69,21 @@ impl Context {
         let rar_extension = "tar.xz";
         #[cfg(target_os = "windows")]
         let rar_extension = "7z";
+
+
+        #[cfg(target_os = "windows")]
+        let os = "win";
+        #[cfg(target_os = "linux")]
+        let os = "linux";
+        #[cfg(target_os = "macos")]
+        let os = "darwin";
+
+        #[cfg(target_arch = "x86_64")]
+        let arch = "x64";
+        #[cfg(target_arch = "aarch64")]
+        let arch = "arm64";
+
+
 
         let mut current_dir = env::current_exe().unwrap();
         current_dir.pop();
@@ -81,25 +103,27 @@ impl Context {
 
         Context {
             rar_extension,
-            download_url: "",
-            file_name: "",
-            node_version: "",
+            file_name: "".to_string(),
+            node_version: "".to_string(),
             pwd,
             temp,
             node_file,
             node_dir,
             target: VersionTarget::None,
             local_exist: false,
+            os: os.to_string(),
+            arch: arch.to_string(),
+
         }
     }
 }
 
 #[cfg(test)]
 mod test {
-    use crate::context::Context;
+    // use crate::context::Context;
 
     #[test]
     fn test_context() {
-        println!("{:?}", Context::build())
+        // println!("{:?}", Context::build())
     }
 }

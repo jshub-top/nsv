@@ -10,7 +10,7 @@ export interface SyncOption {
     origin?: string, // 镜像地址
     version?: string[], // 版本
     arch?: "x64" | "arm64", // cpu类型
-    system?: "win"| "linux"| "darwin", // 操作系统类型
+    system?: "win" | "linux" | "darwin", // 操作系统类型
     static_dir?: string // 静态资源目录
 }
 
@@ -88,28 +88,42 @@ export const sync_node_version_file = async function (
         const file_name = `node-${version}-${system}-${arch}.${ditc_system_file_extends[system]}`
 
         // https://nodejs.org/dist/v20.10.0/node-v20.10.0-darwin-x64.tar.xz
-        const url = `${origin}/dist/${version}/${file_name}`
+        const node_url = `${origin}/dist/${version}/${file_name}`
 
-        const file_dir = join(static_dir, file_name)
+        const node_file_dir = join(static_dir, version, file_name)
+
+        const shar256_url = `${origin}/dist/${version}/SHASUMS256.txt`
+        const shar256_filr_dir = join(static_dir, version, "SHASUMS256.txt")
 
 
-        if (await exists(file_dir)) {
-            console.log(`node ${version} exist`)
-            return
+        if (! await exists(node_file_dir)) {
+
+            console.log(`node ${version} downloading`)
+            await download_file(
+                node_url,
+                node_file_dir,
+            )
+            console.log(`node ${version} downloded`)
         }
 
-        console.log(`node ${version} downloading`)
-        await download_file(
-            url,
-            file_dir,
+        if (! await exists(shar256_filr_dir)) {
+
+            console.log(`node sha256 ${version} downloading`)
+            await download_file(
+                shar256_url,
+                shar256_filr_dir,
             )
-        console.log(`node ${version} downloded`)
+            console.log(`node sha256 ${version} downloded`)
+        }
+
+
+
     }
 
     const version_info = combineArrays([
         version,
-        [ arch ],
-        [ system ],
+        [arch],
+        [system],
     ])
     version_info.map(([version, arch, system]) => {
         sync_node(version, arch as ArrayToType<SyncOptionTrue["arch"]>, system as ArrayToType<SyncOptionTrue["system"]>)
