@@ -5,11 +5,11 @@ use regex::Regex;
 use serde::Deserialize;
 use sha256::try_async_digest;
 use tokio::{
-    fs::{create_dir_all, read_dir, remove_file, File},
+    fs::{create_dir_all, read_dir, remove_dir_all, remove_file, rename, File},
     io::AsyncReadExt,
 };
 
-use crate::util::download::download_file;
+use crate::util::download::{download_file, unzip_file};
 
 use super::NsvCore;
 
@@ -37,6 +37,16 @@ pub enum NsvCoreError {
      * 版本不存在
      */
     NotFound,
+
+    /**
+     * node 文件在未找到
+     */
+    NodeItemFIleNotFound,
+
+    /**
+     * node版本在本地已存在
+     */
+    NodeItemExisted,
 }
 
 #[async_trait]
@@ -71,7 +81,6 @@ pub trait NodeVersion {
      */
     async fn get_node_version_item(&self) -> Result<NodeVersionItem, NsvCoreError>;
 
-
     /**
      * 本地是否存 当前node版本
      */
@@ -96,6 +105,11 @@ pub trait NodeVersion {
     fn get_node_file_name(&self, node_item: &NodeVersionItem) -> String;
 
     /**
+     * 获取 node 解压之后的 文件夹名字
+     */
+    fn get_node_file_unzip_dir_name(&self, node_item: &NodeVersionItem) -> String;
+
+    /**
      * 确保 sha256 文件存在
      */
     async fn ensure_node_sha256_file_exist(&self, node_item: &NodeVersionItem);
@@ -118,20 +132,44 @@ pub trait NodeVersion {
     /**
      * 解压node 文件
      */
-    async fn unzip_node_item(&self, node_item: &NodeVersionItem);
+    async fn unzip_node_item(&self, node_item: &NodeVersionItem) -> Result<(), NsvCoreError>;
 }
 
 #[async_trait]
 impl NodeVersion for NsvCore {
-    async fn unzip_node_item(&self, node_item: &NodeVersionItem) {
+    async fn unzip_node_item(&self, node_item: &NodeVersionItem) -> Result<(), NsvCoreError> {
         let node_file_dir = self.get_node_file_path(node_item);
 
+        if !node_file_dir.exists() {
+            return Err(NsvCoreError::NodeItemFIleNotFound);
+        }
+
+        let unzip_dir = self.context.node_dir.clone().join(&node_item.version);
+
+        if unzip_dir.exists() {
+            remove_dir_all(&unzip_dir).await.unwrap();
+            create_dir_all(&unzip_dir).await.unwrap();
+        }
+
+        unzip_file(&node_file_dir, &unzip_dir.parent().unwrap())
+            .await
+            .unwrap();
+
+        let unzip_file_dir_name = self
+            .context
+            .node_dir
+            .clone()
+            .join(self.get_node_file_unzip_dir_name(node_item));
+
+        println!("{:?}", unzip_file_dir_name);
+        rename(unzip_file_dir_name, unzip_dir).await.unwrap();
+
+        Ok(())
     }
     async fn vail_and_download_file(&self, node_item: &NodeVersionItem) -> bool {
         let local_node_item_dir = self.get_node_file_path(node_item);
         if !local_node_item_dir.exists() {
             #[cfg(debug_assertions)]
-            println!("文件不存在");
             self.download_node(node_item).await.unwrap();
         }
         let mut vail_ok = self.vail_local_node_item(node_item).await;
@@ -200,6 +238,10 @@ impl NodeVersion for NsvCore {
             &node_item.version, self.context.os, self.context.arch, self.context.rar_extension
         );
     }
+    fn get_node_file_unzip_dir_name(&self, node_item: &NodeVersionItem) -> String {
+        self.get_node_file_name(node_item)
+            .replace(format!(".{}", self.context.rar_extension).as_str(), "")
+    }
     async fn download_node(
         &self,
         node_item: &NodeVersionItem,
@@ -259,9 +301,7 @@ impl NodeVersion for NsvCore {
         }
         let assign_version_regexp = Regex::new(&version_regexp_str).unwrap();
 
-
         let mut _node_item = None;
-
 
         let mut dir = read_dir(&self.context.node_dir).await.unwrap();
         while let Some(entry) = dir.next_entry().await.unwrap() {
@@ -278,11 +318,9 @@ impl NodeVersion for NsvCore {
             _node_item = Some(NodeVersionItem {
                 version: version_str.to_string(),
                 date: "".to_string(),
-                lts: NodeVersionLts::Bool(false)
+                lts: NodeVersionLts::Bool(false),
             })
-
         }
-
 
         if let None = _node_item {
             let version_list = self.origin_node_version().await;
@@ -334,7 +372,6 @@ impl NodeVersion for NsvCore {
                 version_item = self.get_latest_version().await;
             }
             VersionTarget::Assign => {
-
                 if let None = version_item {
                     version_item = self.get_assign_version().await;
                 }
@@ -348,7 +385,6 @@ impl NodeVersion for NsvCore {
 
         Err(NsvCoreError::Empyt)
     }
-
 
     fn assign_local_node_exist(&self, node_item: &NodeVersionItem) -> bool {
         let node_dir = self.context.node_dir.clone();

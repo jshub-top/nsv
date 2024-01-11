@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 
 
-use super::{NsvCore, node::{NsvCoreError, NodeVersion as _}};
+use super::{NsvCore, node::{NsvCoreError, NodeVersion}};
 
 
 
@@ -18,14 +18,16 @@ impl AddVersion for NsvCore {
 
         let node_exist = self.assign_local_node_exist(&node_item);
 
-        // 如果在本地不存在这个版本
-        if !node_exist {
-
-
-            self.vail_and_download_file(&node_item).await;
-
+        // 如果在本地存在这个版本
+        if node_exist {
+            return Err(NsvCoreError::NodeItemExisted)
         }
 
-        Ok(())
+
+
+        self.vail_and_download_file(&node_item).await;
+        self.unzip_node_item(&node_item).await.unwrap();
+        return Ok(())
+
     }
 }
