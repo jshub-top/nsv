@@ -14,25 +14,14 @@ pub struct Add {
 #[async_trait]
 impl Command for Add {
     async fn apply(&self, _config: &NsvConfig, core: &mut NsvCore) -> Result<(), NsvCoreError> {
-        match core.add_version(self.version.clone()).await {
 
-            Ok(()) => {
-                let node_item = core.context.node_item.clone().unwrap();
-                print_log_1!("nsv: {} add successlfy!", node_item.version)
-            }
-            Err(err) => {
-                if err == NsvCoreError::NodeItemExisted {
-                    let node_item = core.context.node_item.clone().unwrap();
-                    print_log_1!("{} already exist!", node_item.version);
-                    return Ok(());
-                }
+        core.add_version(self.version.clone()).await?;
 
-                return Err(err);
-
-
-            }
+        if let Some(node_item) = &core.context.node_item {
+            print_log_1!("nsv: {} add successlfy!", node_item.version);
         }
         Ok(())
+
     }
 }
 

@@ -24,6 +24,11 @@ pub enum VersionTarget {
 #[derive(PartialEq, Debug)]
 pub enum NsvCoreError {
     /**
+     * 自定义报错信息
+     */
+    String(String),
+
+    /**
      * 空值
      */
     Empyt,
