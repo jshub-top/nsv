@@ -1,7 +1,7 @@
-use std::path::Path;
-
 use futures_util::StreamExt;
-use tokio::{fs::{File, create_dir_all}, io::AsyncWriteExt};
+use std::path::Path;
+use tokio::{fs::create_dir_all, io::AsyncWriteExt};
+use tokio::fs::File;
 
 pub async fn download_file(url: &str, path: &Path) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = File::create(path).await?;
@@ -14,9 +14,10 @@ pub async fn download_file(url: &str, path: &Path) -> Result<(), Box<dyn std::er
     Ok(())
 }
 
-
-pub async fn unzip_file(zip_file_dir: &Path, output_dir: &Path) -> Result<(), Box<dyn std::error::Error>> {
-
+pub async fn unzip_file(
+    zip_file_dir: &Path,
+    output_dir: &Path,
+) -> Result<(), Box<dyn std::error::Error>> {
     create_dir_all(output_dir.parent().unwrap()).await.unwrap();
 
     #[cfg(target_os = "windows")]
@@ -24,15 +25,18 @@ pub async fn unzip_file(zip_file_dir: &Path, output_dir: &Path) -> Result<(), Bo
         sevenz_rust::decompress_file(zip_file_dir, output_dir).unwrap();
     }
 
-    // #[cfg(any(target_os = "linux", target_os = "macos"))]
-    // {
-
-    // }
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    {
+        let mut unzip_file = File::open(zip_file_dir).await.unwrap();
+        let mut unzip_file_buf = Vec::new();
+        unzip_file.read_to_end(&mut unzip_file_buf).await.unwrap();
+        let xz = XzDecoder::new(&unzip_file_buf[..]);
+        let mut archive = Archive::new(xz);
+        archive.unpack(output_dir).unwrap();
+    }
 
     Ok(())
 }
-
-
 
 #[cfg(test)]
 mod test {
