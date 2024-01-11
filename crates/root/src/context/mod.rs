@@ -1,6 +1,6 @@
 use std::env;
 use std::path::PathBuf;
-use crate::core::node::VersionTarget;
+use crate::core::node::{VersionTarget, NodeVersionItem};
 
 
 
@@ -60,6 +60,11 @@ pub struct Context {
      * cpu类型
      */
     pub arch: String,
+
+    /**
+     * nodeitem
+     */
+    pub node_item: Option<NodeVersionItem>
 }
 
 impl Context {
@@ -113,7 +118,7 @@ impl Context {
             local_exist: false,
             os: os.to_string(),
             arch: arch.to_string(),
-
+            node_item: None,
         }
     }
 }
