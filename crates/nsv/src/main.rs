@@ -1,6 +1,7 @@
 mod cli;
 mod command;
 mod config;
+mod log;
 use cli::parse;
 use root::{config::Config, core::{NsvCore, init::Init}};
 

@@ -2,10 +2,10 @@ mod r#use;
 mod add;
 use async_trait::async_trait;
 use r#use::Use;
-use root::core::NsvCore;
+use root::core::{NsvCore, node::NsvCoreError};
 use add::Add;
 
-use crate::config::NsvConfig;
+use crate::{config::NsvConfig, print_log_err};
 
 #[derive(clap::Parser, Debug)]
 pub enum Commands {
@@ -28,19 +28,18 @@ impl Commands {
 
 #[async_trait]
 pub trait Command {
-    type Error: std::error::Error;
     async fn call(&self, config: NsvConfig, core: &mut NsvCore) {
         match self.apply(&config, core).await {
             Ok(()) => (),
-            Err(err) => self.handle_err(err, &config),
+            Err(err) => self.handle_err(err, &config, core),
         }
     }
 
-    async fn apply(&self, config: &NsvConfig, core: &mut NsvCore) -> Result<(), Self::Error>;
+    async fn apply(&self, config: &NsvConfig, core: &mut NsvCore) -> Result<(), NsvCoreError>;
 
-    fn handle_err(&self, err: Self::Error, config: &NsvConfig) {
-        let err_s = format!("{err}");
-        println!("err: {}. config: {:?}", err_s, config);
+    fn handle_err(&self, err: NsvCoreError, config: &NsvConfig, core: &mut NsvCore) {
+        let err_s = format!("{:?}", err);
+        print_log_err!("{}.\nconfig: {:?} \ncontext: {:?}", err_s, config, core.context);
         std::process::exit(1);
     }
 }

@@ -1,10 +1,10 @@
 use async_trait::async_trait;
-use root::core::NsvCore;
+use root::core::{node::NsvCoreError, NsvCore};
 
-use crate::config::NsvConfig;
-use thiserror::Error;
-use root::core::add::AddVersion;
 use super::Command;
+use crate::{config::NsvConfig, print_log_1};
+use root::core::add::AddVersion;
+use thiserror::Error;
 
 #[derive(clap::Parser, Debug)]
 pub struct Add {
@@ -13,10 +13,24 @@ pub struct Add {
 
 #[async_trait]
 impl Command for Add {
-    type Error = Error;
-    async fn apply(&self, _config: &NsvConfig, core: &mut NsvCore) -> Result<(), Error> {
-        if let Err(err) = core.add_version(self.version.clone()).await {
-            println!("err1: {:?}", err)
+    async fn apply(&self, _config: &NsvConfig, core: &mut NsvCore) -> Result<(), NsvCoreError> {
+        match core.add_version(self.version.clone()).await {
+
+            Ok(()) => {
+                let node_item = core.context.node_item.clone().unwrap();
+                print_log_1!("nsv: {} add successlfy!", node_item.version)
+            }
+            Err(err) => {
+                if err == NsvCoreError::NodeItemExisted {
+                    let node_item = core.context.node_item.clone().unwrap();
+                    print_log_1!("{} already exist!", node_item.version);
+                    return Ok(());
+                }
+
+                return Err(err);
+
+
+            }
         }
         Ok(())
     }

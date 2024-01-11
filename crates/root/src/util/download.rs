@@ -27,6 +27,10 @@ pub async fn unzip_file(
 
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     {
+
+        use tar::Archive;
+        use tokio::io::AsyncReadExt;
+        use xz2::read::XzDecoder;
         let mut unzip_file = File::open(zip_file_dir).await.unwrap();
         let mut unzip_file_buf = Vec::new();
         unzip_file.read_to_end(&mut unzip_file_buf).await.unwrap();
@@ -34,6 +38,8 @@ pub async fn unzip_file(
         let mut archive = Archive::new(xz);
         archive.unpack(output_dir).unwrap();
     }
+
+
 
     Ok(())
 }

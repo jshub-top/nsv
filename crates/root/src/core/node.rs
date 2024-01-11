@@ -161,7 +161,6 @@ impl NodeVersion for NsvCore {
             .clone()
             .join(self.get_node_file_unzip_dir_name(node_item));
 
-        println!("{:?}", unzip_file_dir_name);
         rename(unzip_file_dir_name, unzip_dir).await.unwrap();
 
         Ok(())
