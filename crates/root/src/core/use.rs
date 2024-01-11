@@ -18,7 +18,7 @@ impl UseVersion for NsvCore {
         // 验证 版本是否有效
         self.vail_version(&version)?;
 
-        let node_item = self.get_node_version_item().await;
+        let _node_item = self.get_node_version_item().await;
 
 
         Ok(())
