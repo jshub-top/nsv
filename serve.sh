@@ -1,1 +1,1 @@
- cd serve && bun run start 
+cd serve && bun run start
