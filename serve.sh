@@ -1,1 +1,1 @@
-cd serve && bun run start
+cd crates/serve && cargo run

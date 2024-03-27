@@ -1,7 +1,9 @@
 {
     "rust-analyzer.linkedProjects": [
         ".\\crates\\root\\Cargo.toml",
-        ".\\crates\\nsv\\Cargo.toml"
+        ".\\crates\\nsv\\Cargo.toml",
+        ".\\crates\\serve\\Cargo.toml"
     ],
-    "terminal.explorerKind": "both"
+    "terminal.explorerKind": "both",
+    "rust-analyzer.showUnlinkedFileNotification": false
 }
