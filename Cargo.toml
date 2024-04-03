@@ -1,0 +1,16 @@
+
+
+
+
+[workspace]
+resolver = "2"
+members = [
+    "crates/root",
+    "crates/nsv",
+    "crates/serve",
+]
+
+[profile.release]
+opt-level = 'z'  # Optimize for size
+lto = true
+codegen-units = 1
