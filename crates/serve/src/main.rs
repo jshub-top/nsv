@@ -7,6 +7,8 @@ mod app;
 mod controller;
 mod util;
 mod config;
+mod service;
+mod model;
 
 
 
