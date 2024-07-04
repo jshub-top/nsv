@@ -2,7 +2,7 @@
 #[derive(Debug, Clone)]
 pub struct Config {
     pub origin: &'static str,
-    // pub version: String,
+
 }
 
 impl Config {

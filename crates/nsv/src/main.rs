@@ -17,5 +17,5 @@ async fn main() {
 
     let mut nsv_core = NsvCore::build(config);
     nsv_core.init().await;
-    cli.subcmd.call(cli.config, &mut nsv_core).await
+    cli.subcmd.call(&mut nsv_core).await
 }

@@ -1,7 +1,6 @@
 use clap::Parser;
 
 use crate::command::Commands;
-use crate::config::NsvConfig;
 
 
 
@@ -9,9 +8,6 @@ use crate::config::NsvConfig;
 #[clap(name = "nsv", version = env!("CARGO_PKG_VERSION"), bin_name = "nsv")]
 pub struct Cli {
     // pub core: NsvCore,
-
-    #[clap(flatten)]
-    pub config: NsvConfig,
 
     #[clap(subcommand)]
     pub subcmd: Commands,

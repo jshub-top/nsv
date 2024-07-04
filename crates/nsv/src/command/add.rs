@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use root::core::{node::NsvCoreError, NsvCore};
 
 use super::Command;
-use crate::{config::NsvConfig, print_log_1};
+use crate::{ print_log_1};
 use root::core::add::AddVersion;
 use thiserror::Error;
 
@@ -13,7 +13,7 @@ pub struct Add {
 
 #[async_trait]
 impl Command for Add {
-    async fn apply(&self, _config: &NsvConfig, core: &mut NsvCore) -> Result<(), NsvCoreError> {
+    async fn apply(&self, core: &mut NsvCore) -> Result<(), NsvCoreError> {
 
         core.add_version(self.version.clone()).await?;
 

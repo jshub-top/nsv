@@ -142,7 +142,8 @@ pub trait NodeVersion {
 
 #[async_trait]
 impl NodeVersion for NsvCore {
-    async fn unzip_node_item(&self, node_item: &NodeVersionItem) -> Result<(), NsvCoreError> {
+
+      async fn unzip_node_item(&self, node_item: &NodeVersionItem) -> Result<(), NsvCoreError> {
         let node_file_dir = self.get_node_file_path(node_item);
 
         if !node_file_dir.exists() {
@@ -170,6 +171,7 @@ impl NodeVersion for NsvCore {
 
         Ok(())
     }
+
     async fn vail_and_download_file(&self, node_item: &NodeVersionItem) -> bool {
         let local_node_item_dir = self.get_node_file_path(node_item);
         if !local_node_item_dir.exists() {
