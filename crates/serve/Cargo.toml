@@ -7,9 +7,13 @@ edition = "2021"
 
 [dependencies]
 tokio = { version = "1.36.0", features = ["full"] }
-axum = "0.7.4"
+axum = { version = "0.7.5", features = ["macros"] }
 serde = { version = "1.0", features = ["derive"] }
 hyper = "1.2.0"
 regex = "1.10.4"
 sea-orm = { version = "0.12", features = [ "sqlx-sqlite", "runtime-tokio-rustls", "macros" ] }
 dotenvy = "0.15.7"
+reqwest = "0.12.5"
+tower-http = { version = "0.5.2", features = ["trace", "fs"] }
+futures = "0.3.30"
+tokio-util = { version = "0.7", features = ["io"] }
