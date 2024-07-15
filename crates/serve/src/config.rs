@@ -1,10 +1,11 @@
 use std::{env, sync::Arc};
 
+#[derive(Debug)]
 pub struct Config {
     pub port: String,
     pub host: String,
     pub db_url: String,
-    pub server_url: String,
+    pub base_url: String,
 }
 
 impl Config {
@@ -22,7 +23,6 @@ impl Config {
 
         let port = env::var("PORT").expect("PORT env var get error");
         let host = env::var("HOST").expect("HOST env var get error");
-        let server_url = format!("{host}:{port}");
 
         println!("{}", db_url);
 
@@ -30,7 +30,7 @@ impl Config {
             db_url,
             port,
             host,
-            server_url,
+            base_url: "https://nodejs.org/dist".to_string()
         })
     }
 }
