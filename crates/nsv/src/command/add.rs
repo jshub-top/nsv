@@ -1,10 +1,9 @@
 use async_trait::async_trait;
-use root::core::{node::NsvCoreError, NsvCore};
+use thiserror::Error;
+use root::core::NsvCore;
 
 use super::Command;
-use crate::{ print_log_1};
-use root::core::add::AddVersion;
-use thiserror::Error;
+use root::node::{NodeDispose, NsvCoreError};
 
 #[derive(clap::Parser, Debug)]
 pub struct Add {
@@ -14,14 +13,7 @@ pub struct Add {
 #[async_trait]
 impl Command for Add {
     async fn apply(&self, core: &mut NsvCore) -> Result<(), NsvCoreError> {
-
-        core.add_version(self.version.clone()).await?;
-
-        if let Some(node_item) = &core.context.node_item {
-            print_log_1!("nsv: {} add successlfy!", node_item.version);
-        }
-        Ok(())
-
+        core.sync_version_by_str(&self.version).await
     }
 }
 

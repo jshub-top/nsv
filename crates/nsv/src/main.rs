@@ -3,19 +3,14 @@ mod command;
 mod config;
 mod log;
 use cli::parse;
-use root::{config::Config, core::{NsvCore, init::Init}};
+use config::parse_config;
+use root::core::{init::Init, NsvCore};
 
 #[tokio::main]
 async fn main() {
     let cli = parse();
-    let mut config = Config::build();
 
-    #[cfg(debug_assertions)]
-    {
-        config.origin = "http://127.0.0.1:3000";
-    }
-
-    let mut nsv_core = NsvCore::build(config);
+    let mut nsv_core = NsvCore::build(parse_config());
     nsv_core.init().await;
-    cli.subcmd.call(&mut nsv_core).await
+    cli.subcommand.call(&mut nsv_core).await
 }

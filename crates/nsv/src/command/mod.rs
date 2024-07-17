@@ -1,11 +1,12 @@
-mod r#use;
 mod add;
+mod r#use;
+use add::Add;
 use async_trait::async_trait;
 use r#use::Use;
-use root::core::{NsvCore, node::NsvCoreError};
-use add::Add;
-
-use crate::{print_log_err};
+use root::core::{ NsvCore};
+use root::node;
+use root::node::NsvCoreError;
+use crate::print_log_err;
 
 #[derive(clap::Parser, Debug)]
 pub enum Commands {
@@ -20,8 +21,8 @@ pub enum Commands {
 impl Commands {
     pub async fn call(&self, core: &mut NsvCore) {
         match self {
-            Self::Use(cmd) => cmd.call( core).await,
-            Self::Add(cmd) => cmd.call( core).await,
+            Self::Use(cmd) => cmd.call(core).await,
+            Self::Add(cmd) => cmd.call(core).await,
         }
     }
 }
@@ -31,7 +32,24 @@ pub trait Command {
     async fn call(&self, core: &mut NsvCore) {
         match self.apply(core).await {
             Ok(()) => (),
-            Err(err) => self.handle_err(err, core),
+            Err(err) => {
+                println!("err: {:?}", err);
+                match err {
+                    NsvCoreError::NodeItemExisted => {
+                        println!("nsv: version is existed")
+                    }
+                    _ => {
+                        core.context.node_version_list = None;
+                        println!(
+                            "err: {:?}\n{:?}\n{:?}",
+                            err,
+                            core.context,
+                            core.config,
+                        );
+                        panic!()
+                    }
+                }
+            },
         }
     }
 

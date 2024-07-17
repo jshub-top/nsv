@@ -10,7 +10,7 @@ pub struct Cli {
     // pub core: NsvCore,
 
     #[clap(subcommand)]
-    pub subcmd: Commands,
+    pub subcommand: Commands,
 }
 
 pub fn parse() -> Cli {
