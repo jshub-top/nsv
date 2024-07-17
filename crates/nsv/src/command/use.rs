@@ -1,19 +1,27 @@
 use async_trait::async_trait;
-use root::core::{NsvCore};
+use root::{core::NsvCore, node::NodeDispose};
 
-use thiserror::Error;
-use root::node::NsvCoreError;
 use super::Command;
+use root::node::NsvCoreError;
+use thiserror::Error;
 
 #[derive(clap::Parser, Debug)]
 pub struct Use {
     version: String,
 }
 
-
 #[async_trait]
 impl Command for Use {
     async fn apply(&self, core: &mut NsvCore) -> Result<(), NsvCoreError> {
+        core.format_version_str(&self.version)?;
+
+        // let version = core.find_version_by_local(&self.version).await;
+
+        // if version.is_none() {
+        //     return Err(NsvCoreError::NodeVersionLocalNotFound)
+        // }
+
+
 
 
         Ok(())
