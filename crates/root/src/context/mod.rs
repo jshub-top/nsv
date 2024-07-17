@@ -1,75 +1,59 @@
 use std::env;
+use std::env::current_dir;
 use std::path::PathBuf;
-use crate::core::node::{VersionTarget, NodeVersionItem};
-
-
+use crate::node::{NodeVersionItem, VersionTarget};
 
 #[derive(Debug, Clone)]
 pub struct Context {
-    /**
-     * node压缩包扩展名 tar.xz 7z
-     */
+    /// node压缩包扩展名 tar.xz 7z
     pub rar_extension: &'static str,
 
-    /**
-     * node压缩包的文件名
-     */
+
+    /// node压缩包的文件名
     pub file_name: String,
 
-    /**
-     * 当前node版本
-     */
-    pub node_version: String,
 
-    /**
-     * 工作目录
-     */
+    /// 操作的node版本
+    pub version: String,
+
+    /// 工作目录
     pub pwd: PathBuf,
 
-    /**
-     * 缓存路径
-     */
+    /// nsv home
+    pub nsv_home: PathBuf,
+
+    /// 缓存路径
     pub temp: PathBuf,
 
-    /**
-     * node压缩包路径
-     */
+
+    /// node压缩包路径
     pub node_file: PathBuf,
 
-    /**
-     * node解压完成路径
-     */
+
+    /// node解压完成路径
     pub node_dir: PathBuf,
 
-    /**
-     * node 版本标记
-     */
+
+    /// node 版本标记
     pub target: VersionTarget,
 
-    /**
-     * 在本地已存在
-     */
-    pub local_exist: bool,
-
-    /**
-     * 操作系统类型
-     */
+    /// 操作系统类型
     pub os: String,
 
-    /**
-     * cpu类型
-     */
+
+    /// cpu类型
     pub arch: String,
 
-    /**
-     * nodeitem
-     */
-    pub node_item: Option<NodeVersionItem>
+    /// 远程 nodejs 列表
+    pub node_version_list: Option<Vec<NodeVersionItem>>,
 }
 
 impl Context {
     pub fn build() -> Context {
         // https://nodejs.org/dist/v20.9.0/node-v20.9.0-win-x86.7z
+
+
+
         #[cfg(any(target_os = "linux", target_os = "macos"))]
         let rar_extension = "tar.xz";
         #[cfg(target_os = "windows")]
@@ -89,36 +73,34 @@ impl Context {
         let arch = "arm64";
 
 
+        let mut nsv_home = env::current_exe().unwrap();
+        nsv_home.pop();
 
-        let mut current_dir = env::current_exe().unwrap();
-        current_dir.pop();
-        let pwd = current_dir.clone();
+        nsv_home.push("temp");
+        let temp = nsv_home.clone();
+        nsv_home.pop();
 
-        current_dir.push("temp");
-        let temp = current_dir.clone();
+        nsv_home.push("node_file");
+        let node_file = nsv_home.clone();
+        nsv_home.pop();
 
-        current_dir.pop();
-        current_dir.push("node_file");
-        let node_file = current_dir.clone();
-
-        current_dir.pop();
-        current_dir.push("node_dir");
-        let node_dir = current_dir.clone();
+        nsv_home.push("node_dir");
+        let node_dir = nsv_home.clone();
 
 
         Context {
-            rar_extension,
             file_name: "".to_string(),
-            node_version: "".to_string(),
-            pwd,
+            rar_extension,
+            version: "".to_string(),
+            nsv_home,
+            pwd: current_dir().unwrap(),
             temp,
             node_file,
             node_dir,
-            target: VersionTarget::None,
-            local_exist: false,
+            target: VersionTarget::Latest,
             os: os.to_string(),
             arch: arch.to_string(),
-            node_item: None,
+            node_version_list: None,
         }
     }
 }
