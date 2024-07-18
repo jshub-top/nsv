@@ -14,6 +14,7 @@ pub struct Add {
 impl Command for Add {
     async fn apply(&self, core: &mut NsvCore) -> Result<(), NsvCoreError> {
         let version = core.format_version(&self.version)?;
+
         core.set_version_target(&version)?;
         let local_node_version = core.get_version_by_local(&version).await;
         if local_node_version.is_some() {
@@ -21,16 +22,12 @@ impl Command for Add {
         }
         drop(local_node_version);
 
-        let mut remote_node_version = None;
-
-        {
-            remote_node_version = core.get_version_by_remote().await
-        }
+        let remote_node_version = core.get_version_by_remote().await;
 
         if remote_node_version.is_none() {
             return Err(NsvCoreError::NodeVersionRemoteNotFound);
         };
-        let remote_node_version = remote_node_version.unwrap();
+        let remote_node_version = remote_node_version.unwrap().clone();
 
         core.context.version = core.format_version(&remote_node_version.version)?;
 

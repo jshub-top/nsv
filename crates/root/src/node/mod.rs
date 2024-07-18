@@ -83,11 +83,23 @@ pub trait NodeDispose {
 impl NodeDispose for NsvCore {
 
     fn format_version(&self, version: &str) -> Result<String, NsvCoreError>{
+
+        // 空字符串
+        if version.len() == 0 {
+            return Err(NsvCoreError::Empty);
+        }
+
+        // 正则校验
+        let version_reg = create_node_version_vaildate_reg("");
+        if !version_reg.is_match(version) {
+            return Err(NsvCoreError::IllegalityVersion(version.to_string()));
+        }
+
         let (char, ver) = version.split_at(1);
         if char == "v" {
             return Ok(ver.to_string());
         }
-        return Ok(ver.to_string());
+        return Ok(version.to_string());
     }
     fn get_local_node_dir_2_dir_entry(&self, version: &str) -> Option<DirEntry> {
         let version_reg = regex::Regex::new(&format!("^{}", version)).unwrap();

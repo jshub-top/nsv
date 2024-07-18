@@ -12,17 +12,14 @@ pub struct Use {
 
 #[async_trait]
 impl Command for Use {
-    async fn apply(&self, core: &mut NsvCore) -> Result<(), NsvCoreError> {
-        core.format_version_str(&self.version)?;
+    async fn apply(&self, _core: &mut NsvCore) -> Result<(), NsvCoreError> {
+        // core.format_version_str(&self.version)?;
 
         // let version = core.find_version_by_local(&self.version).await;
 
         // if version.is_none() {
         //     return Err(NsvCoreError::NodeVersionLocalNotFound)
         // }
-
-
-
 
         Ok(())
     }
