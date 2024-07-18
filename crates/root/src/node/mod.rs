@@ -195,8 +195,6 @@ impl NodeDispose for NsvCore {
             target,
         };
 
-        println!("{:?}", download_fine_info);
-
         self.download_node_by_remote(&download_fine_info).await;
 
         return download_fine_info
