@@ -32,7 +32,22 @@ pub trait Command {
         match self.apply(core).await {
             Ok(()) => (),
             Err(err) => {
-                self.handle_err(err, core);
+                match err {
+                    NsvCoreError::NodeVersionLocalExist(version) => {
+                        print_log_err!("node version {} already exist", version);
+                    }
+                    NsvCoreError::NodeVersionLocalNotFound => {
+                        print_log_err!("node version not found by local");
+                    }
+                    NsvCoreError::NodeVersionRemoteNotFound => {
+                        print_log_err!("node version not found byg remote")
+                    }
+                    NsvCoreError::IllegalityVersion(version) => {
+                        print_log_err!("illegality version: {}", version)
+                    }
+                    _ => self.handle_err(err, core)
+                };
+
             }
         }
     }
