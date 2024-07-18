@@ -4,9 +4,9 @@ use crate::util::dir::ensure_dir;
 use crate::util::download::{download_file, unzip_file};
 use async_trait::async_trait;
 use serde::Deserialize;
-use tokio::fs::{remove_dir, remove_dir_all, rename};
 use std::fs::{read_dir, DirEntry};
 use std::path::{Path, PathBuf};
+use tokio::fs::rename;
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum VersionTarget {
@@ -45,7 +45,7 @@ pub enum NsvCoreError {
     /**
      * 本地已存在
      */
-    NodeVersionLocalExist,
+    NodeVersionLocalExist(String),
 }
 
 #[async_trait]
@@ -56,13 +56,11 @@ pub trait NodeDispose {
     /// 格式化用户输入的 版本
     fn set_version_target(&mut self, version: &str) -> Result<(), NsvCoreError>;
 
-
     /// 获取远程 node列表
     async fn get_version_list_by_remote(&mut self);
 
     /// 查找node版本 通过远程
     async fn get_version_by_remote(&mut self) -> Option<&NodeVersionItem>;
-
 
     /// 下载node
     async fn download_node_by_remote(&mut self, version: &DownloadNodeItem);
@@ -75,12 +73,10 @@ pub trait NodeDispose {
 
     /// 获取本地node版本
     async fn get_version_by_local(&mut self) -> Option<String>;
-
 }
 
 #[async_trait]
 impl NodeDispose for NsvCore {
-
     fn get_local_node_dir_2_dir_entry(&self, version: &str) -> Option<DirEntry> {
         let version_reg = regex::Regex::new(&format!("^{}", version)).unwrap();
         for entry in read_dir(&self.context.node_dir).unwrap() {
@@ -93,8 +89,8 @@ impl NodeDispose for NsvCore {
     }
 
     fn set_version_target(&mut self, version: &str) -> Result<(), NsvCoreError> {
-          // 空字符串
-          if version.len() == 0 {
+        // 空字符串
+        if version.len() == 0 {
             return Err(NsvCoreError::Empty);
         }
         let target = match version {
@@ -157,7 +153,6 @@ impl NodeDispose for NsvCore {
         }
     }
 
-
     async fn download_node_by_remote(&mut self, download_fine_info: &DownloadNodeItem) {
         download_file(&download_fine_info.url, &download_fine_info.target)
             .await
@@ -169,14 +164,10 @@ impl NodeDispose for NsvCore {
             "node-v{}-{}-{}.{}",
             version, self.context.os, self.context.arch, self.context.rar_extension
         );
-        let url = format!(
-            "{}/v{}/{}",
-            self.config.origin, version, file_name
-        );
+        let url = format!("{}/v{}/{}", self.config.origin, version, file_name);
         let mut target = self.context.node_file.clone();
         target.push(&file_name);
 
-        println!("url: {:?}", url);
         let download_fine_info = DownloadNodeItem {
             file_name,
             url,
@@ -185,7 +176,7 @@ impl NodeDispose for NsvCore {
 
         self.download_node_by_remote(&download_fine_info).await;
 
-        return download_fine_info
+        return download_fine_info;
     }
 
     async fn unzip_node_file(&self, file_dir: &Path) {
@@ -193,20 +184,21 @@ impl NodeDispose for NsvCore {
         ensure_dir(&output_dir).await.unwrap();
         unzip_file(file_dir, &output_dir).await.unwrap();
 
-
-        let node_dir_file_name = file_dir.file_name().unwrap().to_str().unwrap().replace(&format!(".{}", self.context.rar_extension), "");
+        let node_dir_file_name = file_dir
+            .file_name()
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .replace(&format!(".{}", self.context.rar_extension), "");
 
         output_dir.push(node_dir_file_name.clone());
 
         let mut node_dir = self.context.node_dir.clone();
         node_dir.push(self.context.version.clone());
-        println!("output_dir: {:?}", &output_dir);
-        println!("node_dir: {:?}", &node_dir);
         rename(&output_dir, &node_dir).await.unwrap();
     }
 
     async fn get_version_by_local(&mut self) -> Option<String> {
-
         let version: Option<String> = match &self.context.target {
             // 输入 lts latest 等
             VersionTarget::Latest | VersionTarget::Lts => {
@@ -214,7 +206,7 @@ impl NodeDispose for NsvCore {
                 if node_version_item.is_none() {
                     return None;
                 }
-                Some(node_version_item.unwrap().version.clone())
+                Some(node_version_item.unwrap().get_version())
             }
             // 输入的是精准node版本
             VersionTarget::Assign(version) => Some(version.clone()),
@@ -262,10 +254,9 @@ pub struct NodeVersionItem {
     pub security: bool,
 }
 
-
 impl NodeVersionItem {
     pub fn get_version(&self) -> String {
-        let (v, version) = self.version.split_at(1);
+        let (_, version) = self.version.split_at(1);
         return version.to_string();
     }
 }

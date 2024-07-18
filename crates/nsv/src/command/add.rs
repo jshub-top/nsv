@@ -16,7 +16,7 @@ impl Command for Add {
         core.set_version_target(&self.version)?;
         let local_node_version = core.get_version_by_local().await;
         if local_node_version.is_some() {
-            return Err(NsvCoreError::NodeVersionLocalExist)
+            return Err(NsvCoreError::NodeVersionLocalExist(local_node_version.unwrap()))
         }
         drop(local_node_version);
 
