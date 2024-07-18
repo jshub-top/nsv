@@ -13,10 +13,8 @@ pub struct Add {
 #[async_trait]
 impl Command for Add {
     async fn apply(&self, core: &mut NsvCore) -> Result<(), NsvCoreError> {
-        let version = core.format_version(&self.version)?;
-
-        core.set_version_target(&version)?;
-        let local_node_version = core.get_version_by_local(&version).await;
+        core.set_version_target(&self.version)?;
+        let local_node_version = core.get_version_by_local().await;
         if local_node_version.is_some() {
             return Err(NsvCoreError::NodeVersionLocalExist)
         }
@@ -24,14 +22,14 @@ impl Command for Add {
 
         let remote_node_version = core.get_version_by_remote().await;
 
+
         if remote_node_version.is_none() {
             return Err(NsvCoreError::NodeVersionRemoteNotFound);
         };
+
         let remote_node_version = remote_node_version.unwrap().clone();
 
-        core.context.version = core.format_version(&remote_node_version.version)?;
-
-        let download_node_info = core.sync_node_by_remote().await;
+        let download_node_info = core.sync_node_by_remote(&remote_node_version.get_version()).await;
 
         core.unzip_node_file(&download_node_info.target).await;
 
