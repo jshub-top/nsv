@@ -1,8 +1,10 @@
 mod add;
 mod r#use;
+mod install;
 use crate::print_log_err;
 use add::Add;
 use async_trait::async_trait;
+use install::Install;
 use r#use::Use;
 use root::core::NsvCore;
 use root::node::NsvCoreError;
@@ -16,12 +18,17 @@ pub enum Commands {
     /// 下载node版本
     #[clap(name = "add", bin_name = "add")]
     Add(Add),
+
+    /// 安装 Nsv
+    #[clap(name = "install", bin_name = "install")]
+    Install(Install)
 }
 impl Commands {
     pub async fn call(&self, core: &mut NsvCore) {
         match self {
             Self::Use(cmd) => cmd.call(core).await,
             Self::Add(cmd) => cmd.call(core).await,
+            Self::Install(cmd) => cmd.call(core).await,
         }
     }
 }
