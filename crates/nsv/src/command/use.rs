@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use root::core::NsvCore;
+use root::{core::NsvCore, node::NodeDispose};
 
 use super::Command;
 use root::node::NsvCoreError;
@@ -12,14 +12,15 @@ pub struct Use {
 
 #[async_trait]
 impl Command for Use {
-    async fn apply(&self, _core: &mut NsvCore) -> Result<(), NsvCoreError> {
-        // core.set_version_target(&self.version)?;
-        // let local_node_version = core.get_version_by_local().await;
-        // if local_node_version.is_none() {
-        //     return Err(NsvCoreError::NodeVersionLocalNotFound)
-        // }
-        // let local_node_version = local_node_version.as_ref().unwrap();
-
+    async fn apply(&self, core: &mut NsvCore) -> Result<(), NsvCoreError> {
+        core.set_version_target(&self.version)?;
+        let local_node_version = core.get_version_by_local().await;
+        if local_node_version.is_none() {
+            return Err(NsvCoreError::NodeVersionLocalNotFound)
+        }
+        let local_node_version = local_node_version.as_ref().unwrap();
+        let set_version_shell = core.create_temp_node_version_shell(local_node_version);
+        core.create_temp_script_file(set_version_shell).await;
         Ok(())
     }
 }
