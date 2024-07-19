@@ -53,7 +53,6 @@ impl Context {
         // https://nodejs.org/dist/v20.9.0/node-v20.9.0-win-x86.7z
 
 
-
         #[cfg(any(target_os = "linux", target_os = "macos"))]
         let rar_extension = "tar.xz";
         #[cfg(target_os = "windows")]
@@ -73,19 +72,19 @@ impl Context {
         let arch = "arm64";
 
 
-        let mut nsv_home = env::current_exe().unwrap();
-        nsv_home.pop();
+        let mut current_exe_dir = env::current_exe().unwrap();
+        current_exe_dir.pop();
+        let nsv_home = current_exe_dir.clone();
+        current_exe_dir.push("temp");
+        let temp = current_exe_dir.clone();
+        current_exe_dir.pop();
 
-        nsv_home.push("temp");
-        let temp = nsv_home.clone();
-        nsv_home.pop();
+        current_exe_dir.push("node_file");
+        let node_file = current_exe_dir.clone();
+        current_exe_dir.pop();
 
-        nsv_home.push("node_file");
-        let node_file = nsv_home.clone();
-        nsv_home.pop();
-
-        nsv_home.push("node_dir");
-        let node_dir = nsv_home.clone();
+        current_exe_dir.push("node_dir");
+        let node_dir = current_exe_dir.clone();
 
 
         Context {
