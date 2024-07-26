@@ -4,10 +4,9 @@ use crate::util::dir::ensure_dir;
 use crate::util::download::{download_file, unzip_file};
 use async_trait::async_trait;
 use serde::Deserialize;
-use tokio::io::AsyncWriteExt;
 use std::fs::{read_dir, DirEntry};
 use std::path::{Path, PathBuf};
-use tokio::fs::{rename, File};
+use tokio::fs::rename;
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum VersionTarget {
@@ -75,12 +74,8 @@ pub trait NodeDispose {
     /// 获取本地node版本
     async fn get_version_by_local(&mut self) -> Option<String>;
 
-    /// 创建临时脚本文件
-    async fn create_temp_script_file(&self, shell: String) -> PathBuf;
-
-    /// 生成临时切换node version 脚本
-    fn create_temp_node_version_shell(&self, version: &String) -> String;
-
+    /// 修改 matefile 地址
+    async fn sync_mate_file_by_version(&self, version: &String) -> ();
 }
 
 #[async_trait]
@@ -239,30 +234,27 @@ impl NodeDispose for NsvCore {
         }
     }
 
-    async fn create_temp_script_file(&self, shell: String) -> PathBuf {
-        let mut temp_dir = self.context.temp.clone();
-        temp_dir.push("temp_version");
-        let mut temp_file = File::create(&temp_dir).await.unwrap();
-        temp_file.write_all(shell.as_bytes()).await.unwrap();
-        return temp_dir
-    }
-
-    fn create_temp_node_version_shell(&self, version: &String) -> String {
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
-        let bin = "bin";
+    async fn sync_mate_file_by_version(&self, version: &String) {
+        let local_node_dir = self.get_local_node_dir_2_dir_entry(version).unwrap().path();
+        let target_dir = Path::new(&self.context.shell_matefile_env).to_path_buf();
         #[cfg(target_os = "windows")]
-        let bin = "";
-        let mut node_dir = self.context.node_dir.clone();
-        node_dir.push(version);
-        node_dir.push(bin);
+        {
+            use tokio::fs::symlink_dir;
+            symlink_dir(local_node_dir, target_dir)
+                .await
+                .unwrap();
+        }
 
         #[cfg(any(target_os = "linux", target_os = "macos"))]
-        let bin = format!(&"#!/bin/bash
-        export PATH={}:$PATH", node_dir.to_str().unwrap());
-        #[cfg(target_os = "windows")]
-        let bin = format!("$Env:PATH = \"{};\" + $Env:PATH", node_dir.to_str().unwrap());
+        {
+            use tokio::fs::symlink;
+            let mut local_node_dir = local_node_dir;
+            local_node_dir.push("bin");
+            symlink(local_node_dir, target_dir)
+                .await
+                .unwrap();
+        }
 
-        return bin;
     }
 }
 

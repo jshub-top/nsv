@@ -19,8 +19,7 @@ impl Command for Use {
             return Err(NsvCoreError::NodeVersionLocalNotFound)
         }
         let local_node_version = local_node_version.as_ref().unwrap();
-        let set_version_shell = core.create_temp_node_version_shell(local_node_version);
-        core.create_temp_script_file(set_version_shell).await;
+        core.sync_mate_file_by_version(local_node_version).await;
         Ok(())
     }
 }
