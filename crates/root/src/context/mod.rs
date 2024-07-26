@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, process};
 use std::env::current_dir;
 use std::path::PathBuf;
 use crate::node::{NodeVersionItem, VersionTarget};
@@ -46,6 +46,9 @@ pub struct Context {
 
     /// 远程 nodejs 列表
     pub node_version_list: Option<Vec<NodeVersionItem>>,
+
+    /// shell_matefile_env
+    pub shell_matefile_env: String,
 }
 
 impl Context {
@@ -87,6 +90,12 @@ impl Context {
         let node_dir = current_exe_dir.clone();
 
 
+        let shell_matefile_env = env::var("NSV_MATEFILE").unwrap_or_else(|_e| {
+            println!("nsv: NSV_MATEFILE environment variables not found");
+            process::exit(1)
+        });
+
+
         Context {
             file_name: "".to_string(),
             rar_extension,
@@ -100,6 +109,7 @@ impl Context {
             os: os.to_string(),
             arch: arch.to_string(),
             node_version_list: None,
+            shell_matefile_env,
         }
     }
 }
