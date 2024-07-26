@@ -5,9 +5,6 @@ if($null -eq $NSV_HOME) {
     $NSV_HOME = $PSScriptRoot
 }
 
-# nsv defualt node dir matefile
-# $NSV_DEFAULT_MATEFILE = "$NSV_HOME\temp\default"
-
 # log file dir
 $log_file = "$NSV_HOME\install.log"
 
@@ -17,19 +14,10 @@ $NSV_PROFILE_BAT = (Split-Path -Path $PROFILE) + "\nsv_profile.bat"
 
 
 function Set-Profile-Content {
-    # powershell profile
+    # profile short circuit import nsv profile
     if(!(Test-Path -Path $PROFILE)) {
         New-Item -ItemType File -Path $PROFILE -Force > $log_file
     }
-
-    if(!(Test-Path -Path $NSV_PROFILE_PS1)) {
-        New-Item -ItemType File -Path $NSV_PROFILE_PS1 -Force > $log_file
-    }
-
-    if(!(Test-Path -Path $NSV_PROFILE_BAT)) {
-        New-Item -ItemType File -Path $NSV_PROFILE_BAT -Force > $log_file
-    }
-    # profile short circuit import nsv profile
     $ps_content = '
     if(Test-Path -Path $Env:NSV_PROFILE_PS1) {
         . $Env:NSV_PROFILE_PS1
@@ -37,7 +25,11 @@ function Set-Profile-Content {
     '
     Add-Content -Path $PROFILE -Value  $ps_content
 
+
     # nsv_profile set dynamic environment variables
+    if(!(Test-Path -Path $NSV_PROFILE_PS1)) {
+        New-Item -ItemType File -Path $NSV_PROFILE_PS1 -Force > $log_file
+    }
     $nsv_ps1_profile_content = @(
         '$timestamp=Get-Date -UFormat %s'
         '$Env:NSV_MATEFILE='+'"'+'$NSV_HOME\temp\'+'$timestamp'+'"'
@@ -45,17 +37,17 @@ function Set-Profile-Content {
     )
     Add-Content -Path $NSV_PROFILE_PS1 -Value  $nsv_ps1_profile_content
 
-    $nsv_bat_profile_content = @(
-        'set timestamp=%date:~10,4%%date:~4,2%%date:~7,2%%time:~0,2%%time:~3,2%%time:~6,2%'
-        'set NSV_MATEFILE=%NSV_HOME%\temp%timestamp%'
-    )
-    Add-Content -Path $NSV_PROFILE_BAT -Value  $nsv_bat_profile_content
-
-
-    $is_admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
-
     # Administrator use set command profile
+    $is_admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
     if ($is_admin) {
+        if(!(Test-Path -Path $NSV_PROFILE_BAT)) {
+            New-Item -ItemType File -Path $NSV_PROFILE_BAT -Force > $log_file
+        }
+        $nsv_bat_profile_content = @(
+            'set timestamp=%date:~10,4%%date:~4,2%%date:~7,2%%time:~0,2%%time:~3,2%%time:~6,2%'
+            'set NSV_MATEFILE=%NSV_HOME%\temp%timestamp%'
+        )
+        Add-Content -Path $NSV_PROFILE_BAT -Value  $nsv_bat_profile_content
         Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Command Processor" -Name "nsv_bat_profile" -Value $NSV_PROFILE_BAT
     }
 }
@@ -83,16 +75,9 @@ function Set-EnvironmentVariable {
 }
 
 
-Set-Profile-Content
 
 
-# add to user environment variables
-# # NSV_PROFILE NSV_HOME NSV_DEFAULT_MATEFILE PATH
 
-# Set-EnvironmentVariable -Name 'NSV_PROFILE_PS1' -Value $NSV_PROFILE_PS1
-# Set-EnvironmentVariable -Name 'NSV_HOME' -Value $NSV_HOME
-# Set-EnvironmentVariable -Name 'NSV_DEFAULT_MATEFILE' -Value '%NSV_HOME%\temp\default'
-# Set-EnvironmentVariable -Name 'Path' -Value '%NSV_MATEFILE%;%NSV_DEFAULT_MATEFILE%;%NSV_HOME%' -Append $true
 
 
 function Download-File($url, $out_put) {
@@ -125,4 +110,17 @@ function Download-Nsv-Binary {
     Download-File $NSV_DOWNLOAD_URL $NSV_BINARY_PATH
 }
 
-# Download-Nsv-Binary
+
+# set profile
+Set-Profile-Content
+
+# add to user environment variables
+# with NSV_PROFILE, NSV_HOME, NSV_DEFAULT_MATEFILE and PATH env
+Set-EnvironmentVariable -Name 'NSV_PROFILE_PS1' -Value $NSV_PROFILE_PS1
+Set-EnvironmentVariable -Name 'NSV_HOME' -Value $NSV_HOME
+Set-EnvironmentVariable -Name 'NSV_DEFAULT_MATEFILE' -Value '%NSV_HOME%\temp\default'
+Set-EnvironmentVariable -Name 'Path' -Value '%NSV_MATEFILE%;%NSV_DEFAULT_MATEFILE%;%NSV_HOME%' -Append $true
+
+
+Download-Nsv-Binary
+
