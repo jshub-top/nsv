@@ -51,7 +51,13 @@ function Set-Profile-Content {
     )
     Add-Content -Path $NSV_PROFILE_BAT -Value  $nsv_bat_profile_content
 
-    Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Command Processor" -Name "nsv_bat_profile" -Value $NSV_PROFILE_BAT
+
+    $is_admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+
+    # Administrator use set command profile
+    if ($is_admin) {
+        Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Command Processor" -Name "nsv_bat_profile" -Value $NSV_PROFILE_BAT
+    }
 }
 
 function Set-EnvironmentVariable {
