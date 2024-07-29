@@ -135,6 +135,11 @@ Set-EnvironmentVariable -Name 'NSV_HOME' -Value $NSV_HOME
 Download-Nsv-Binary
 
 Write-Host "✨✨✨"
+Write-Host ""
 Write-Host -ForegroundColor Green "    nsv install success."
 Write-Host -ForegroundColor Blue "    Please reload the user environment variables..."
+Write-Host ""
 Write-Host "✨✨✨"
+
+
+Add-Content -Path $log_file -Value "nsv install success."
