@@ -1,4 +1,14 @@
 
+
+# Administrator run script
+$is_admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+if (-not $is_admin) {
+    $ps_file = $MyInvocation.MyCommand.Definition
+    $arguments = "& '$ps_file' $args"
+    Start-Process powershell -Verb runas -ArgumentList $arguments
+    exit
+}
+
 # nsv home
 $NSV_HOME= $ENV:NSV_HOME
 if($null -eq $NSV_HOME) {
@@ -38,7 +48,6 @@ function Set-Profile-Content {
     Add-Content -Path $NSV_PROFILE_PS1 -Value  $nsv_ps1_profile_content
 
     # Administrator use set command profile
-    $is_admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
     if ($is_admin) {
         if(!(Test-Path -Path $NSV_PROFILE_BAT)) {
             New-Item -ItemType File -Path $NSV_PROFILE_BAT -Force > $log_file
@@ -84,7 +93,7 @@ function Download-File($url, $out_put) {
     $proxyStatus = Get-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings' -Name ProxyEnable -ErrorAction SilentlyContinue | Select-Object -ExpandProperty ProxyEnable
     if ($proxyStatus) {
         $proxySettings = Get-ItemProperty -Path "Registry::HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -Name ProxyServer -ErrorAction SilentlyContinue
-        write-Output "nsv: use proxy with--> $($proxySettings.ProxyServer)"
+        write-Output "use proxy with--> $($proxySettings.ProxyServer)"
         $proxy_serve = "http://$($proxySettings.ProxyServer)"
         Invoke-WebRequest $url -OutFile $out_put -Proxy $proxy_serve
         return
