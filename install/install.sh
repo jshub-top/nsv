@@ -1,9 +1,13 @@
 #!/bin/sh
 
 if [[ -z "$NSV_HOME" ]]; then
-    NSV_HOME=$(pwd)
+    NSV_HOME="~/.nsv"
 fi
-OS=$(uname | sed 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/')
+if [ ! -d "$NSV_HOME" ]; then
+    mkdir -p "$NSV_HOME"
+fi
+
+OS=$(uname | tr '[:upper:]' '[:lower:]')
 log_file="$NSV_HOME/install.log"
 
 NSV_PROFILE="$HOME/.nsv_profile_sh"
@@ -22,6 +26,7 @@ set_profile_content() {
 timestamp=\$(date +%s)
 export NSV_HOME=$NSV_HOME
 export PATH=\$NSV_HOME/temp/\$timestamp:\$NSV_HOME/temp/default:\$NSV_HOME:\$PATH
+nsv adapt
     "
     echo "$nsv_sh_profile_content" > "$NSV_PROFILE"
     echo "set nsv profile" >> $log_file
@@ -58,8 +63,7 @@ get_nsv_file_name() {
 }
 
 download_nsv_binary() {
-    nsv_download_url="https://github.com/1739616529/nsv/releases/download/v0.0.1/nsv-x64-win.exe"
-    # nsv_download_url="https://github.com/1739616529/nsv/releases/download/v0.0.1/$(get_nsv_file_name)"
+    nsv_download_url="https://github.com/1739616529/nsv/releases/download/v0.0.1/$(get_nsv_file_name)"
     nsv_binary_path="$NSV_HOME/nsv"
     download_file "$nsv_download_url" "$nsv_binary_path"
     chmod 755 $nsv_binary_path
@@ -68,23 +72,9 @@ download_nsv_binary() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+download_nsv_binary
 # set profile
 set_profile_content
-download_nsv_binary
 
 echo -e "✨✨✨
 
@@ -93,6 +83,4 @@ echo -e "✨✨✨
 
 ✨✨✨
 "
-echo ""
-
 echo "nsv install soccess" >> $log_file

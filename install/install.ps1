@@ -123,6 +123,7 @@ function Download-Nsv-Binary {
 }
 
 
+Download-Nsv-Binary
 # set profile
 Set-Profile-Content
 
@@ -132,7 +133,6 @@ Set-EnvironmentVariable -Name 'NSV_PROFILE_PS1' -Value $NSV_PROFILE_PS1
 Set-EnvironmentVariable -Name 'NSV_HOME' -Value $NSV_HOME
 
 
-Download-Nsv-Binary
 
 Write-Host "✨✨✨"
 Write-Host ""
