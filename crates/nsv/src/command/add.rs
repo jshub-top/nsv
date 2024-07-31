@@ -2,6 +2,8 @@ use async_trait::async_trait;
 use thiserror::Error;
 use root::core::NsvCore;
 
+use crate::print_log_1;
+
 use super::Command;
 use root::node::{NodeDispose, NsvCoreError};
 
@@ -37,7 +39,7 @@ impl Command for Add {
 
         core.unzip_node_file(&download_node_info.target).await;
 
-        println!("nsv: {} added", &remote_node_version.version);
+        print_log_1!("{} added", &remote_node_version.version);
         Ok(())
     }
 }
