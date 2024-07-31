@@ -1,6 +1,6 @@
 
 if test -z "$NSV_HOME"
-    set NSV_HOME "$HOME/.nsv"
+    set NSV_HOME ~/.nsv
 end
 if not test -d "$NSV_HOME"
     mkdir -p "$NSV_HOME"
@@ -12,7 +12,7 @@ end
 set OS (uname | tr '[:upper:]' '[:lower:]')
 set log_file "$NSV_HOME/install.log"
 
-set NSV_PROFILE "$HOME/.config/fish/conf.d/nsv.fish"
+set NSV_PROFILE ~/.config/fish/conf.d/nsv.fish
 
 function set_profile_content
     set nsv_fish_profile_content "

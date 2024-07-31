@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [[ -z "$NSV_HOME" ]]; then
-    NSV_HOME="~/.nsv"
+    NSV_HOME=~/.nsv
 fi
 if [ ! -d "$NSV_HOME" ]; then
     mkdir -p "$NSV_HOME"
@@ -25,7 +25,7 @@ set_profile_content() {
 #!/bin/sh
 timestamp=\$(date +%s%3N)
 export NSV_HOME=$NSV_HOME
-export NSV_MATEFILE= \$NSV_HOME/temp/\$timestamp
+export NSV_MATEFILE=\$NSV_HOME/temp/\$timestamp
 export PATH=\$NSV_MATEFILE:\$NSV_HOME/temp/default:\$NSV_HOME:\$PATH
 nsv adapt
     "
