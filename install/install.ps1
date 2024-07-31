@@ -1,11 +1,22 @@
 
+
+$ErrorActionPreference = 'Stop'
+
+
 # nsv home
 $NSV_HOME= $ENV:NSV_HOME
 if($null -eq $NSV_HOME) {
     $NSV_HOME = $pwd
 }
+
 # log file dir
 $log_file = "$NSV_HOME\install.log"
+
+
+if(!(Test-Path -Path $NSV_HOME)) {
+    New-Item -ItemType Directory -Path $NSV_HOME -Force
+}
+
 
 # nsv profile
 $NSV_PROFILE_PS1 = (Split-Path -Path $PROFILE) + "\nsv_profile.ps1"
@@ -32,7 +43,8 @@ function Set-Profile-Content {
     }
     $nsv_ps1_profile_content = @(
         '$timestamp=Get-Date -UFormat %s'
-        '$Env:Path='+'"'+'$Env:NSV_HOME\temp\$timestamp;$Env:NSV_HOME\temp\default;$Env:NSV_HOME;$Env:Path'+'"'
+        '$Env:NSV_MATEFILE="$Env:NSV_HOME\temp\$timestamp"'
+        '$Env:Path="$Env:NSV_MATEFILE;$Env:NSV_HOME\temp\default;$Env:NSV_HOME;$Env:Path"'
         "nsv adapt"
     )
     Add-Content -Path $NSV_PROFILE_PS1 -Value  $nsv_ps1_profile_content
