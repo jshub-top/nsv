@@ -1,6 +1,8 @@
 mod add;
 mod r#use;
+mod adapt;
 use crate::print_log_err;
+use adapt::Adapt;
 use add::Add;
 use async_trait::async_trait;
 use r#use::Use;
@@ -16,12 +18,17 @@ pub enum Commands {
     /// 下载node版本
     #[clap(name = "add", bin_name = "add")]
     Add(Add),
+
+    /// 适配
+    #[clap(name = "adapt", bin_name = "adapt")]
+    Adapt(Adapt),
 }
 impl Commands {
     pub async fn call(&self, core: &mut NsvCore) {
         match self {
             Self::Use(cmd) => cmd.call(core).await,
             Self::Add(cmd) => cmd.call(core).await,
+            Self::Adapt(cmd) => cmd.call(core).await,
         }
     }
 }
