@@ -1,14 +1,12 @@
 use app::App;
 
 
-mod db;
 mod router;
 mod app;
 mod controller;
 mod util;
 mod config;
 mod service;
-mod model;
 
 
 

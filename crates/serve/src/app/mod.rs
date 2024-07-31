@@ -3,7 +3,7 @@ use std::sync::Arc;
 use axum::{serve::Serve, Router};
 use tokio::net::TcpListener;
 
-use crate::{config::Config, db::Db, router};
+use crate::{config::Config, router};
 
 pub struct App {
     pub serve: Serve<Router, Router>,
@@ -12,11 +12,9 @@ pub struct App {
 
 impl App {
     pub async fn build(config: Arc<Config>) -> App {
-        let db = Db::build(config.clone()).await;
 
         let share_state = ShareState {
             config: config.clone(),
-            db,
         };
         let share_state = Arc::new(share_state);
         let router = router::create_router(share_state);
@@ -34,5 +32,4 @@ impl App {
 
 pub struct ShareState {
     pub config: Arc<Config>,
-    pub db: Db,
 }
