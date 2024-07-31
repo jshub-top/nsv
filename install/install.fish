@@ -19,7 +19,8 @@ function set_profile_content
 #!/bin/fish
 set timestamp (date +%s)
 set -gx NSV_HOME $NSV_HOME
-set -gx PATH \$NSV_HOME/temp/\$timestamp \$NSV_HOME/temp/default \$NSV_HOME \$PATH
+set -gx NSV_MATEFILE \$NSV_HOME/temp/\$timestamp
+set -gx PATH \$NSV_MATEFILE \$NSV_HOME/temp/default \$NSV_HOME \$PATH
 nsv adapt
     "
     echo "$nsv_fish_profile_content" > "$NSV_PROFILE"

@@ -25,7 +25,8 @@ set_profile_content() {
 #!/bin/sh
 timestamp=\$(date +%s)
 export NSV_HOME=$NSV_HOME
-export PATH=\$NSV_HOME/temp/\$timestamp:\$NSV_HOME/temp/default:\$NSV_HOME:\$PATH
+export NSV_MATEFILE= \$NSV_HOME/temp/\$timestamp
+export PATH=\$NSV_MATEFILE:\$NSV_HOME/temp/default:\$NSV_HOME:\$PATH
 nsv adapt
     "
     echo "$nsv_sh_profile_content" > "$NSV_PROFILE"
