@@ -29,10 +29,15 @@ impl Command for Add {
 
         let remote_node_version = remote_node_version.unwrap().clone();
 
+
+
         let download_node_info = core.sync_node_by_remote(&remote_node_version.get_version()).await;
+
+
 
         core.unzip_node_file(&download_node_info.target).await;
 
+        println!("nsv: {} added", &remote_node_version.version);
         Ok(())
     }
 }

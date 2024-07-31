@@ -20,6 +20,7 @@ impl Command for Use {
         }
         let local_node_version = local_node_version.as_ref().unwrap();
         core.sync_mate_file_by_version(local_node_version).await;
+        println!("nsv: use version: {}", local_node_version);
         Ok(())
     }
 }
