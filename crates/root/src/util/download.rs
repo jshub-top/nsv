@@ -24,12 +24,12 @@ pub async fn unzip_file(
 ) -> Result<(), Box<dyn std::error::Error>> {
     create_dir_all(output_dir.parent().unwrap()).await.unwrap();
 
-    #[cfg(target_os = "windows")]
+    #[cfg(windows)]
     {
         sevenz_rust::decompress_file(zip_file_dir, output_dir).unwrap();
     }
 
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    #[cfg(unix)]
     {
 
         use tar::Archive;
@@ -56,14 +56,14 @@ mod test {
     use super::download_file;
 
     #[tokio::test]
-    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    #[cfg(unix)]
     async fn test_download_file() {
         let file_url = "http://127.0.0.1:3000/dist/v20.10.0/node-v20.10.0-linux-x64.tar.xz";
         let ret = download_file(file_url, &PathBuf::from("node-v20.10.0-linux-x64.tar.xz")).await;
         assert!(matches!(ret, Ok(())));
     }
     #[tokio::test]
-    #[cfg(target_os = "windows")]
+    #[cfg(windows)]
     async fn test_download_file() {
         let file_url = "http://127.0.0.1:3000/dist/v20.10.0/node-v20.10.0-win-x64.7z";
         let ret = download_file(file_url, &PathBuf::from("node-v20.10.0-win-x64.7z")).await;

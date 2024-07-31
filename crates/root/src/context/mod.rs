@@ -56,13 +56,13 @@ impl Context {
         // https://nodejs.org/dist/v20.9.0/node-v20.9.0-win-x86.7z
 
 
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        #[cfg(unix)]
         let rar_extension = "tar.xz";
-        #[cfg(target_os = "windows")]
+        #[cfg(windows)]
         let rar_extension = "7z";
 
 
-        #[cfg(target_os = "windows")]
+        #[cfg(windows)]
         let os = "win";
         #[cfg(target_os = "linux")]
         let os = "linux";
