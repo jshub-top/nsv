@@ -6,8 +6,7 @@ use async_trait::async_trait;
 use serde::Deserialize;
 use std::fs::{read_dir, DirEntry};
 use std::path::{Path, PathBuf};
-use tokio::fs::rename;
-
+use tokio::fs::{remove_file, rename};
 #[derive(PartialEq, Debug, Clone)]
 pub enum VersionTarget {
     Lts,
@@ -237,6 +236,11 @@ impl NodeDispose for NsvCore {
     async fn sync_mate_file_by_version(&self, version: &String) {
         let local_node_dir = self.get_local_node_dir_2_dir_entry(version).unwrap().path();
         let target_dir = Path::new(&self.context.shell_matefile_env).to_path_buf();
+        if let Err(e) = remove_file(&target_dir).await {
+            if e.kind() != std::io::ErrorKind::NotFound {
+                panic!("{}", e)
+            }
+        }
         #[cfg(target_os = "windows")]
         {
             use tokio::fs::symlink_dir;
