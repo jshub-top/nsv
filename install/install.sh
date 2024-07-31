@@ -23,7 +23,7 @@ set_profile_content() {
 
     nsv_sh_profile_content="
 #!/bin/sh
-timestamp=\$(date +%s)
+timestamp=\$(date +%s%3N)
 export NSV_HOME=$NSV_HOME
 export NSV_MATEFILE= \$NSV_HOME/temp/\$timestamp
 export PATH=\$NSV_MATEFILE:\$NSV_HOME/temp/default:\$NSV_HOME:\$PATH
