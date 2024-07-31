@@ -1,6 +1,6 @@
 use crate::core::NsvCore;
 use crate::util::create_node_version_vaildate_reg;
-use crate::util::dir::ensure_dir;
+use crate::util::dir::{ensure_dir, remove_symlink_dir};
 use crate::util::download::{download_file, unzip_file};
 use async_trait::async_trait;
 use serde::Deserialize;
@@ -236,7 +236,7 @@ impl NodeDispose for NsvCore {
     async fn sync_mate_file_by_version(&self, version: &String) {
         let local_node_dir = self.get_local_node_dir_2_dir_entry(version).unwrap().path();
         let target_dir = Path::new(&self.context.shell_matefile_env).to_path_buf();
-        if let Err(e) = remove_file(&target_dir).await {
+        if let Err(e) = remove_symlink_dir(&target_dir).await {
             if e.kind() != std::io::ErrorKind::NotFound {
                 panic!("{}", e)
             }
