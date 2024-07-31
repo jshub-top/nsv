@@ -1,7 +1,10 @@
 
 
 $ErrorActionPreference = 'Stop'
-
+$is_admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+if ($is_admin) {
+    Write-Host "user is Administrator"
+}
 
 # nsv home
 $NSV_HOME= $ENV:NSV_HOME
@@ -51,19 +54,23 @@ function Set-Profile-Content {
     Add-Content -Path $log_file -Value "add nsv profile content"
     Add-Content -Path $log_file -Value $nsv_ps1_profile_content
 
+    $is_admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
     # Administrator use set command profile
     if ($is_admin) {
         if(!(Test-Path -Path $NSV_PROFILE_BAT)) {
             New-Item -ItemType File -Path $NSV_PROFILE_BAT -Force | Out-File -FilePath $log_file -Append
         }
         $nsv_bat_profile_content = @(
+            '@echo off'
             'set timestamp=%date:~10,4%%date:~4,2%%date:~7,2%%time:~0,2%%time:~3,2%%time:~6,2%'
             'set NSV_MATEFILE=%NSV_HOME%\temp%timestamp%'
+            'set PATH=%NSV_MATEFILE%;%NSV_HOME%\temp\default;%NSV_HOME%;%PATH%;'
+            "nsv adapt"
         )
         Add-Content -Path $NSV_PROFILE_BAT -Value $nsv_bat_profile_content
         Add-Content -Path $log_file -Value "add nsv bat profile content"
         Add-Content -Path $log_file -Value $nsv_bat_profile_content
-        Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Command Processor" -Name "nsv_bat_profile" -Value $NSV_PROFILE_BAT
+        Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Command Processor" -Name "AutoRun" -Value "%USERPROFILE%\Documents\WindowsPowerShell\nsv_profile.bat"
         Add-Content -Path $log_file -Value "set HKLM:\SOFTWARE\Microsoft\Command Processor"
         Add-Content -Path $log_file -Value $NSV_PROFILE_BAT
     }
