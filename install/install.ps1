@@ -136,7 +136,7 @@ function Get-Nsv-File-Name {
 
 # download nsv binary
 function Download-Nsv-Binary {
-    $NSV_DOWNLOAD_URL = "https://github.com/1739616529/nsv/releases/download/v0.0.1/" + (Get-Nsv-File-Name)
+    $NSV_DOWNLOAD_URL = "https://github.com/jshub-top/nsv/releases/download/v0.0.1/" + (Get-Nsv-File-Name)
     $NSV_BINARY_PATH = "$NSV_HOME\nsv.exe"
     Download-File $NSV_DOWNLOAD_URL $NSV_BINARY_PATH
 }

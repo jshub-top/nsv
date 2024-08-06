@@ -64,7 +64,7 @@ get_nsv_file_name() {
 }
 
 download_nsv_binary() {
-    nsv_download_url="https://github.com/1739616529/nsv/releases/download/v0.0.1/$(get_nsv_file_name)"
+    nsv_download_url="https://github.com/jshub-top/nsv/releases/download/v0.0.1/$(get_nsv_file_name)"
     nsv_binary_path="$NSV_HOME/nsv"
     download_file "$nsv_download_url" "$nsv_binary_path"
     chmod 755 $nsv_binary_path

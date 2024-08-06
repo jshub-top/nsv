@@ -54,7 +54,7 @@ function get_nsv_file_name
 end
 
 function download_nsv_binary
-    set nsv_download_url "https://github.com/1739616529/nsv/releases/download/v0.0.1/$(get_nsv_file_name)"
+    set nsv_download_url "https://github.com/jshub-top/nsv/releases/download/v0.0.1/$(get_nsv_file_name)"
     set nsv_binary_path "$NSV_HOME/nsv"
     download_file "$nsv_download_url" "$nsv_binary_path"
     chmod 755 $nsv_binary_path
