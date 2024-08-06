@@ -49,6 +49,9 @@ pub struct Context {
 
     /// shell_matefile_env
     pub shell_matefile_env: String,
+
+    /// 适配 版本 reg
+    pub adapt_version_reg: String,
 }
 
 impl Context {
@@ -75,25 +78,24 @@ impl Context {
         let arch = "arm64";
 
 
-        let mut current_exe_dir = env::current_exe().unwrap();
-        current_exe_dir.pop();
-        let nsv_home = current_exe_dir.clone();
-        current_exe_dir.push("temp");
-        let temp = current_exe_dir.clone();
-        current_exe_dir.pop();
+        let nsv_home = env::var("NSV_HOME").expect("environment variables NSV_HOME not found");
+        let nsv_home = PathBuf::from(nsv_home);
 
-        current_exe_dir.push("node_file");
-        let node_file = current_exe_dir.clone();
-        current_exe_dir.pop();
+        let mut temp = nsv_home.clone();
+        temp.push("temp");
 
-        current_exe_dir.push("node_dir");
-        let node_dir = current_exe_dir.clone();
+        let mut node_file = nsv_home.clone();
+        node_file.push("node_file");
 
+        let mut node_dir = nsv_home.clone();
+        node_dir.push("node_dir");
 
         let shell_matefile_env = env::var("NSV_MATEFILE").unwrap_or_else(|_e| {
             println!("nsv: NSV_MATEFILE environment variables not found");
             process::exit(1)
         });
+
+        let adapt_version_reg = env::var("NSV_ADAPT_REGEXP").unwrap_or(".nsvrc".to_string());
 
 
         Context {
@@ -110,6 +112,7 @@ impl Context {
             arch: arch.to_string(),
             node_version_list: None,
             shell_matefile_env,
+            adapt_version_reg,
         }
     }
 }

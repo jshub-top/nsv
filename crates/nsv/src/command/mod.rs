@@ -19,7 +19,7 @@ pub enum Commands {
     #[clap(name = "add", bin_name = "add")]
     Add(Add),
 
-    /// 适配
+    /// 根据配置文件适配node版本
     #[clap(name = "adapt", bin_name = "adapt")]
     Adapt(Adapt),
 }

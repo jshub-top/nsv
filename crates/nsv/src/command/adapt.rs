@@ -13,7 +13,7 @@ pub struct Adapt {
 
 #[async_trait]
 impl Command for Adapt {
-    async fn apply(&self, core: &mut NsvCore) -> Result<(), NsvCoreError> {
+    async fn apply(&self, _core: &mut NsvCore) -> Result<(), NsvCoreError> {
         print_log_1!("adapt {}", "功能待开发");
 
         Ok(())
