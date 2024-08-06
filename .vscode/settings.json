@@ -5,5 +5,82 @@
         ".\\crates\\serve\\Cargo.toml"
     ],
     "terminal.explorerKind": "both",
-    "rust-analyzer.showUnlinkedFileNotification": false
+    "rust-analyzer.showUnlinkedFileNotification": false,
+    "i18n-ally.pathMatcher": "package.nls.{locale}.json",
+    "i18n-ally.keystyle": "flat",
+    "i18n-ally.localesPaths": ["."],
+    "i18n-ally.enabledFrameworks": ["vscode", "react"],
+    "i18n-ally.dirStructure": "file",
+    // Enable eslint for all supported languages
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact",
+        "vue",
+        "html",
+        "json",
+        "jsonc",
+        "yaml"
+    ],
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false,
+    "search.exclude": {
+        "package-lock.json": true
+    },
+    "editor.codeActionsOnSave": [
+        "source.addMissingImports",
+        "source.fixAll.eslint"
+    ],
+    "typescript.tsdk": "node_modules/typescript/lib", // Use the workspace version of TypeScript
+    "typescript.enablePromptUseWorkspaceTsdk": true, // For security reasons it's require that users opt into using the workspace version of typescript
+    "typescript.preferences.preferTypeOnlyAutoImports": true, // Prefer type-only imports
+    "testing.openTesting": "neverOpen", // Don't open the testing view automatically when running tests
+    "prettier.enable": true, // enable prettier for those who disabled it for some reason
+    "prettier.ignorePath": ".gitignore", // Don't run prettier for files listed in .gitignore
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnPaste": false,
+    "editor.formatOnType": false,
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file",
+    "typescript.inlayHints.parameterNames.enabled": "all",
+    // "typescript.inlayHints.variableTypes.enabled": true,
+    // "typescript.inlayHints.propertyDeclarationTypes.enabled": true,
+    "typescript.inlayHints.parameterTypes.enabled": true,
+    // "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
+    "cSpell.words": [
+        "autoplay",
+        "Codegee",
+        "Codeium",
+        "commitlint",
+        "deepseek",
+        "esno",
+        "execa",
+        "Flytek",
+        "fullpath",
+        "ianvs",
+        "iconify",
+        "iflytek",
+        "knip",
+        "langchain",
+        "Nicepkg",
+        "nodir",
+        "Nolebase",
+        "Ollama",
+        "openai",
+        "Pipfile",
+        "pyproject",
+        "qwen",
+        "tailwindcss",
+        "treeshake",
+        "tsup",
+        "undici",
+        "vitepress",
+        "vsix",
+        "Xclip",
+        "Zhipu"
+    ],
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
 }

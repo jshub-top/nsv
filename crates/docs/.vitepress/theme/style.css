@@ -1,0 +1,92 @@
+/* Styles adjusting VitePress according to theme */
+:root {
+    --vp-c-brand-1: #00accc;
+    --vp-c-brand-2: #00accc;
+    --vp-c-brand-3: #00accc;
+
+    --vp-c-brand-soft: rgba(140, 107, 239, 0.14);
+
+    /* We need this because menu component has 51 index which overlaps on navbar on scroll */
+    /* --vp-z-index-nav: 52; */
+
+    --vp-code-scrollbar-thumb-bg: hsl(0, 0%, 40%);
+    --vp-code-line-height: 1.9;
+
+    --vp-home-hero-name-color: transparent;
+    --vp-home-hero-name-background: -webkit-linear-gradient(
+        120deg,
+        #4f9b43,
+        #29a7d4
+    );
+
+    --vp-home-hero-image-background-image: linear-gradient(
+        -45deg,
+        #4f9b43 50%,
+        #0272bb 50%,
+        #29a7d4 50%
+    );
+    --vp-home-hero-image-filter: blur(44px);
+}
+
+:root.dark {
+    --vp-code-scrollbar-thumb-bg: hsl(0, 0%, 25%);
+}
+
+@media (min-width: 640px) {
+    :root {
+        --vp-home-hero-image-filter: blur(56px);
+    }
+}
+
+@media (min-width: 960px) {
+    :root {
+        --vp-home-hero-image-filter: blur(68px);
+    }
+}
+
+/*
+ * Copy from https://github.com/nolebase/integrations/blob/main/packages/vitepress-plugin-enhanced-mark/src/client/style.css
+ */
+.vp-doc mark {
+    --vp-nolebase-mark-bg-shift: 0.4lh;
+    --vp-nolebase-mark-bg-color: #8c6bef50;
+
+    /* Override default styles of <mark>  */
+    color: inherit;
+    background-color: transparent;
+
+    /* Configure animations */
+    animation-name: mark-highlight-animation;
+    animation-duration: 1.5s;
+    animation-delay: 0.5s;
+    animation-fill-mode: forwards;
+
+    /* Expand the background image width 2x larger than the default background width */
+    background-size: 200%;
+    /* Init position of background image, otherwise it will cause a flicker */
+    background-position: 100% var(--vp-nolebase-mark-bg-shift);
+    /* By default, background image will repeat, we don't want that */
+    background-repeat: no-repeat;
+    /* Use background image with linear gradient to create the highlight effect */
+    background-image: linear-gradient(
+        to right,
+        var(--vp-nolebase-mark-bg-color) 50%,
+        transparent 50%
+    );
+}
+
+.dark .vp-doc mark {
+    --vp-nolebase-mark-bg-color: #8c6befaa;
+}
+
+@keyframes mark-highlight-animation {
+    from {
+        color: inherit;
+        background-position: 100% var(--vp-nolebase-mark-bg-shift);
+    }
+
+    to {
+        color: var(--vp-c-text-1);
+        background-position: 0% var(--vp-nolebase-mark-bg-shift);
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "useDefineForClassFields": true,
+        "lib": ["ESNext", "DOM", "DOM.Iterable"],
+        "baseUrl": ".",
+        "allowJs": false, //允许 导入 js文件
+        "skipLibCheck": true, // 跳过声明文件的类型检查
+        "esModuleInterop": false,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "forceConsistentCasingInFileNames": true, // 引入文件是否区分大小写
+        "module": "ESNext",
+        "moduleResolution": "node", // node解析方式
+        "resolveJsonModule": true, // 引入 .json 文件
+        "isolatedModules": true, // babel 等解析不了 枚举或者命名空间 时候 报错
+        "noEmit": true, // https://www.typescriptlang.org/tsconfig#noEmit
+        "jsx": "preserve",
+        "jsxImportSource": "vue",
+        "allowImportingTsExtensions": true,
+        "paths": {
+            "src/*": ["./src/*"],
+            "project/*": ["./*"]
+        }
+    }
+}
