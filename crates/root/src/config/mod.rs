@@ -1,25 +1,41 @@
-use std::io::BufWriter;
-use std::{env, fmt::Display};
+use std::env;
 use std::path::PathBuf;
 
-use regex::Regex;
-use tokio::io::AsyncWriteExt;
+use tokio::fs::write;
 use tokio::{
     fs::{metadata, File},
-    io::{AsyncBufReadExt, AsyncReadExt, BufReader},
+    io::{AsyncBufReadExt, BufReader},
 };
 
 #[derive(Debug, Clone)]
 pub struct Config {
+    /// 源
     pub origin: String,
+
+    /// 配置文件路径
     pub file_path: PathBuf,
+
+    /// 是否适配
+    pub adapt: bool,
+
+    /// 是否自动处理
+    pub auto: bool,
+
+    /// 适配版本匹配
+    pub adapt_version_match: Option<String>,
 }
 
 impl Config {
     pub async fn build() -> Self {
         let mut config = Config::default();
 
-        config.sync_config_2_npmrc("test", "test1").await;
+        // global config
+        config
+            .parse_config_by_nsvrc(&config.file_path.clone())
+            .await;
+
+        // project config
+        // config.parse_config_by_nsvrc(&Path::new(".nsvrc").to_path_buf()).await;
 
         config
     }
@@ -29,35 +45,28 @@ impl Config {
             "origin" => {
                 self.origin = value.to_string();
             }
+            "adapt" => {
+                self.adapt = value.parse::<bool>().unwrap();
+            }
+            "auto" => {
+                self.auto = value.parse::<bool>().unwrap();
+            }
             _ => {}
         }
     }
 
-    pub async fn sync_config_2_npmrc<T: Display>(&self, key: &str, value: T) {
-
-        // 文件不存在 不继续往下走
-        if metadata(&self.file_path).await.is_err() {
-            File::create(&self.file_path).await.unwrap();
-        }
-        let config_file = File::open(&self.file_path).await.unwrap();
-        let mut file_buf = BufReader::new(config_file);
-        let mut file_content = String::new();
-        file_buf.read_to_string(&mut file_content).await.unwrap();
-        let file_lines: Vec<&str> = file_content.split("\n").collect();
-        let line_index = file_lines.iter().position(|line| line.contains(key));
-
-
-
-
-
-
-
+    pub async fn sync_config_2_npmrc(&self) {
+        let config_file_content = vec![
+            format!("origin={}", &self.origin),
+            format!("adapt={}", self.adapt),
+            format!("auto={}", self.adapt),
+        ];
+        write(&self.file_path, config_file_content.join("\n"))
+            .await
+            .unwrap();
     }
 
-    pub async fn parse_config_by_nsvrc(&mut self) {
-        let file_path = &self.file_path;
-
-        println!("config file path: {}", file_path.display());
+    pub async fn parse_config_by_nsvrc(&mut self, file_path: &PathBuf) {
         // 文件不存在 不继续往下走
         if metadata(file_path).await.is_err() {
             return;
@@ -66,14 +75,12 @@ impl Config {
         let config_file = File::open(file_path).await.unwrap();
         let mut lines = BufReader::new(config_file).lines();
         while let Some(line) = lines.next_line().await.unwrap() {
-            println!("line: {}", line);
             let config_vec = line.split("=").collect::<Vec<_>>();
             let key = config_vec[0];
             let value = config_vec[1];
-            if key.is_empty() || value.is_empty() {
-                panic!("config file format error");
+            if !key.is_empty() && !value.is_empty() {
+                self.set_config(config_vec[0], config_vec[1]);
             }
-            self.set_config(config_vec[0], config_vec[1]);
         }
     }
 }
@@ -89,6 +96,9 @@ impl Default for Config {
         Self {
             origin: env::var("NSV_ORIGIN").unwrap_or("https://nodejs.org/dist".to_string()),
             file_path: user_home,
+            adapt: true,
+            auto: true,
+            adapt_version_match: env::var("NSV_ADAPT_MATCH").ok(),
         }
     }
 }
