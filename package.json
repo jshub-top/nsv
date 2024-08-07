@@ -2,9 +2,11 @@
     "name": "nsv",
     "version": "1.0.0",
     "description": "",
-    "scripts": {
-    },
+    "scripts": {},
     "keywords": [],
     "author": "",
-    "license": "MIT"
+    "license": "MIT",
+    "devDependencies": {
+        "typescript": "^5.5.4"
+    }
 }
