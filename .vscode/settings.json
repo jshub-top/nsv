@@ -44,11 +44,14 @@
     "typescript.inlayHints.parameterTypes.enabled": true,
     // "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
     "cSpell.words": [
-       "nsvrc",
+        "nsvrc",
         "thiserror",
         "reqwest",
         "vaildate",
         "Jshub",
+        "nuxt",
+        "tailwindcss",
+
     ],
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
