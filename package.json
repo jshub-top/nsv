@@ -2,7 +2,9 @@
     "name": "nsv",
     "version": "1.0.0",
     "description": "",
-    "scripts": {},
+    "scripts": {
+        "dev:docs": "cd crates/docs && pnpm run dev"
+    },
     "keywords": [],
     "author": "",
     "license": "MIT",
