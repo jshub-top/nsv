@@ -1,4 +1,5 @@
 use std::env;
+use std::fmt::Display;
 use std::path::PathBuf;
 
 use tokio::fs::write;
@@ -6,6 +7,9 @@ use tokio::{
     fs::{metadata, File},
     io::{AsyncBufReadExt, BufReader},
 };
+
+use crate::node::NsvCoreError;
+
 
 #[derive(Debug, Clone)]
 pub struct Config {
@@ -40,6 +44,26 @@ impl Config {
         config
     }
 
+    pub fn get_config(&self, key: &str) -> Result<String, NsvCoreError> {
+        match key {
+            "origin" => {
+                Ok(self.origin.clone())
+            }
+            "adapt" => {
+                Ok(self.adapt.to_string())
+            }
+            "auto" => {
+               Ok( self.auto.to_string())
+            }
+            "adapt_version_match" => {
+               Ok(self.adapt_version_match.clone().unwrap_or("null".to_string()))
+            }
+            _ => {
+                Err(NsvCoreError::ConfigKeyNotFound(key.to_string()))
+            }
+        }
+    }
+
     pub fn set_config(&mut self, key: &str, value: &str) {
         match key {
             "origin" => {
@@ -51,17 +75,16 @@ impl Config {
             "auto" => {
                 self.auto = value.parse::<bool>().unwrap();
             }
+            "adapt_version_match" => {
+                self.adapt_version_match = Some(value.to_string());
+            }
             _ => {}
         }
     }
 
     pub async fn sync_config_2_npmrc(&self) {
-        let config_file_content = vec![
-            format!("origin={}", &self.origin),
-            format!("adapt={}", self.adapt),
-            format!("auto={}", self.adapt),
-        ];
-        write(&self.file_path, config_file_content.join("\n"))
+        let config_file_content = format!("{}", self);
+        write(&self.file_path, config_file_content)
             .await
             .unwrap();
     }
@@ -82,6 +105,20 @@ impl Config {
                 self.set_config(config_vec[0], config_vec[1]);
             }
         }
+    }
+
+}
+
+
+impl Display for Config {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}",
+            vec![
+                format!("origin={}", &self.origin),
+                format!("adapt={}", self.adapt),
+                format!("auto={}", self.adapt),
+            ].join("\n")
+        )
     }
 }
 
