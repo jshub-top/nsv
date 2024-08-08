@@ -16,9 +16,6 @@
         "isolatedModules": true, // babel 等解析不了 枚举或者命名空间 时候 报错
         "noEmit": true, // https://www.typescriptlang.org/tsconfig#noEmit
         "allowImportingTsExtensions": true,
-        "paths": {
-            "src/*": ["./src/*"],
-            "project/*": ["./*"]
-        }
+
     }
 }
