@@ -45,6 +45,9 @@ pub enum NsvCoreError {
      * 本地已存在
      */
     NodeVersionLocalExist(String),
+
+    /// config key 不存在
+    ConfigKeyNotFound(String),
 }
 
 #[async_trait]

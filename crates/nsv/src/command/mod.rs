@@ -1,10 +1,12 @@
 mod add;
 mod r#use;
 mod adapt;
+mod config;
 use crate::print_log_err;
 use adapt::Adapt;
 use add::Add;
 use async_trait::async_trait;
+use config::Config;
 use r#use::Use;
 use root::core::NsvCore;
 use root::node::NsvCoreError;
@@ -22,6 +24,10 @@ pub enum Commands {
     /// 根据配置文件适配node版本
     #[clap(name = "adapt", bin_name = "adapt")]
     Adapt(Adapt),
+
+    /// 修改配置
+    #[clap(name = "config", bin_name = "config")]
+    Config(Config),
 }
 impl Commands {
     pub async fn call(&self, core: &mut NsvCore) {
@@ -29,6 +35,7 @@ impl Commands {
             Self::Use(cmd) => cmd.call(core).await,
             Self::Add(cmd) => cmd.call(core).await,
             Self::Adapt(cmd) => cmd.call(core).await,
+            Self::Config(cmd) => cmd.call(core).await,
         }
     }
 }
@@ -51,6 +58,9 @@ pub trait Command {
                     }
                     NsvCoreError::IllegalityVersion(version) => {
                         print_log_err!("illegality version: {}", version)
+                    }
+                    NsvCoreError::ConfigKeyNotFound(key) => {
+                        print_log_err!("config key --> {} <-- not found. see https://nsv.jshub.top", key)
                     }
                     _ => self.handle_err(err, core)
                 };
