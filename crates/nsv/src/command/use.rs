@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use root::{core::NsvCore, node::NodeDispose};
 
-use crate::print_log_1;
+use crate::print_log_info;
 
 use super::Command;
 use root::node::NsvCoreError;
@@ -22,7 +22,7 @@ impl Command for Use {
         }
         let local_node_version = local_node_version.as_ref().unwrap();
         core.sync_mate_file_by_version(local_node_version).await;
-        print_log_1!("use version: {}", local_node_version);
+        print_log_info!("use version: {}", local_node_version);
         Ok(())
     }
 }

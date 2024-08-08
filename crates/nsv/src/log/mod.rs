@@ -1,7 +1,7 @@
 
 
 #[macro_export]
-macro_rules! print_log_1 {
+macro_rules! print_log_info {
     ($($arg:tt)*) => {{
         println!("nsv: {}", format_args!($($arg)*));
     }};
