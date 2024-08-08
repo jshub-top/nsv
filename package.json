@@ -9,6 +9,7 @@
     "author": "",
     "license": "MIT",
     "devDependencies": {
+        "@lobehub/commit-cli": "^2.15.1",
         "typescript": "^5.5.4"
     }
 }

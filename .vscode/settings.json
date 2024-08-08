@@ -51,7 +51,8 @@
         "Jshub",
         "nuxt",
         "tailwindcss",
-
+        "vitepress",
+        "lobehub",
     ],
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
