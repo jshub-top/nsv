@@ -1,9 +1,4 @@
 {
-    "rust-analyzer.linkedProjects": [
-        ".\\crates\\root\\Cargo.toml",
-        ".\\crates\\nsv\\Cargo.toml",
-        ".\\crates\\serve\\Cargo.toml"
-    ],
     "terminal.explorerKind": "both",
     "rust-analyzer.showUnlinkedFileNotification": false,
     // "i18n-ally.pathMatcher": "package.nls.{locale}.json",
@@ -59,5 +54,5 @@
     },
     "[rust]": {
         "editor.defaultFormatter": "rust-lang.rust-analyzer"
-    }
+    },
 }
