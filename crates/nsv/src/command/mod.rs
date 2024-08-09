@@ -14,7 +14,7 @@ use root::node::NsvCoreError;
 #[derive(clap::Parser, Debug)]
 pub enum Commands {
     /// 修改node版本
-    #[clap(name = "use", bin_name = "use")]
+    #[clap(name = "use", bin_name = "use", alias = "u")]
     Use(Use),
 
     /// 下载node版本
@@ -22,11 +22,11 @@ pub enum Commands {
     Add(Add),
 
     /// 根据配置文件适配node版本
-    #[clap(name = "adapt", bin_name = "adapt")]
+    #[clap(name = "adapt", bin_name = "adapt", alias = "a")]
     Adapt(Adapt),
 
     /// 修改配置
-    #[clap(name = "config", bin_name = "config")]
+    #[clap(name = "config", bin_name = "config", alias = "c")]
     Config(Config),
 }
 impl Commands {

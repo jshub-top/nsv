@@ -35,11 +35,11 @@ impl Command for Config {
 
 #[derive(clap::Parser, Debug)]
 pub enum ConfigSubCommand {
-    #[clap(name = "set", bin_name = "set")]
+    #[clap(name = "set", bin_name = "set", alias = "s")]
     Set(ConfigSubSet),
-    #[clap(name = "get", bin_name = "get")]
+    #[clap(name = "get", bin_name = "get", alias = "g")]
     Get(ConfigSubGet),
-    #[clap(name = "list", bin_name = "list")]
+    #[clap(name = "list", bin_name = "list", alias = "l")]
     List(ConfigSubList),
 }
 
