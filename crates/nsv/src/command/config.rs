@@ -25,6 +25,9 @@ impl Command for Config {
             ConfigSubCommand::Get(get) => {
                 get.apply(core).await?;
             }
+            ConfigSubCommand::List(get) => {
+                get.apply(core).await?;
+            }
         }
         Ok(())
     }
@@ -36,6 +39,8 @@ pub enum ConfigSubCommand {
     Set(ConfigSubSet),
     #[clap(name = "get", bin_name = "get")]
     Get(ConfigSubGet),
+    #[clap(name = "list", bin_name = "list")]
+    List(ConfigSubList),
 }
 
 
@@ -67,6 +72,19 @@ impl Command for ConfigSubGet {
     async fn apply(&self, core: &mut NsvCore) -> Result<(), NsvCoreError>{
         let value = core.config.get_config(&self.key)?;
         print_log_info!("{}={}", &self.key, value);
+        Ok(())
+    }
+}
+
+
+#[derive(clap::Parser, Debug)]
+pub struct ConfigSubList {
+}
+
+#[async_trait]
+impl Command for ConfigSubList {
+    async fn apply(&self, core: &mut NsvCore) -> Result<(), NsvCoreError>{
+        print_log_info!("config list: \n{}", &core.config);
         Ok(())
     }
 }
