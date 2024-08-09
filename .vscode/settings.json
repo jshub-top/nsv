@@ -23,7 +23,7 @@
         "jsonc",
         "yaml"
     ],
-    "editor.tabSize": 2,
+    "editor.tabSize": 4,
     "editor.detectIndentation": false,
     "search.exclude": {
         "package-lock.json": true
