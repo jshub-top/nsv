@@ -31,7 +31,7 @@ export const shared = defineConfig({
     },
 
     head: [
-        ["link", { rel: "icon", type: "image/svg+xml", href: "/logo.svg" }],
+        ["link", { rel: "icon", type: "image/svg+xml", href: "/logo-n.svg" }],
         ["meta", { name: "theme-color", content: "#8c6bef" }],
         ["meta", { property: "og:type", content: "website" }],
         ["meta", { property: "og:locale", content: "en" }],
