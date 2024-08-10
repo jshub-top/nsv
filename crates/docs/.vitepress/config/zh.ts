@@ -47,7 +47,7 @@ function nav(): DefaultTheme.NavItem[] {
     return [
         {
             text: "指南",
-            link: "/zh/guide/getting-started/",
+            link: "/zh/guide/intro/",
             activeMatch: "/zh/guide/",
         },
         {
@@ -75,14 +75,14 @@ function sidebar(): DefaultTheme.Sidebar {
     return {
         "/zh/guide/": [
             {
-                text: "🚀&nbsp;&nbsp; 快速开始",
+                text: "简介",
                 collapsed: false,
-                base: "/zh/guide/getting-started",
+                base: "/zh/guide/intro",
                 items: [
                     { text: "简介", link: "/" },
                     {
-                        text: "安装",
-                        link: "/installation",
+                        text: "快速开始",
+                        link: "/getting-started",
                     },
                     {
                         text: "自定义快捷键",

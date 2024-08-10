@@ -14,7 +14,7 @@ hero:
     actions:
         - theme: brand
           text: 开始使用
-          link: /guide/getting-started
+          link: /guide/intro/
         - theme: alt
           text: 在github上查看
           link: https://github.com/jshub-top/nsv
