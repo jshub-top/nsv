@@ -4,9 +4,12 @@
     "pull-request-title-pattern": "chore: release${component} ${version}",
     "release-type": "rust",
     "include-component-in-tag": true,
+    "plugins": [
+        "cargo-workspace"
+    ],
     "packages": {
-      ".": {
-        "component": "nsv"
-      }
+        ".": {
+            "component": "nsv"
+        }
     }
-  }
+}
