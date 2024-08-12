@@ -9,6 +9,7 @@ use root::node::{NodeDispose, NsvCoreError};
 
 #[derive(clap::Parser, Debug)]
 pub struct Add {
+    /// add node version.
     version: String,
 }
 

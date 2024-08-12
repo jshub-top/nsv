@@ -17,7 +17,7 @@ pub enum Commands {
     #[clap(name = "use", bin_name = "use", alias = "u")]
     Use(Use),
 
-    /// 下载node版本
+    /// download node version by remote.
     #[clap(name = "add", bin_name = "add")]
     Add(Add),
 

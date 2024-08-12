@@ -84,15 +84,19 @@ function sidebar(): DefaultTheme.Sidebar {
                         text: "快速开始",
                         link: "/getting-started",
                     },
+                ],
+            },
+
+            {
+                text: "Command",
+                collapsed: false,
+                base: "/zh/guide/command",
+                items: [
+                    { text: "add", link: "/add" },
                     {
-                        text: "自定义快捷键",
-                        link: "/customize-shortcuts",
+                        text: "快速开始",
+                        link: "/getting-started",
                     },
-                    {
-                        text: "自定义配置",
-                        link: "/customize-configuration",
-                    },
-                    { text: "常见问题解答", link: "/faq" },
                 ],
             },
         ],
