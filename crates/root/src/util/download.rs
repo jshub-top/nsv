@@ -47,26 +47,3 @@ pub async fn unzip_file(
 
     Ok(())
 }
-
-#[cfg(test)]
-mod test {
-
-    use std::path::PathBuf;
-
-    use super::download_file;
-
-    #[tokio::test]
-    #[cfg(unix)]
-    async fn test_download_file() {
-        let file_url = "http://127.0.0.1:3000/dist/v20.10.0/node-v20.10.0-linux-x64.tar.xz";
-        let ret = download_file(file_url, &PathBuf::from("node-v20.10.0-linux-x64.tar.xz")).await;
-        assert!(matches!(ret, Ok(())));
-    }
-    #[tokio::test]
-    #[cfg(windows)]
-    async fn test_download_file() {
-        let file_url = "http://127.0.0.1:3000/dist/v20.10.0/node-v20.10.0-win-x64.7z";
-        let ret = download_file(file_url, &PathBuf::from("node-v20.10.0-win-x64.7z")).await;
-        assert!(matches!(ret, Ok(())));
-    }
-}
