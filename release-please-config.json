@@ -6,7 +6,7 @@
     "include-component-in-tag": true,
     "plugins": [
         {
-            "type": "cargo-workspace",
+            "type": "cargo-workspace"
         },
         {
             "type": "linked-versions",
