@@ -2,6 +2,7 @@
     "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
     "pull-request-header": ":robot: I have created a release",
     "pull-request-title-pattern": "chore: release 1 ${component} 2 ${version}",
+    "bootstrap-sha": "821f990a974e75aaf52755bb742450b388ba8a9e",
     "release-type": "rust",
     "include-component-in-tag": true,
     "plugins": [
