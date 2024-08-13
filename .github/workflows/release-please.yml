@@ -17,8 +17,7 @@ jobs:
               id: release
               with:
                 token: ${{ secrets.ACTIOPNS_TOKEN }}
-                path: "/"
-
+                path: /CHANGELOG.md
             - name: Release Please Results
               env:
                   RESULTS: ${{ toJSON(steps.release.outputs) }}
