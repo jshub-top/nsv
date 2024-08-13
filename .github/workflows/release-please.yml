@@ -17,6 +17,7 @@ jobs:
               id: release
               with:
                 token: ${{ secrets.ACTIOPNS_TOKEN }}
+                path: "/"
 
             - name: Release Please Results
               env:
