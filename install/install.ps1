@@ -9,7 +9,7 @@ if ($is_admin) {
 # nsv home
 $NSV_HOME= $ENV:NSV_HOME
 if($null -eq $NSV_HOME) {
-    $NSV_HOME = $pwd
+    $NSV_HOME = "$USERPROFILE\.nsv"
 }
 
 # log file dir

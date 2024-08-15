@@ -48,6 +48,11 @@
         "tailwindcss",
         "vitepress",
         "lobehub",
+        "USERPROFILE",
+        "matefile",
+        "aarch",
+        "sevenz",
+        "serde",
     ],
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
