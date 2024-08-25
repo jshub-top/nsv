@@ -13,9 +13,6 @@
     "packages": {
         ".": {
             "component": "nsv"
-        },
-        "crates/nsv": {
-            "component": "nsv"
         }
     }
 }
