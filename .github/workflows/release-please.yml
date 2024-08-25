@@ -3,8 +3,6 @@ name: release-please
 on:
     push:
         branches: ["main"]
-    pull_request:
-        branches: ["main"]
 
 jobs:
     release-please:
@@ -12,13 +10,39 @@ jobs:
             id-token: write
             contents: write
         runs-on: ubuntu-latest
+        outputs:
+            release_created: ${{ steps.release.outputs.release_created }}
+            upload_url: ${{ steps.release.outputs.upload_url }}
         steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4.1.6
+
             - uses: googleapis/release-please-action@v4
               id: release
               with:
-                token: ${{ secrets.ACTIOPNS_TOKEN }}
-                path: /CHANGELOG.md
+                  token: ${{ secrets.ACTIOPNS_TOKEN }}
+
             - name: Release Please Results
               env:
                   RESULTS: ${{ toJSON(steps.release.outputs) }}
               run: echo "$RESULTS"
+
+    build:
+        name: build for all platforms
+        runs-on: ubuntu-latest
+        env:
+            CARGO_TERM_COLOR: always
+            BINARY_NAME: nsv
+        steps:
+            - uses: actions/checkout@v2
+            - name: install cross-rs
+              run: cargo install cross --git https://github.com/cross-rs/cross
+            - name: build
+              run: |
+                  cross build --target aarch64-unknown-linux-musl
+                  cross build --target i586-unknown-linux-musl
+                  cross build --target x86_64-unknown-linux-musl
+                  cross build --target i686-pc-windows-gnu
+                  cross build --target x86_64-pc-windows-gnu
+            - name: test nsv
+              run: target/x86_64-unknown-linux-musl/release/nsv --version
