@@ -20,37 +20,37 @@ jobs:
             - uses: googleapis/release-please-action@v4
               id: release
               with:
-                  token: ${{ secrets.ACTIOPNS_TOKEN }}
+                  token: ${{ secrets.ACTIONS_TOKEN }}
 
             - name: Release Please Results
               env:
                   RESULTS: ${{ toJSON(steps.release.outputs) }}
               run: echo "$RESULTS"
 
-    build:
-        name: build for all platforms
-        runs-on: ${{ matrix.os }}
-        strategy:
-            matrix:
-                target:
-                    - x86_64-unknown-linux-gnu
-                    - x86_64-apple-darwin
-                    - x86_64-pc-windows-msvc
-                include:
-                    - target: x86_64-unknown-linux-gnu
-                      os: ubuntu-latest
-                    - target: x86_64-apple-darwin
-                      os: macos-13
-                    - target: x86_64-pc-windows-msvc
-                      os: windows-latest
-        env:
-            CARGO_TERM_COLOR: always
-            BINARY_NAME: nsv
-        steps:
-            - uses: actions/checkout@v2
-            - name: use target
-              run: rustup target add ${{ matrix.target }}
-            - name: build binary
-              run: cargo build --release --target ${{ matrix.target }} --bin nsv
-            - name: test binary version
-              run: ./target/${{ matrix.target }}/release/nsv --version
+    # build:
+    #     name: build for all platforms
+    #     runs-on: ${{ matrix.os }}
+    #     strategy:
+    #         matrix:
+    #             target:
+    #                 - x86_64-unknown-linux-gnu
+    #                 - x86_64-apple-darwin
+    #                 - x86_64-pc-windows-msvc
+    #             include:
+    #                 - target: x86_64-unknown-linux-gnu
+    #                   os: ubuntu-latest
+    #                 - target: x86_64-apple-darwin
+    #                   os: macos-13
+    #                 - target: x86_64-pc-windows-msvc
+    #                   os: windows-latest
+    #     env:
+    #         CARGO_TERM_COLOR: always
+    #         BINARY_NAME: nsv
+    #     steps:
+    #         - uses: actions/checkout@v2
+    #         - name: use target
+    #           run: rustup target add ${{ matrix.target }}
+    #         - name: build binary
+    #           run: cargo build --release --target ${{ matrix.target }} --bin nsv
+    #         - name: test binary version
+    #           run: ./target/${{ matrix.target }}/release/nsv --version
