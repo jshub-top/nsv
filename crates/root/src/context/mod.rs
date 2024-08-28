@@ -74,9 +74,10 @@ impl Context {
 
         #[cfg(target_arch = "x86_64")]
         let arch = "x64";
+        #[cfg(target_arch = "x86")]
+        let arch = "x86";
         #[cfg(target_arch = "aarch64")]
         let arch = "arm64";
-
 
         let nsv_home = env::var("NSV_HOME").expect("environment variables NSV_HOME not found");
         let nsv_home = PathBuf::from(nsv_home);
