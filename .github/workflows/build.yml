@@ -1,8 +1,12 @@
 name: build nsv
 
+#on:
+#    release:
+#        types: [created]
+
 on:
-    release:
-        types: [created]
+    push:
+        branches: ["main"]
 
 jobs:
     release:
@@ -10,6 +14,8 @@ jobs:
         outputs:
             latest_release_tag: ${{ steps.latest_release_tag.outputs }}
         runs-on: ubuntu-latest
+        env:
+            GH_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
         steps:
             -   name: get latest release tag
                 id: latest_release_tag
@@ -20,6 +26,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             CARGO_TERM_COLOR: always
+            GH_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
         steps:
             -   uses: actions/checkout@v2
             -   name: build linux
@@ -39,6 +46,7 @@ jobs:
         runs-on: macos-latest
         env:
             CARGO_TERM_COLOR: always
+            GH_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
         steps:
             -   uses: actions/checkout@v2
             -   name: build macos

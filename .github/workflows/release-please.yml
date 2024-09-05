@@ -5,21 +5,21 @@ on:
         branches: ["main"]
 
 jobs:
-     release-please:
-         permissions:
-             id-token: write
-             contents: write
-         runs-on: ubuntu-latest
-         steps:
-             -  name: Checkout repository
-                uses: actions/checkout@v4.1.6
-
-             -  uses: googleapis/release-please-action@v4
-                id: release
-                with:
-                    token: ${{ secrets.ACTIONS_TOKEN }}
-
-             -  name: Release Please Results
-                env:
-                    RESULTS: ${{ toJSON(steps.release.outputs) }}
-                run: echo "$RESULTS"
+#     release-please:
+#         permissions:
+#             id-token: write
+#             contents: write
+#         runs-on: ubuntu-latest
+#         steps:
+#             -  name: Checkout repository
+#                uses: actions/checkout@v4.1.6
+#
+#             -  uses: googleapis/release-please-action@v4
+#                id: release
+#                with:
+#                    token: ${{ secrets.ACTIONS_TOKEN }}
+#
+#             -  name: Release Please Results
+#                env:
+#                    RESULTS: ${{ toJSON(steps.release.outputs) }}
+#                run: echo "$RESULTS"
