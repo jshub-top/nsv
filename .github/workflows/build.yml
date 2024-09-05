@@ -9,6 +9,7 @@ jobs:
         name: release
         outputs:
             latest_release_tag: ${{ steps.latest_release_tag.outputs }}
+        runs-on: ubuntu-latest
         steps:
             -   name: get latest release tag
                 id: latest_release_tag
