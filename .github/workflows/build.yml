@@ -20,7 +20,9 @@ jobs:
             -   uses: actions/checkout@v2
             -   name: get latest release tag
                 id: latest_release_tag
-                run: gh release list --limit 1 --json tagName --template '{{range .}}{{.tagName}}{{end}}'
+                run: |
+                    latest_release_tag=gh release list --limit 1 --json tagName --template '{{range .}}{{.tagName}}{{end}}'
+                    echo "::set-output name=latest_release_tag::$latest_release_tag"
     build:
         needs: [release]
         name: build for all platforms
