@@ -5,104 +5,22 @@ on:
         branches: ["main"]
 
 jobs:
-    # release-please:
-    #     permissions:
-    #         id-token: write
-    #         contents: write
-    #     runs-on: ubuntu-latest
-    #     outputs:
-    #         release_created: ${{ steps.release.outputs.release_created }}
-    #         upload_url: ${{ steps.release.outputs.upload_url }}
-    #     steps:
-    #         - name: Checkout repository
-    #           uses: actions/checkout@v4.1.6
+     release-please:
+         if: startsWith(github.event.head_commit.message, 'release:')
+         permissions:
+             id-token: write
+             contents: write
+         runs-on: ubuntu-latest
+         steps:
+             -  name: Checkout repository
+                uses: actions/checkout@v4.1.6
 
-    #         - uses: googleapis/release-please-action@v4
-    #           id: release
-    #           with:
-    #               token: ${{ secrets.ACTIONS_TOKEN }}
+             -  uses: googleapis/release-please-action@v4
+                id: release
+                with:
+                    token: ${{ secrets.ACTIONS_TOKEN }}
 
-    #         - name: Release Please Results
-    #           env:
-    #               RESULTS: ${{ toJSON(steps.release.outputs) }}
-    #           run: echo "$RESULTS"
-
-    # build:
-    #     name: build for all platforms
-    #     runs-on: ubuntu-latest
-    #     env:
-    #         CARGO_TERM_COLOR: always
-    #     steps:
-    #         - uses: actions/checkout@v2
-    #         - name: install cross-rs
-    #           run: cargo install cross --git https://github.com/cross-rs/cross
-    #         - name: build
-    #           run: |
-    #               cross build --release --target aarch64-unknown-linux-musl
-    #               cross build --release --target i686-unknown-linux-musl
-    #               cross build --release --target x86_64-unknown-linux-musl
-    #               cross build --release --target i686-pc-windows-gnu
-    #               cross build --release --target x86_64-pc-windows-gnu
-
-    #         - uses: actions/upload-artifact@v4
-    #           name: upload nsv-aarch64-linux-musl
-    #           with:
-    #               name: nsv-aarch64-linux-musl
-    #               path: ./target/aarch64-unknown-linux-musl/release/nsv
-
-    #         - uses: actions/upload-artifact@v4
-    #           with:
-    #               name: nsv-x86-linux-musl
-    #               path: ./target/i686-unknown-linux-musl/release/nsv
-
-    #         - uses: actions/upload-artifact@v4
-    #           with:
-    #               name: nsv-x64-linux-musl
-    #               path: ./target/x86_64-unknown-linux-musl/release/nsv
-
-    #         - uses: actions/upload-artifact@v4
-    #           with:
-    #               name: nsv-x86-windows-gnu
-    #               path: ./target/i686-pc-windows-gnu/release/nsv.exe
-
-    #         - uses: actions/upload-artifact@v4
-    #           with:
-    #               name: nsv-x64-windows-gnu
-    #               path: ./target/x86_64-pc-windows-gnu/release/nsv.exe
-
-#    build:
-#        name: build for all platforms
-#        runs-on: ubuntu-latest
-#        env:
-#            CARGO_TERM_COLOR: always
-#        steps:
-#            - uses: actions/checkout@v2
-#            - name: build linux
-#              run: |
-#                bash script/ci/build.linux.sh
-#                bash script/ci/build.windows.sh
-#
-#            - name: log nsv file
-#              run: |
-#                  ls -l ./target/aarch64-unknown-linux-gnu/release
-#                  ls -l ./target/x86_64-unknown-linux-gnu/release
-#                  ls -l ./target/i686-unknown-linux-gnu/release
-#                  ls -l -a ./target/i686-pc-windows-gnu/release
-#                  ls -l -a ./target/x86_64-pc-windows-gnu/release
-
-
-    build-macos:
-        name: build for all platforms
-        runs-on: macos-latest
-        env:
-            CARGO_TERM_COLOR: always
-        steps:
-            - uses: actions/checkout@v2
-
-            - name: build macos
-              run: |
-                bash script/ci/build.macos.sh
-            - name: log nsv file
-              run: |
-                  ls -l -a ./target/aarch64-apple-darwin/release
-                  ls -l -a ./target/x86_64-apple-darwin/release
+             -  name: Release Please Results
+                env:
+                    RESULTS: ${{ toJSON(steps.release.outputs) }}
+                run: echo "$RESULTS"
