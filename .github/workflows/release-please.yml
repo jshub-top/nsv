@@ -6,7 +6,6 @@ on:
 
 jobs:
      release-please:
-         if: startsWith(github.event.head_commit.message, 'release:')
          permissions:
              id-token: write
              contents: write
