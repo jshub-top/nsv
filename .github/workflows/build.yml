@@ -26,7 +26,7 @@ jobs:
 
 
     build:
-        needs: [release]
+        needs: [latest_release_tag]
         name: build for all platforms
         runs-on: ubuntu-latest
         env:
@@ -46,7 +46,7 @@ jobs:
 
 
     build-macos:
-        needs: [release]
+        needs: [latest_release_tag]
         name: build for all platforms
         runs-on: macos-latest
         env:
