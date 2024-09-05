@@ -12,7 +12,7 @@ serde = { version = "1.0", features = ["derive"] }
 hyper = "1.2.0"
 regex = "1.10.4"
 dotenvy = "0.15.7"
-reqwest = "0.12.5"
+reqwest = { version = "0.11.22", features = ["stream", "json", "rustls"] }
 tower-http = { version = "0.5.2", features = ["trace", "fs"] }
 futures = "0.3.30"
 tokio-util = { version = "0.7", features = ["io"] }
