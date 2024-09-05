@@ -1,0 +1,21 @@
+
+
+[alias]
+build_linux_aarch64     = "build --bin nsv --release --target aarch64-unknown-linux-gnu"
+build_linux_x86         = "build --bin nsv --release --target i686-unknown-linux-gnu"
+build_linux_x64         = "build --bin nsv --release --target x86_64-unknown-linux-gnu"
+
+build_windows_aarch64   = "build --bin nsv --release --target aarch64-pc-windows-msvc"
+build_windows_x86       = "build --bin nsv --release --target i686-pc-windows-msvc"
+build_windows_x64       = "build --bin nsv --release --target x86_64-pc-windows-msvc"
+
+
+build_macos_aarch64     = "build --bin nsv --release --target aarch64-pc-windows-msvc"
+build_macos_x86         = "build --bin nsv --release --target i686-pc-windows-msvc"
+build_macos_x64         = "build --bin nsv --release --target x86_64-pc-windows-msvc"
+
+
+
+
+# [target.aarch64-unknown-linux-gnu]
+# linker = "aarch64-linux-gnu-gcc"
