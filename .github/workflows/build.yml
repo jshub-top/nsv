@@ -1,0 +1,49 @@
+name: build nsv
+
+on:
+    release:
+        types: [created]
+
+jobs:
+    release:
+        name: release
+        outputs:
+            latest_release_tag: ${{ steps.latest_release_tag.outputs }}
+        steps:
+            -   name: get latest release tag
+                id: latest_release_tag
+                run: gh release list --limit 1 --json tagName --template '{{range .}}{{.tagName}}{{end}}'
+    build:
+        needs: [release]
+        name: build for all platforms
+        runs-on: ubuntu-latest
+        env:
+            CARGO_TERM_COLOR: always
+        steps:
+            -   uses: actions/checkout@v2
+            -   name: build linux
+                run: |
+                    bash script/ci/build.linux.sh
+                    bash script/ci/build.windows.sh
+
+            -   name: upload windows and linux nsv binary to latest release tag
+                run: |
+                    gh release upload ${{ needs.release.outputs.latest_release_tag }} target/nsv-x64-linux target/nsv-arm64-linux target/nsv-x86-linux target/nsv-x64-win.exe target/nsv-x86-win.exe
+
+
+
+    build-macos:
+        needs: [release]
+        name: build for all platforms
+        runs-on: macos-latest
+        env:
+            CARGO_TERM_COLOR: always
+        steps:
+            -   uses: actions/checkout@v2
+            -   name: build macos
+                run: |
+                    bash script/ci/build.macos.sh
+
+            -   name: upload mac nsv binary to latest release tag
+                run: |
+                    gh release upload ${{ needs.release.outputs.latest_release_tag }} target/target/nsv-x64-macos target/nsv-arm64-macos
