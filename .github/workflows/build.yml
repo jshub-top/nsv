@@ -9,8 +9,8 @@ on:
         branches: ["main"]
 
 jobs:
-    release:
-        name: release
+    latest_release_tag:
+        name: latest_release_tag
         outputs:
             latest_release_tag: ${{ steps.latest_release_tag.outputs.latest_release_tag }}
         runs-on: ubuntu-latest
