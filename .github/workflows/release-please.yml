@@ -78,23 +78,31 @@ jobs:
 #        steps:
 #            - uses: actions/checkout@v2
 #            - name: build linux
-#              run: bash script/ci/build.linux.sh
+#              run: |
+#                bash script/ci/build.linux.sh
+#                bash script/ci/build.windows.sh
+#
 #            - name: log nsv file
 #              run: |
-#                ls -l ./target/aarch64-unknown-linux-gnu
-#                ls -l ./target/x86_64-unknown-linux-gnu
-#                ls -l ./target/i686-unknown-linux-gnu
+#                  ls -l ./target/aarch64-unknown-linux-gnu/release
+#                  ls -l ./target/x86_64-unknown-linux-gnu/release
+#                  ls -l ./target/i686-unknown-linux-gnu/release
+#                  ls -l -a ./target/i686-pc-windows-gnu/release
+#                  ls -l -a ./target/x86_64-pc-windows-gnu/release
 
-    build:
+
+    build-macos:
         name: build for all platforms
-        runs-on: ubuntu-latest
+        runs-on: macos-latest
         env:
             CARGO_TERM_COLOR: always
         steps:
             - uses: actions/checkout@v2
-            - name: build linux
-              run: bash script/ci/build.windows.sh
+
+            - name: build macos
+              run: |
+                bash script/ci/build.macos.sh
             - name: log nsv file
               run: |
-                  ls -l -a ./target/i686-pc-windows-gnu/release
-                  ls -l -a ./target/x86_64-pc-windows-gnu/release
+                  ls -l -a ./target/aarch64-apple-darwin/release
+                  ls -l -a ./target/x86_64-apple-darwin/release
