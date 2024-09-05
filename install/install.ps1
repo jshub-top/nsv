@@ -129,7 +129,7 @@ function Get-Nsv-File-Name {
     $ProcessorArchitecture = switch ($env:PROCESSOR_ARCHITECTURE) {
         "AMD64" { "x64" }
         "x86"   { "x86" }
-        "ARM64" { "arm" }
+        "ARM64" { "arm64" }
     }
     return "nsv-$ProcessorArchitecture-win.exe"
 }
