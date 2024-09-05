@@ -70,17 +70,32 @@ jobs:
     #               name: nsv-x64-windows-gnu
     #               path: ./target/x86_64-pc-windows-gnu/release/nsv.exe
 
+#    build:
+#        name: build for all platforms
+#        runs-on: ubuntu-latest
+#        env:
+#            CARGO_TERM_COLOR: always
+#        steps:
+#            - uses: actions/checkout@v2
+#            - name: build linux
+#              run: bash script/ci/build.linux.sh
+#            - name: log nsv file
+#              run: |
+#                ls -l ./target/aarch64-unknown-linux-gnu
+#                ls -l ./target/x86_64-unknown-linux-gnu
+#                ls -l ./target/i686-unknown-linux-gnu
+
     build:
         name: build for all platforms
-        runs-on: ubuntu-latest
+        runs-on: window-latest
         env:
             CARGO_TERM_COLOR: always
         steps:
             - uses: actions/checkout@v2
             - name: build linux
-              run: bash script/ci/build.linux.sh
+              run: bash script/ci/build.windows.sh
             - name: log nsv file
               run: |
-                ls -l ./target/aarch64-unknown-linux-gnu
-                ls -l ./target/x86_64-unknown-linux-gnu
-                ls -l ./target/i686-unknown-linux-gnu
+                  ls -l ./target/aarch64-pc-windows-msvc/release
+                  ls -l ./target/x86_64-pc-windows-msvc/release
+                  ls -l ./target/i686-pc-windows-msvc/release
