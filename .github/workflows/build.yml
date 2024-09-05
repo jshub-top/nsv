@@ -12,7 +12,7 @@ jobs:
     release:
         name: release
         outputs:
-            latest_release_tag: ${{ steps.latest_release_tag.outputs }}
+            latest_release_tag: ${{ steps.latest_release_tag.outputs.latest_release_tag }}
         runs-on: ubuntu-latest
         env:
             GH_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
@@ -22,7 +22,7 @@ jobs:
                 id: latest_release_tag
                 run: |
                     latest_release_tag=gh release list --limit 1 --json tagName --template '{{range .}}{{.tagName}}{{end}}'
-                    echo "::set-output name=latest_release_tag::$latest_release_tag"
+                    echo "latest_release_tag=$latest_release_tag" >> $GITHUB_OUTPUT
     build:
         needs: [release]
         name: build for all platforms
