@@ -96,6 +96,5 @@ jobs:
               run: bash script/ci/build.windows.sh
             - name: log nsv file
               run: |
-                  ls -l ./target/aarch64-pc-windows-msvc/release
-                  ls -l ./target/x86_64-pc-windows-msvc/release
-                  ls -l ./target/i686-pc-windows-msvc/release
+                  ls -l -a ./target/i686-pc-windows-gnu/release
+                  ls -l -a ./target/x86_64-pc-windows-gnu/release
