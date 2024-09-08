@@ -22,7 +22,7 @@ jobs:
                 id: latest_release_tag
                 shell: bash
                 run: |
-                    export latest_release_tag=(gh release list --limit 1 --json tagName --template '{{range .}}{{.tagName}}{{end}}')
+                    export latest_release_tag=$(gh release list --limit 1 --json tagName --template '{{range .}}{{.tagName}}{{end}}')
                     echo $latest_release_tag
                     echo "latest_release_tag=$latest_release_tag" >> $GITHUB_OUTPUT
 
