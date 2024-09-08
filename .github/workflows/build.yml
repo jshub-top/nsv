@@ -20,6 +20,7 @@ jobs:
             -   uses: actions/checkout@v2
             -   name: get latest release tag
                 id: latest_release_tag
+                shell: bash
                 run: |
                     export latest_release_tag=(gh release list --limit 1 --json tagName --template '{{range .}}{{.tagName}}{{end}}')
                     echo $latest_release_tag
