@@ -21,8 +21,8 @@ jobs:
             -   name: get latest release tag
                 id: latest_release_tag
                 run: |
-                    latest_release_tag=gh release list --limit 1 --json tagName --template '{{range .}}{{.tagName}}{{end}}'
-                    # echo "latest_release_tag=$latest_release_tag" >> $GITHUB_OUTPUT
+                    export latest_release_tag=(gh release list --limit 1 --json tagName --template '{{range .}}{{.tagName}}{{end}}')
+                    echo "latest_release_tag=$latest_release_tag" >> $GITHUB_OUTPUT
 
 
     build:
