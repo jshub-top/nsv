@@ -1,12 +1,12 @@
 name: build nsv
 
-#on:
-#    release:
-#        types: [created]
-
 on:
-    push:
-        branches: ["main"]
+   release:
+       types: [created]
+
+# on:
+#     push:
+#         branches: ["main"]
 
 jobs:
     latest_release_tag:
