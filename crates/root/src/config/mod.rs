@@ -1,145 +1,161 @@
-use std::env;
-use std::fmt::Display;
+use ini::Ini;
+use std::env::{self, current_dir};
+use std::fs::read_to_string;
 use std::path::PathBuf;
-
-use tokio::fs::write;
-use tokio::{
-    fs::{metadata, File},
-    io::{AsyncBufReadExt, BufReader},
-};
-
-use crate::node::NsvCoreError;
-
+use std::str::FromStr;
 
 #[derive(Debug, Clone)]
 pub struct Config {
-    /// 源
-    pub origin: String,
+    // / 源
+    // pub origin: String,
 
-    /// 配置文件路径
-    pub file_path: PathBuf,
+    // / 配置文件路径
+    // pub file_path: PathBuf,
 
-    /// 是否适配
-    pub adapt: bool,
+    // / 添加node版本时候是否自动更新node版本到最新 比如 add 18 本地 18.5 新版18.6 将自动更新到 18.6
+    // pub upgrade: bool,
 
-    /// 是否自动处理
-    pub auto: bool,
+    // / 是否通过 `npmrc` 自动读取node版本进行修改
+    // pub adapt: bool,
 
-    /// 适配版本匹配
-    pub adapt_version_match: Option<String>,
+    // / 默认node版本
+    // pub node: String,
 
-    /// index.json 有效期是多久
-    pub index_json_file_effect_time: u64
+    // index.json 有效期是多久
+    // pub index_json_file_effect_time: u64
+    def_config: Ini,
+    user_config: Ini,
+    global_config: Ini,
+    user_nsvrc_path: PathBuf,
+    global_nsvrc_path: PathBuf,
 }
 
 impl Config {
-    pub async fn build() -> Self {
-        let mut config = Config::default();
+    pub fn build() -> Self {
+        let default_config = format!(
+            r#"
+            index_json_file_effect_time="{}"
+            origin="https://nodejs.org/dist"
+            upgrade="true"
+            adapt="false"
+        "#,
+            60 * 60 * 5,
+        );
 
-        // global config
-        config
-            .parse_config_by_nsvrc(&config.file_path.clone())
-            .await;
-
-        // project config
-        // config.parse_config_by_nsvrc(&Path::new(".nsvrc").to_path_buf()).await;
-
-        config
-    }
-
-    pub fn get_config(&self, key: &str) -> Result<String, NsvCoreError> {
-        match key {
-            "origin" => {
-                Ok(self.origin.clone())
-            }
-            "adapt" => {
-                Ok(self.adapt.to_string())
-            }
-            "auto" => {
-               Ok( self.auto.to_string())
-            }
-            "adapt_version_match" => {
-               Ok(self.adapt_version_match.clone().unwrap_or("null".to_string()))
-            }
-            _ => {
-                Err(NsvCoreError::ConfigKeyNotFound(key.to_string()))
+        //从 pwd 寻找顶层 nsvrc 文件
+        let mut pwd = current_dir().unwrap();
+        pwd.push(".nsvrc");
+        let mut user_nsvrc_path = None;
+        while pwd.pop() {
+            let nsvrc_path = pwd.join(".nsvrc");
+            if nsvrc_path.exists() {
+                user_nsvrc_path = Some(nsvrc_path);
+                break;
             }
         }
-    }
 
-    pub fn set_config(&mut self, key: &str, value: &str) {
-        match key {
-            "origin" => {
-                self.origin = value.to_string();
-            }
-            "adapt" => {
-                self.adapt = value.parse::<bool>().unwrap();
-            }
-            "auto" => {
-                self.auto = value.parse::<bool>().unwrap();
-            }
-            "adapt_version_match" => {
-                self.adapt_version_match = Some(value.to_string());
-            }
-            _ => {}
-        }
-    }
-
-    pub async fn sync_config_2_npmrc(&self) {
-        let config_file_content = format!("{}", self);
-        write(&self.file_path, config_file_content)
-            .await
-            .unwrap();
-    }
-
-    pub async fn parse_config_by_nsvrc(&mut self, file_path: &PathBuf) {
-        // 文件不存在 不继续往下走
-        if metadata(file_path).await.is_err() {
-            return;
-        }
-
-        let config_file = File::open(file_path).await.unwrap();
-        let mut lines = BufReader::new(config_file).lines();
-        while let Some(line) = lines.next_line().await.unwrap() {
-            let config_vec = line.split("=").collect::<Vec<_>>();
-            let key = config_vec[0];
-            let value = config_vec[1];
-            if !key.is_empty() && !value.is_empty() {
-                self.set_config(config_vec[0], config_vec[1]);
-            }
-        }
-    }
-
-}
+        let pwd = current_dir().unwrap();
 
 
-impl Display for Config {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}",
-            vec![
-                format!("origin={}", &self.origin),
-                format!("adapt={}", self.adapt),
-                format!("auto={}", self.adapt),
-            ].join("\n")
-        )
-    }
-}
+        let user_config = match user_nsvrc_path.as_ref() {
+            Some(path) => match Ini::load_from_file(path) {
+                Ok(config) => config,
+                Err(_) => {
+                    // 这里是为了兼容旧版本
+                    // ```ini
+                    // .nsvrc
+                    // 20
+                    // ```
+                    // 旧版本很简单的就一个 20 新版本使用ini 来存储信息
+                    let mut ini = Ini::new();
 
-impl Default for Config {
-    fn default() -> Self {
+                    let value = read_to_string(path).unwrap();
+
+                    ini.set_to(None::<&str>, "node".to_string(), value);
+
+                    ini
+                }
+            },
+            None => Ini::new(),
+        };
+
+        let user_nsvrc_path = user_nsvrc_path.unwrap_or_else(|| pwd.join(".nsvrc"));
+
         #[cfg(windows)]
         let user_home = env::var("USERPROFILE").unwrap();
         #[cfg(unix)]
         let user_home = env::var("HOME").unwrap();
-        let mut user_home = PathBuf::from(user_home);
-        user_home.push(".nsvrc");
+
+        let global_nsvrc_path = PathBuf::from(user_home).join(".nsvrc");
+        let global_config = match Ini::load_from_file(&global_nsvrc_path) {
+            Ok(config) => config,
+            Err(_) => {
+                let ini = Ini::new();
+                ini
+            }
+        };
+
         Self {
-            origin: env::var("NSV_ORIGIN").unwrap_or("https://nodejs.org/dist".to_string()),
-            file_path: user_home,
-            adapt: true,
-            auto: true,
-            adapt_version_match: env::var("NSV_ADAPT_MATCH").ok(),
-            index_json_file_effect_time: 60 * 60 * 5,
+            def_config: Ini::load_from_str(&default_config).unwrap(),
+            user_config,
+            global_config,
+            user_nsvrc_path,
+            global_nsvrc_path,
         }
+    }
+
+    pub fn get<T>(&self, key: &str) -> T
+    where
+        T: FromStr,
+        <T as FromStr>::Err: std::fmt::Debug,
+    {
+        // Try user config first
+        if let Some(value) = self.user_config.get_from(None::<&str>, key) {
+            if let Ok(parsed) = T::from_str(value) {
+                return parsed;
+            }
+        }
+
+        // Try home config next
+        if let Some(value) = self.global_config.get_from(None::<&str>, key) {
+            if let Ok(parsed) = T::from_str(value) {
+                return parsed;
+            }
+        }
+
+        let value = self.def_config.get_from(None::<&str>, key).unwrap();
+        let parsed = T::from_str(value).unwrap();
+        return parsed;
+    }
+
+    pub fn set(&mut self, key: &str, value: &str) {
+        self.user_config
+            .set_to(None::<&str>, key.to_string(), value.to_string());
+        self.user_config
+            .write_to_file(&self.user_nsvrc_path)
+            .unwrap();
+    }
+
+    pub fn set_global(&mut self, key: &str, value: &str) {
+        self.global_config
+            .set_to(None::<&str>, key.to_string(), value.to_string());
+        self.global_config
+            .write_to_file(&self.global_nsvrc_path)
+            .unwrap();
+    }
+
+    pub fn display(&self) -> String {
+        let mut display = String::new();
+        display.push_str(&format!("user_config: {:?}", self.user_config));
+        display.push_str(&format!("global_config: {:?}", self.global_config));
+        display
+    }
+
+    pub fn display_with_all(&self) -> String {
+        let mut display = String::new();
+        display.push_str(&format!("def_config: {:?}", self.def_config));
+        display.push_str(&format!("user_config: {:?}", self.user_config));
+        display.push_str(&format!("global_config: {:?}", self.global_config));
+        display
     }
 }

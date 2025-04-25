@@ -70,7 +70,7 @@ impl NodeDisposeDownload for NsvCore {
     }
     async fn download_node(&self, version: &str) -> Result<(), NsvCoreError> {
         let file_name = self.get_download_file_name(version);
-        let url = format!("{}/{}/{}", self.config.origin, version, file_name);
+        let url = format!("{}/{}/{}", self.config.get::<String>("origin"), version, file_name);
 
 
         // 先下载到 临时文件夹
@@ -99,7 +99,7 @@ impl NodeDisposeDownload for NsvCore {
                 .unwrap_or_default();
 
             let is_recent =
-                time_difference <= Duration::from_secs(self.config.index_json_file_effect_time);
+                time_difference <= Duration::from_secs(self.config.get("index_json_file_effect_time"));
 
             if is_recent {
                 let file_content = read_to_string(dist_version_path).await.unwrap();
@@ -111,7 +111,7 @@ impl NodeDisposeDownload for NsvCore {
             }
         }
 
-        let url = format!("{}/index.json", self.config.origin);
+        let url = format!("{}/index.json", self.config.get::<String>("origin"));
         let resp = reqwest::get(url).await.unwrap();
         // 缓存到本地
         let resp_byt = resp.bytes().await.unwrap();

@@ -53,8 +53,7 @@ pub struct ConfigSubSet {
 #[async_trait]
 impl Command for ConfigSubSet {
     async fn apply(&self, core: &mut NsvCore) -> Result<(), NsvCoreError>{
-        core.config.set_config(&self.key, &self.value);
-        core.config.sync_config_2_npmrc().await;
+        core.config.set(&self.key, &self.value);
         print_log_info!("set config success: {}", &self.key);
         Ok(())
     }
@@ -70,7 +69,7 @@ pub struct ConfigSubGet {
 #[async_trait]
 impl Command for ConfigSubGet {
     async fn apply(&self, core: &mut NsvCore) -> Result<(), NsvCoreError>{
-        let value = core.config.get_config(&self.key)?;
+        let value = core.config.get::<String>(&self.key);
         print_log_info!("{}={}", &self.key, value);
         Ok(())
     }
@@ -84,7 +83,7 @@ pub struct ConfigSubList {
 #[async_trait]
 impl Command for ConfigSubList {
     async fn apply(&self, core: &mut NsvCore) -> Result<(), NsvCoreError>{
-        print_log_info!("config list: \n{}", &core.config);
+        print_log_info!("config list: \n{}", &core.config.display());
         Ok(())
     }
 }
