@@ -1,0 +1,12 @@
+#!/bin/bash
+# run.sh
+
+
+export NSV_MATEFILE=$PWD/nsv-test/NSV_MATEFILE
+export NSV_HOME=$PWD/nsv-test
+export PATH=$NSV_MATEFILE:$PATH
+export NSV_ORIGIN=http://127.0.0.1:3001/cdn
+
+cargo run --bin nsv -- "$@"
+
+which node
