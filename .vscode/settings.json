@@ -1,4 +1,12 @@
 {
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+        "tsconfig.json": "tsconfig.*.json, env.d.ts",
+        "vite.config.*": "jsconfig*, vitest.config.*, cypress.config.*, playwright.config.*",
+        "package.json": "package-lock.json, pnpm*, .yarnrc*, yarn*, .eslint*, eslint*, .oxlint*, oxlint*, .prettier*, prettier*, .editorconfig",
+        "Cargo.toml": "Cargo.lock, Cross.toml, .release-please*, ",
+
+    },
     "terminal.explorerKind": "both",
     "rust-analyzer.showUnlinkedFileNotification": false,
     // "i18n-ally.pathMatcher": "package.nls.{locale}.json",
@@ -23,8 +31,6 @@
     "search.exclude": {
         "package-lock.json": true
     },
-    "typescript.tsdk": "node_modules/typescript/lib", // Use the workspace version of TypeScript
-    "typescript.enablePromptUseWorkspaceTsdk": true, // For security reasons it's require that users opt into using the workspace version of typescript
     "typescript.preferences.preferTypeOnlyAutoImports": true, // Prefer type-only imports
     "testing.openTesting": "neverOpen", // Don't open the testing view automatically when running tests
     "prettier.enable": true, // enable prettier for those who disabled it for some reason
@@ -52,12 +58,12 @@
         "matefile",
         "aarch",
         "sevenz",
-        "serde",
+        "serde"
     ],
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[rust]": {
         "editor.defaultFormatter": "rust-lang.rust-analyzer"
-    },
+    }
 }
