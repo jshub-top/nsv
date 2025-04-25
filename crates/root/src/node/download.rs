@@ -5,7 +5,7 @@ use std::{
 
 use async_trait::async_trait;
 use tokio::{
-    fs::{read_to_string, remove_dir, remove_dir_all, remove_file, rename, write},
+    fs::{read_to_string, remove_dir_all, remove_file, rename, write},
     spawn,
 };
 

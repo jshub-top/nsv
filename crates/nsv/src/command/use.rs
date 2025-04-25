@@ -18,7 +18,6 @@ impl Command for Use {
         let option = NsvUseNodeOption {
             ensure: false
         };
-        println!("{}", &self.version);
         core.use_node(&self.version, option).await?;
         Ok(())
     }
