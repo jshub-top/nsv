@@ -8,5 +8,3 @@ export PATH=$NSV_MATEFILE:$PATH
 export NSV_ORIGIN=http://127.0.0.1:3001/cdn
 
 cargo run --bin nsv -- "$@"
-
-which node
