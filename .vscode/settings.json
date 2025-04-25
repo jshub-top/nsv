@@ -65,5 +65,6 @@
     },
     "[rust]": {
         "editor.defaultFormatter": "rust-lang.rust-analyzer"
-    }
+    },
+    "testing.automaticallyOpenTestResults": "neverOpen"
 }

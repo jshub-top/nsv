@@ -7,6 +7,11 @@ use serde::Deserialize;
 use std::fs::{read_dir, DirEntry};
 use std::path::{Path, PathBuf};
 use tokio::fs::rename;
+
+pub mod download;
+pub mod version;
+
+
 #[derive(PartialEq, Debug, Clone)]
 pub enum VersionTarget {
     Lts,
@@ -48,6 +53,8 @@ pub enum NsvCoreError {
 
     /// config key 不存在
     ConfigKeyNotFound(String),
+
+
 }
 
 #[async_trait]
@@ -58,8 +65,6 @@ pub trait NodeDispose {
     /// 格式化用户输入的 版本
     fn set_version_target(&mut self, version: &str) -> Result<(), NsvCoreError>;
 
-    /// 获取远程 node列表
-    async fn get_version_list_by_remote(&mut self);
 
     /// 查找node版本 通过远程
     async fn get_version_by_remote(&mut self) -> Option<&NodeVersionItem>;
@@ -122,18 +127,7 @@ impl NodeDispose for NsvCore {
         Ok(())
     }
 
-    async fn get_version_list_by_remote(&mut self) {
-        if self.context.node_version_list.is_some() {
-            return;
-        }
-        let url = format!("{}/index.json", self.config.origin);
-        let resp = reqwest::get(url).await.unwrap();
-        let resp_json: Vec<NodeVersionItem> = resp.json().await.unwrap();
-        self.context.node_version_list = Some(resp_json);
-    }
-
     async fn get_version_by_remote(&mut self) -> Option<&NodeVersionItem> {
-        self.get_version_list_by_remote().await;
         match &self.context.target {
             VersionTarget::Lts => self
                 .context

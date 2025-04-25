@@ -1,17 +1,16 @@
-use std::{env, process};
+use crate::node::{NodeVersionItem, VersionTarget};
 use std::env::current_dir;
 use std::path::PathBuf;
-use crate::node::{NodeVersionItem, VersionTarget};
+use std::sync::Arc;
+use std::{env, process};
 
 #[derive(Debug, Clone)]
 pub struct Context {
     /// node压缩包扩展名 tar.xz 7z
     pub rar_extension: &'static str,
 
-
     /// node压缩包的文件名
     pub file_name: String,
-
 
     /// 操作的node版本
     pub version: String,
@@ -25,14 +24,11 @@ pub struct Context {
     /// 缓存路径
     pub temp: PathBuf,
 
-
     /// node压缩包路径
     pub node_file: PathBuf,
 
-
     /// node解压完成路径
     pub node_dir: PathBuf,
-
 
     /// node 版本标记
     pub target: VersionTarget,
@@ -40,12 +36,11 @@ pub struct Context {
     /// 操作系统类型
     pub os: String,
 
-
     /// cpu类型
     pub arch: String,
 
     /// 远程 nodejs 列表
-    pub node_version_list: Option<Vec<NodeVersionItem>>,
+    pub node_version_list: Arc<Vec<NodeVersionItem>>,
 
     /// shell_matefile_env
     pub shell_matefile_env: String,
@@ -58,12 +53,10 @@ impl Context {
     pub fn build() -> Context {
         // https://nodejs.org/dist/v20.9.0/node-v20.9.0-win-x86.7z
 
-
         #[cfg(unix)]
         let rar_extension = "tar.xz";
         #[cfg(windows)]
         let rar_extension = "7z";
-
 
         #[cfg(windows)]
         let os = "win";
@@ -98,7 +91,6 @@ impl Context {
 
         let adapt_version_reg = env::var("NSV_ADAPT_REGEXP").unwrap_or(".nsvrc".to_string());
 
-
         Context {
             file_name: "".to_string(),
             rar_extension,
@@ -111,7 +103,7 @@ impl Context {
             target: VersionTarget::Latest,
             os: os.to_string(),
             arch: arch.to_string(),
-            node_version_list: None,
+            node_version_list: Default::default(),
             shell_matefile_env,
             adapt_version_reg,
         }

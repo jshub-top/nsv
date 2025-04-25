@@ -27,6 +27,9 @@ pub struct Config {
 
     /// 适配版本匹配
     pub adapt_version_match: Option<String>,
+
+    /// index.json 有效期是多久
+    pub index_json_file_effect_time: u64
 }
 
 impl Config {
@@ -136,6 +139,7 @@ impl Default for Config {
             adapt: true,
             auto: true,
             adapt_version_match: env::var("NSV_ADAPT_MATCH").ok(),
+            index_json_file_effect_time: 60 * 60 * 5,
         }
     }
 }
