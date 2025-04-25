@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "Vue.volar",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "w88975.code-translate",
+    "ms-vscode.vscode-typescript-next",
+    "dbaeumer.vscode-eslint",
+    "jbockle.jbockle-format-files",
+    "rust-lang.rust-analyzer",
+  ]
+}
