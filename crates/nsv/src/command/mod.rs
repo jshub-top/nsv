@@ -2,7 +2,7 @@ mod add;
 mod r#use;
 mod adapt;
 mod config;
-use crate::print_log_err;
+use crate::{print_log_err, print_log_info};
 use adapt::Adapt;
 use add::Add;
 use async_trait::async_trait;
@@ -48,7 +48,7 @@ pub trait Command {
             Err(err) => {
                 match err {
                     NsvCoreError::NodeVersionLocalExist(version) => {
-                        print_log_err!("node version {} already exist", version);
+                        print_log_info!("node version {} already exist", version);
                     }
                     NsvCoreError::NodeVersionLocalNotFound => {
                         print_log_err!("node version not found by local");

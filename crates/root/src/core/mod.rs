@@ -22,4 +22,3 @@ impl NsvCore {
         instance
     }
 }
-

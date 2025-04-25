@@ -40,6 +40,8 @@ pub async fn unzip_file(
         unzip_file.read_to_end(&mut unzip_file_buf).await.unwrap();
         let xz = XzDecoder::new(&unzip_file_buf[..]);
         let mut archive = Archive::new(xz);
+        println!("----{:?}", zip_file_dir);
+        println!("----{:?}", output_dir);
         archive.unpack(output_dir).unwrap();
     }
 

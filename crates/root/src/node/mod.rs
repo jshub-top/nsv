@@ -1,16 +1,14 @@
-use crate::core::NsvCore;
-use crate::util::create_node_version_vaildate_reg;
-use crate::util::dir::{ensure_dir, remove_symlink_dir};
-use crate::util::download::{download_file, unzip_file};
 use async_trait::async_trait;
+use download::NodeDisposeDownload;
+use semver::Version;
 use serde::Deserialize;
-use std::fs::{read_dir, DirEntry};
-use std::path::{Path, PathBuf};
-use tokio::fs::rename;
+use std::path::PathBuf;
+use version::NodeDisposeVersion;
+
+use crate::{core::NsvCore, util::dir::remove_symlink_dir};
 
 pub mod download;
 pub mod version;
-
 
 #[derive(PartialEq, Debug, Clone)]
 pub enum VersionTarget {
@@ -53,204 +51,121 @@ pub enum NsvCoreError {
 
     /// config key 不存在
     ConfigKeyNotFound(String),
-
-
 }
 
 #[async_trait]
 pub trait NodeDispose {
-    /// 根据版本str获取本地 node  dir
-    fn get_local_node_dir_2_dir_entry(&self, version: &str) -> Option<DirEntry>;
-
-    /// 格式化用户输入的 版本
-    fn set_version_target(&mut self, version: &str) -> Result<(), NsvCoreError>;
-
-
-    /// 查找node版本 通过远程
-    async fn get_version_by_remote(&mut self) -> Option<&NodeVersionItem>;
-
-    /// 下载node
-    async fn download_node_by_remote(&mut self, version: &DownloadNodeItem);
-
-    /// 从远程同步 node 版本 到本地
-    async fn sync_node_by_remote(&mut self, version: &String) -> DownloadNodeItem;
-
-    /// 解压 本地node压缩包
-    async fn unzip_node_file(&self, file_dir: &Path);
-
-    /// 获取本地node版本
-    async fn get_version_by_local(&mut self) -> Option<String>;
-
-    /// 修改 matefile 地址
-    async fn sync_mate_file_by_version(&self, version: &String) -> ();
+    /// 切换`node`版本
+    async fn use_node(&self, version: &str, option: NsvUseNodeOption) -> Result<(), NsvCoreError>;
+    /// 添加`node`版本
+    async fn add_node(&mut self, version: &str, option: NsvAddNodeOption) -> Result<(), NsvCoreError>;
 }
+
+pub struct NsvUseNodeOption {
+    /// 确保版本存在 (当本地找不到自动下载)
+    pub ensure: bool,
+}
+
+pub struct NsvAddNodeOption {
+    /// 如果版本存在是否更新最新版本
+    /// ```sh
+    /// $ nsv add 18
+    /// ```
+    /// 当添加版本为`18`时 当前已添加的版本为`18.5.1`最新版本为`18.9.0` 如果为`true` 将会下载`18.9.0`
+    ///
+    pub upgrade: bool
+}
+
 
 #[async_trait]
 impl NodeDispose for NsvCore {
-    fn get_local_node_dir_2_dir_entry(&self, version: &str) -> Option<DirEntry> {
-        let version_reg = regex::Regex::new(&format!("^{}", version)).unwrap();
-        for entry in read_dir(&self.context.node_dir).unwrap() {
-            let entry = entry.unwrap();
-            if version_reg.is_match(entry.file_name().to_str().unwrap()) {
-                return Some(entry);
+    async fn use_node(&self, version: &str, option: NsvUseNodeOption) -> Result<(), NsvCoreError> {
+        // 转换成正常版本号
+        let vers = self.formatter_version(version).await?;
+
+        // 看一下本地有没有
+        let mut vers = self.find_local_version(&vers).await;
+
+        //没有就去远程找
+        if vers.is_err() {
+            // 如果 不需要去远程找 抛出错误
+            if !option.ensure {
+                return Err(NsvCoreError::NodeVersionLocalNotFound);
             }
-        }
-        return None;
-    }
 
-    fn set_version_target(&mut self, version: &str) -> Result<(), NsvCoreError> {
-        // 空字符串
-        if version.len() == 0 {
-            return Err(NsvCoreError::Empty);
-        }
-        let target = match version {
-            "lts" => Ok(VersionTarget::Lts),
-            "latest" => Ok(VersionTarget::Latest),
-            _ => {
-                let version_reg = create_node_version_vaildate_reg("");
-                if !version_reg.is_match(version) {
-                    return Err(NsvCoreError::IllegalityVersion(version.to_string()));
-                }
-
-                let (char, ver) = version.split_at(1);
-                if char == "v" {
-                    Ok(VersionTarget::Assign(ver.to_string()))
-                } else {
-                    Ok(VersionTarget::Assign(version.to_string()))
-                }
-            }
-        };
-        if target.is_err() {
-            return Err(target.err().unwrap());
-        };
-        self.context.target = target.unwrap();
-        Ok(())
-    }
-
-    async fn get_version_by_remote(&mut self) -> Option<&NodeVersionItem> {
-        match &self.context.target {
-            VersionTarget::Lts => self
-                .context
-                .node_version_list
-                .as_ref()
-                .unwrap()
-                .iter()
-                .find(|item| match item.lts {
-                    NodeLtsTarget::Str(_) => true,
-                    _ => false,
-                }),
-            VersionTarget::Latest => self.context.node_version_list.as_ref().unwrap().first(),
-            VersionTarget::Assign(version) => {
-                let assign_version_reg = create_node_version_vaildate_reg(version);
-                self.context
-                    .node_version_list
-                    .as_ref()
-                    .unwrap()
-                    .iter()
-                    .find(|item| assign_version_reg.is_match(&*item.version))
-            }
-        }
-    }
-
-    async fn download_node_by_remote(&mut self, download_fine_info: &DownloadNodeItem) {
-        download_file(&download_fine_info.url, &download_fine_info.target)
-            .await
-            .unwrap();
-    }
-    async fn sync_node_by_remote(&mut self, version: &String) -> DownloadNodeItem {
-        self.context.version = version.clone();
-        let file_name = format!(
-            "node-v{}-{}-{}.{}",
-            version, self.context.os, self.context.arch, self.context.rar_extension
-        );
-        let url = format!("{}/v{}/{}", self.config.origin, version, file_name);
-        let mut target = self.context.node_file.clone();
-        target.push(&file_name);
-
-        let download_fine_info = DownloadNodeItem {
-            file_name,
-            url,
-            target,
+            let _vers = vers.unwrap();
+            let _vers = self.find_remote_version(&_vers).await?;
+            vers = Ok(_vers.clone());
+            self.download_node(&_vers).await?;
+            self.unzip_node_file(&_vers).await?;
         };
 
-        self.download_node_by_remote(&download_fine_info).await;
-
-        return download_fine_info;
-    }
-
-    async fn unzip_node_file(&self, file_dir: &Path) {
-        let mut output_dir = self.context.temp.clone();
-        ensure_dir(&output_dir).await.unwrap();
-        unzip_file(file_dir, &output_dir).await.unwrap();
-
-        let node_dir_file_name = file_dir
-            .file_name()
-            .unwrap()
-            .to_str()
-            .unwrap()
-            .replace(&format!(".{}", self.context.rar_extension), "");
-
-        output_dir.push(node_dir_file_name.clone());
-
-        let mut node_dir = self.context.node_dir.clone();
-        node_dir.push(self.context.version.clone());
-        rename(&output_dir, &node_dir).await.unwrap();
-    }
-
-    async fn get_version_by_local(&mut self) -> Option<String> {
-        let version: Option<String> = match &self.context.target {
-            // 输入 lts latest 等
-            VersionTarget::Latest | VersionTarget::Lts => {
-                let node_version_item = self.get_version_by_remote().await;
-                if node_version_item.is_none() {
-                    return None;
-                }
-                Some(node_version_item.unwrap().get_version())
-            }
-            // 输入的是精准node版本
-            VersionTarget::Assign(version) => Some(version.clone()),
-        };
-
-        if version.is_none() {
-            return None;
-        };
-
-        let local_node_dir = self.get_local_node_dir_2_dir_entry(&version.unwrap());
-        if local_node_dir.is_some() {
-            Some(
-                local_node_dir
-                    .unwrap()
-                    .file_name()
-                    .to_str()
-                    .unwrap()
-                    .to_string(),
-            )
-        } else {
-            None
-        }
-    }
-
-    async fn sync_mate_file_by_version(&self, version: &String) {
-        let local_node_dir = self.get_local_node_dir_2_dir_entry(version).unwrap().path();
-        let target_dir = Path::new(&self.context.shell_matefile_env).to_path_buf();
-        if let Err(e) = remove_symlink_dir(&target_dir).await {
+        // 删除旧的 文件
+        let mate_env_path = PathBuf::from(&self.context.shell_matefile_env);
+        if let Err(e) = remove_symlink_dir(&mate_env_path).await {
             if e.kind() != std::io::ErrorKind::NotFound {
                 panic!("{}", e)
             }
         }
+
+        let vers = vers.unwrap();
+
+        let mut vers_path = self.context.node_dir.join(vers);
+
         #[cfg(windows)]
         {
             use tokio::fs::symlink_dir;
-            symlink_dir(local_node_dir, target_dir).await.unwrap();
+            symlink_dir(&vers_path, &mate_env_path).await.unwrap();
         }
 
         #[cfg(unix)]
         {
             use tokio::fs::symlink;
-            let mut local_node_dir = local_node_dir;
-            local_node_dir.push("bin");
-            symlink(local_node_dir, target_dir).await.unwrap();
+            // unix 系统的 node 可执行文件在 bin下面
+            vers_path.push("bin");
+            symlink(&vers_path, &mate_env_path).await.unwrap();
         }
+
+        Ok(())
+    }
+
+    async fn add_node(&mut self, version: &str, option: NsvAddNodeOption) -> Result<(), NsvCoreError>  {
+        // 转换成正常版本号
+        let vers = self.formatter_version(version).await?;
+        // 看一下本地有没有
+        let vers = self.find_local_version(&vers).await;
+        self.download_dist_version().await?;
+
+        if vers.is_ok() {
+
+            // 如果不升级
+            if !option.upgrade {
+                return Err(NsvCoreError::NodeVersionLocalExist( vers.unwrap()))
+            }
+
+            let local_version = vers.unwrap();
+            let remote_version = self.find_remote_version(version).await?;
+
+            let local_vers = Version::parse(&local_version).unwrap();
+            let remote_vers = Version::parse(&remote_version).unwrap();
+            // 对比一下版本号如果 本地和远程一样 就是已存在
+            if local_vers >= remote_vers {
+                return Err(NsvCoreError::NodeVersionLocalExist(local_version.to_string()))
+            }
+
+        }
+
+        let vers = self.find_remote_version(version).await?;
+
+        self.download_node(&vers).await.unwrap();
+        self.unzip_node_file(&vers).await.unwrap();
+
+
+
+
+
+        Ok(())
+
     }
 }
 

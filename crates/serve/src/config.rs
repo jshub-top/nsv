@@ -25,6 +25,7 @@ impl Config {
         let host = env::var("HOST").expect("HOST env var get error");
 
         println!("{}", db_url);
+        println!("PORT: {port}. host: {host}");
 
         Arc::new(Config {
             db_url,
