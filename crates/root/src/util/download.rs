@@ -1,12 +1,16 @@
 use futures_util::StreamExt;
+use reqwest::Response;
+use std::io::Read;
 use std::path::Path;
-use tokio::{fs::create_dir_all, io::AsyncWriteExt};
 use tokio::fs::File;
+use tokio::{fs::create_dir_all, io::AsyncWriteExt};
+
+use super::progress::Progress;
 
 pub async fn download_file(url: &str, path: &Path) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = File::create(path).await?;
     let res = reqwest::get(url).await?;
-    if  res.status().as_str() != "200" {
+    if res.status().as_str() != "200" {
         return Err(format!("{}", res.status().as_str()).into());
     }
     let mut stream = res.bytes_stream();
@@ -15,6 +19,22 @@ pub async fn download_file(url: &str, path: &Path) -> Result<(), Box<dyn std::er
         file.write_all(&chunk).await?;
     }
     file.flush().await?;
+    Ok(())
+}
+
+pub async fn write_file(res: Response, path: &Path) -> Result<(), Box<dyn std::error::Error>> {
+    let mut file = File::create(path).await?;
+    let file_len = res.content_length().unwrap();
+    let mut stream = res.bytes_stream();
+    let bar = Progress::build(file_len);
+
+    while let Some(chunk_result) = stream.next().await {
+        let chunk = chunk_result?;
+        bar.upgrade(chunk.len() as u64);
+        file.write_all(&chunk).await?;
+    }
+    file.flush().await?;
+    bar.finish();
     Ok(())
 }
 
@@ -31,7 +51,6 @@ pub async fn unzip_file(
 
     #[cfg(unix)]
     {
-
         use tar::Archive;
         use tokio::io::AsyncReadExt;
         use xz2::read::XzDecoder;
@@ -40,12 +59,31 @@ pub async fn unzip_file(
         unzip_file.read_to_end(&mut unzip_file_buf).await.unwrap();
         let xz = XzDecoder::new(&unzip_file_buf[..]);
         let mut archive = Archive::new(xz);
-        println!("----{:?}", zip_file_dir);
-        println!("----{:?}", output_dir);
         archive.unpack(output_dir).unwrap();
     }
 
+    Ok(())
+}
 
+pub async fn unzip_file_read(
+    read: impl Read,
+    output_dir: &Path,
+) -> Result<(), Box<dyn std::error::Error>> {
+    create_dir_all(output_dir.parent().unwrap()).await.unwrap();
+
+    #[cfg(windows)]
+    {
+        sevenz_rust::decompress(read, output_dir).unwrap();
+    }
+
+    #[cfg(unix)]
+    {
+        use tar::Archive;
+        use xz2::read::XzDecoder;
+        let xz = XzDecoder::new(read);
+        let mut archive = Archive::new(xz);
+        archive.unpack(output_dir).unwrap();
+    }
 
     Ok(())
 }

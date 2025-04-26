@@ -2,7 +2,8 @@ use regex::Regex;
 
 pub mod download;
 pub mod dir;
-
+pub mod progress;
+pub mod http;
 
 
 pub fn create_node_version_vaildate_reg(version: &str) -> Regex {

@@ -11,7 +11,11 @@ use tokio::{
 
 use crate::{
     core::NsvCore,
-    util::{dir::ensure_dir, download::{download_file, unzip_file}},
+    util::{
+        dir::ensure_dir,
+        download::{unzip_file, write_file},
+        http::get,
+    },
 };
 
 use super::{NodeVersionItem, NsvCoreError};
@@ -41,14 +45,12 @@ impl NodeDisposeDownload for NsvCore {
         remove_dir_all(&output_dir).await.unwrap();
         ensure_dir(&output_dir).await.unwrap();
 
-
         let node_dir_file_name = file_path
             .file_name()
             .unwrap()
             .to_str()
             .unwrap()
             .replace(&format!(".{}", self.context.rar_extension), "");
-
 
         let mut unzip_node_path = output_dir;
 
@@ -70,14 +72,21 @@ impl NodeDisposeDownload for NsvCore {
     }
     async fn download_node(&self, version: &str) -> Result<(), NsvCoreError> {
         let file_name = self.get_download_file_name(version);
-        let url = format!("{}/{}/{}", self.config.get::<String>("origin"), version, file_name);
-
+        let url = format!(
+            "{}/{}/{}",
+            self.config.get::<String>("origin"),
+            version,
+            file_name
+        );
 
         // 先下载到 临时文件夹
         let target = self.context.temp.join(&file_name);
-        download_file(&url, &target).await.unwrap();
+        let res = get(&url).await.unwrap();
+        write_file(res, &target).await.unwrap();
         // 复制到 放node文件的文件夹
-        rename(target, self.context.node_file.join(file_name)).await.unwrap();
+        rename(target, self.context.node_file.join(file_name))
+            .await
+            .unwrap();
         Ok(())
     }
 
@@ -98,8 +107,8 @@ impl NodeDisposeDownload for NsvCore {
                 .duration_since(file_create_time)
                 .unwrap_or_default();
 
-            let is_recent =
-                time_difference <= Duration::from_secs(self.config.get("index_json_file_effect_time"));
+            let is_recent = time_difference
+                <= Duration::from_secs(self.config.get("index_json_file_effect_time"));
 
             if is_recent {
                 let file_content = read_to_string(dist_version_path).await.unwrap();

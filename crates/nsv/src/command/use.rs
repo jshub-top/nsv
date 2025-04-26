@@ -1,5 +1,8 @@
 use async_trait::async_trait;
-use root::{core::NsvCore, node::{NodeDispose, NsvAddNodeOption, NsvUseNodeOption}};
+use root::{
+    core::NsvCore,
+    node::{NodeDispose, NsvUseNodeOption},
+};
 
 use crate::print_log_info;
 
@@ -9,16 +12,23 @@ use thiserror::Error;
 
 #[derive(clap::Parser, Debug)]
 pub struct Use {
-    version: String,
+    version: Option<String>,
 }
 
 #[async_trait]
 impl Command for Use {
     async fn apply(&self, core: &mut NsvCore) -> Result<(), NsvCoreError> {
-        let option = NsvUseNodeOption {
-            ensure: false
+        let version = match &self.version {
+            Some(version) => version.clone(),
+            None => core.config.get("node"),
         };
-        core.use_node(&self.version, option).await?;
+
+        if version.is_empty() {
+            return Err(NsvCoreError::NodeVersionLocalNotFound);
+        };
+
+        let option = NsvUseNodeOption { ensure: false };
+        core.use_node(&version, option).await?;
         Ok(())
     }
 }
