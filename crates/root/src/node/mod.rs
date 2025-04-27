@@ -60,7 +60,13 @@ pub trait NodeDispose {
     /// 切换`node`版本
     async fn use_node(&self, version: &str, option: NsvUseNodeOption) -> Result<(), NsvCoreError>;
     /// 添加`node`版本
-    async fn add_node(&mut self, version: &str, option: NsvAddNodeOption) -> Result<(), NsvCoreError>;
+    async fn add_node(
+        &mut self,
+        version: &str,
+        option: NsvAddNodeOption,
+    ) -> Result<(), NsvCoreError>;
+    /// 查看`node`版本
+    async fn view_node_version(&mut self, version: Option<&str>) -> Result<(), NsvCoreError>;
 }
 
 pub struct NsvUseNodeOption {
@@ -75,9 +81,8 @@ pub struct NsvAddNodeOption {
     /// ```
     /// 当添加版本为`18`时 当前已添加的版本为`18.5.1`最新版本为`18.9.0` 如果为`true` 将会下载`18.9.0`
     ///
-    pub upgrade: bool
+    pub upgrade: bool,
 }
-
 
 #[async_trait]
 impl NodeDispose for NsvCore {
@@ -131,7 +136,7 @@ impl NodeDispose for NsvCore {
         Ok(())
     }
 
-    async fn add_node(&mut self, version: &str, option: NsvAddNodeOption) -> Result<(), NsvCoreError>  {
+    async fn add_node(&mut self, version: &str, option: NsvAddNodeOption, ) -> Result<(), NsvCoreError> {
         // 转换成正常版本号
         let vers = self.formatter_version(version).await?;
         // 看一下本地有没有
@@ -139,10 +144,9 @@ impl NodeDispose for NsvCore {
         self.download_dist_version().await?;
 
         if vers.is_ok() {
-
             // 如果不升级
             if !option.upgrade {
-                return Err(NsvCoreError::NodeVersionLocalExist( vers.unwrap()))
+                return Err(NsvCoreError::NodeVersionLocalExist(vers.unwrap()));
             }
 
             let local_version = vers.unwrap();
@@ -152,9 +156,10 @@ impl NodeDispose for NsvCore {
             let remote_vers = Version::parse(&remote_version).unwrap();
             // 对比一下版本号如果 本地和远程一样 就是已存在
             if local_vers >= remote_vers {
-                return Err(NsvCoreError::NodeVersionLocalExist(local_version.to_string()))
+                return Err(NsvCoreError::NodeVersionLocalExist(
+                    local_version.to_string(),
+                ));
             }
-
         }
 
         let vers = self.find_remote_version(version).await?;
@@ -162,12 +167,31 @@ impl NodeDispose for NsvCore {
         self.download_node(&vers).await.unwrap();
         self.unzip_node_file(&vers).await.unwrap();
 
+        Ok(())
+    }
 
-
-
+    async fn view_node_version(&mut self, version: Option<&str>) -> Result<(), NsvCoreError> {
+        match version {
+            Some(version) => {
+                // 转换成正常版本号
+                let vers = self.formatter_version(version).await?;
+                self.download_dist_version().await.unwrap();
+                let node_version_list = self.context.node_version_list.clone();
+                let item = node_version_list.iter().find(|item| item.version == vers);
+                if item.is_none() {
+                    return Err(NsvCoreError::IllegalityVersion(vers))
+                }
+                let item = item.unwrap();
+                self.view_version_detail(item).await?;
+            }
+            None => {
+                // 下载一下 node 版本列表
+                self.download_dist_version().await.unwrap();
+                self.view_version_list(self.context.node_version_list.clone()).await?;
+            }
+        }
 
         Ok(())
-
     }
 }
 
@@ -191,13 +215,6 @@ pub struct NodeVersionItem {
 
     /// 安全版本
     pub security: bool,
-}
-
-impl NodeVersionItem {
-    pub fn get_version(&self) -> String {
-        let (_, version) = self.version.split_at(1);
-        return version.to_string();
-    }
 }
 
 #[derive(Clone, Debug)]

@@ -2,6 +2,7 @@ mod add;
 mod r#use;
 mod adapt;
 mod config;
+mod view;
 use crate::{print_log_err, print_log_info};
 use adapt::Adapt;
 use add::Add;

@@ -1,10 +1,11 @@
+use std::sync::Arc;
 
 use async_trait::async_trait;
 use tokio::fs::read_dir;
 
 use crate::core::NsvCore;
 
-use super::{NodeLtsTarget, NsvCoreError};
+use super::{NodeLtsTarget, NodeVersionItem, NsvCoreError};
 
 #[async_trait]
 pub trait NodeDisposeVersion {
@@ -16,6 +17,12 @@ pub trait NodeDisposeVersion {
 
     /// 格式化 用户输入的版本
     async fn formatter_version(&self, version: &str) -> Result<String, NsvCoreError>;
+
+    async fn view_version_detail(&mut self, item: &NodeVersionItem) -> Result<(), NsvCoreError>;
+    async fn view_version_list(
+        &mut self,
+        list: Arc<Vec<NodeVersionItem>>,
+    ) -> Result<(), NsvCoreError>;
 }
 
 #[async_trait]
@@ -51,7 +58,7 @@ impl NodeDisposeVersion for NsvCore {
     }
 
     async fn formatter_version(&self, version: &str) -> Result<String, NsvCoreError> {
-        match version {
+        match version.trim() {
             "lts" => {
                 let current_version_item =
                     self.context
@@ -67,7 +74,7 @@ impl NodeDisposeVersion for NsvCore {
                     return Err(NsvCoreError::NodeVersionRemoteNotFound);
                 }
 
-                return Ok("lts".to_string());
+                return Ok(current_version_item.unwrap().version.clone());
             }
             "latest" => {
                 // 最新版本就获取 最新的呢个 版本
@@ -77,16 +84,27 @@ impl NodeDisposeVersion for NsvCore {
                     return Err(NsvCoreError::NodeVersionRemoteNotFound);
                 }
 
-                return Ok("latest".to_string());
+                return Ok(current_version_item.unwrap().version.clone());
             }
             _ => {
                 let (char, _) = version.split_at(1);
                 if char == "v" {
-                    return Ok(version.to_string())
+                    return Ok(version.to_string());
                 }
 
                 Ok(format!("v{version}"))
             }
         }
+    }
+
+    async fn view_version_detail(&mut self, item: &NodeVersionItem) -> Result<(), NsvCoreError> {
+        Ok(())
+    }
+
+    async fn view_version_list(
+        &mut self,
+        list: Arc<Vec<NodeVersionItem>>,
+    ) -> Result<(), NsvCoreError> {
+        Ok(())
     }
 }
