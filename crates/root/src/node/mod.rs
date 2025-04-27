@@ -110,7 +110,7 @@ impl NodeDispose for NsvCore {
 
         let vers = vers.unwrap();
 
-        let mut vers_path = self.context.node_dir.join(vers);
+        let vers_path = self.context.node_dir.join(vers);
 
         #[cfg(windows)]
         {

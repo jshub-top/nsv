@@ -1,6 +1,5 @@
 use futures_util::StreamExt;
 use reqwest::Response;
-use std::io::Read;
 use std::path::Path;
 use tokio::fs::File;
 use tokio::{fs::create_dir_all, io::AsyncWriteExt};
@@ -58,29 +57,6 @@ pub async fn unzip_file(
         let mut unzip_file_buf = Vec::new();
         unzip_file.read_to_end(&mut unzip_file_buf).await.unwrap();
         let xz = XzDecoder::new(&unzip_file_buf[..]);
-        let mut archive = Archive::new(xz);
-        archive.unpack(output_dir).unwrap();
-    }
-
-    Ok(())
-}
-
-pub async fn unzip_file_read(
-    read: impl Read,
-    output_dir: &Path,
-) -> Result<(), Box<dyn std::error::Error>> {
-    create_dir_all(output_dir.parent().unwrap()).await.unwrap();
-
-    #[cfg(windows)]
-    {
-        sevenz_rust::decompress(read, output_dir).unwrap();
-    }
-
-    #[cfg(unix)]
-    {
-        use tar::Archive;
-        use xz2::read::XzDecoder;
-        let xz = XzDecoder::new(read);
         let mut archive = Archive::new(xz);
         archive.unpack(output_dir).unwrap();
     }
