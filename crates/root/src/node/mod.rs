@@ -127,6 +127,7 @@ impl NodeDispose for NsvCore {
 
         #[cfg(unix)]
         {
+            let mut vers_path = vers_path;
             use tokio::fs::symlink;
             // unix 系统的 node 可执行文件在 bin下面
             vers_path.push("bin");
