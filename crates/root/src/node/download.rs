@@ -31,6 +31,7 @@ pub trait NodeDisposeDownload {
     // 获取下载 node 的文件名
     fn get_download_file_name(&self, version: &str) -> String;
 
+    // 解压node文件
     async fn unzip_node_file(&self, version: &str) -> Result<(), NsvCoreError>;
 }
 

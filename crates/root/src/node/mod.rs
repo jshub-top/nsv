@@ -49,7 +49,9 @@ pub enum NsvCoreError {
      */
     NodeVersionLocalExist(String),
 
-    /// config key 不存在
+    /**
+     * config key 不存在
+     */
     ConfigKeyNotFound(String),
 }
 
