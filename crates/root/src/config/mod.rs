@@ -26,7 +26,7 @@ pub struct Config {
     def_config: Ini,
     user_config: Ini,
     global_config: Ini,
-    user_nsvrc_path: PathBuf,
+    rc: PathBuf,
     global_nsvrc_path: PathBuf,
 }
 
@@ -45,11 +45,18 @@ impl Config {
         //从 pwd 寻找顶层 nsvrc 文件
         let mut pwd = current_dir().unwrap();
         pwd.push(".nsvrc");
-        let mut user_nsvrc_path = None;
+        let mut rc = None;
+        let config_file_list = [".nsvrc", ".nvmrc", ".node-version"];
         while pwd.pop() {
-            let nsvrc_path = pwd.join(".nsvrc");
-            if nsvrc_path.exists() {
-                user_nsvrc_path = Some(nsvrc_path);
+            let rc_path = config_file_list.iter().find_map(| file | {
+                let file_dir = pwd.join(file);
+                if file_dir.exists() {
+                    return Some(file_dir)
+                };
+                None
+            });
+            if rc_path.is_some() {
+                rc = rc_path;
                 break;
             }
         }
@@ -57,7 +64,7 @@ impl Config {
         let pwd = current_dir().unwrap();
 
 
-        let user_config = match user_nsvrc_path.as_ref() {
+        let user_config = match rc.as_ref() {
             Some(path) => match Ini::load_from_file(path) {
                 Ok(config) => config,
                 Err(_) => {
@@ -79,7 +86,7 @@ impl Config {
             None => Ini::new(),
         };
 
-        let user_nsvrc_path = user_nsvrc_path.unwrap_or_else(|| pwd.join(".nsvrc"));
+        let rc = rc.unwrap_or_else(|| pwd.join(".nsvrc"));
 
         #[cfg(windows)]
         let user_home = env::var("USERPROFILE").unwrap();
@@ -99,7 +106,7 @@ impl Config {
             def_config: Ini::load_from_str(&default_config).unwrap(),
             user_config,
             global_config,
-            user_nsvrc_path,
+            rc,
             global_nsvrc_path,
         }
     }
@@ -132,7 +139,7 @@ impl Config {
         self.user_config
             .set_to(None::<&str>, key.to_string(), value.to_string());
         self.user_config
-            .write_to_file(&self.user_nsvrc_path)
+            .write_to_file(&self.rc)
             .unwrap();
     }
 
