@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use root::core::NsvCore;
+use root::{core::NsvCore, node::version::NodeDisposeVersion};
 use thiserror::Error;
 
 
@@ -20,9 +20,7 @@ pub struct View {
 impl Command for View {
     async fn apply(&self, core: &mut NsvCore) -> Result<(), NsvCoreError> {
 
-
-
-
+        core.view_version_list().await?;
 
         Ok(())
     }

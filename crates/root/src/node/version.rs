@@ -1,9 +1,18 @@
-use std::sync::Arc;
+use std::cmp::Ordering;
 
 use async_trait::async_trait;
+use cursive::{
+    align::HAlign,
+    theme::{BorderStyle, Palette},
+    view::{Nameable, Resizable},
+    views::Dialog,
+    With,
+};
 use tokio::fs::read_dir;
 
-use crate::core::NsvCore;
+use crate::{
+    core::NsvCore, library::cursive_table::TableViewItem, node::download::NodeDisposeDownload,
+};
 
 use super::{NodeLtsTarget, NodeVersionItem, NsvCoreError};
 
@@ -19,10 +28,7 @@ pub trait NodeDisposeVersion {
     async fn formatter_version(&self, version: &str) -> Result<String, NsvCoreError>;
 
     async fn view_version_detail(&mut self, item: &NodeVersionItem) -> Result<(), NsvCoreError>;
-    async fn view_version_list(
-        &mut self,
-        list: Arc<Vec<NodeVersionItem>>,
-    ) -> Result<(), NsvCoreError>;
+    async fn view_version_list(&mut self) -> Result<(), NsvCoreError>;
 }
 
 #[async_trait]
@@ -101,10 +107,103 @@ impl NodeDisposeVersion for NsvCore {
         Ok(())
     }
 
-    async fn view_version_list(
-        &mut self,
-        list: Arc<Vec<NodeVersionItem>>,
-    ) -> Result<(), NsvCoreError> {
+    async fn view_version_list(&mut self) -> Result<(), NsvCoreError> {
+        let list = self.download_dist_version().await?;
+        use crate::library::cursive_table::*;
+
+        let mut siv = cursive::default();
+        let mut table = TableView::<NodeVersionItem, BasicColumn>::new()
+            .column(BasicColumn::Version, "版本", |c| c.align(HAlign::Center).width(10))
+            .column(BasicColumn::Date, "发布日期", |c| {
+                c.align(HAlign::Center).width(10)
+            })
+            .column(BasicColumn::Lts, "lts", |c| c.align(HAlign::Center).width(10))
+            .column(BasicColumn::Security, "security", |c| {
+                c.align(HAlign::Center).width(10)
+            })
+            .column(BasicColumn::Installed, "已安装", |c| {
+                c.align(HAlign::Center).width(5)
+            });
+
+        table.set_items(list.to_vec());
+
+        siv.set_theme(cursive::theme::Theme {
+            shadow: true,
+            borders: BorderStyle::Simple,
+            palette: Palette::retro().with(|palette| {
+                use cursive::style::BaseColor::*;
+
+                {
+                    // First, override some colors from the base palette.
+                    use cursive::style::Color::TerminalDefault;
+                    use cursive::style::PaletteColor::*;
+
+                    palette[Background] = TerminalDefault;
+                    palette[View] = TerminalDefault;
+                    palette[Primary] = White.dark();
+                    palette[TitlePrimary] = Blue.light();
+                    palette[Secondary] = Blue.light();
+                    palette[Highlight] = Blue.dark();
+                }
+
+                {
+                    // Then override some styles.
+                    use cursive::style::Effect::*;
+                    use cursive::style::PaletteStyle::*;
+                    use cursive::style::Style;
+                    palette[Highlight] = Style::from(Blue.light()).combine(Bold);
+                    palette[EditableTextCursor] =
+                        Style::secondary().combine(Reverse).combine(Underline)
+                }
+            }),
+        });
+        siv.add_layer(Dialog::around(table.with_name("table").full_height().min_width(60)).title("node 版本列表"));
+
+        siv.run();
+
         Ok(())
+    }
+}
+
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
+enum BasicColumn {
+    Version,
+    Date,
+    Lts,
+    Security,
+    Installed,
+}
+
+impl TableViewItem<BasicColumn> for NodeVersionItem {
+    fn to_column(&self, column: BasicColumn) -> String {
+        match column {
+            BasicColumn::Version => self.version.to_string(),
+            BasicColumn::Date => self.date.to_string(),
+            BasicColumn::Lts => match &self.lts {
+
+                NodeLtsTarget::Bool(_val) => "".to_string(),
+                NodeLtsTarget::Str(val) => val.to_string(),
+            },
+            BasicColumn::Security => match self.security {
+                true => "*".to_string(),
+                false => "".to_string(),
+            },
+            BasicColumn::Installed => {
+                "*".to_string()
+            }
+        }
+    }
+
+    fn cmp(&self, _other: &Self, column: BasicColumn) -> Ordering
+    where
+        Self: Sized,
+    {
+        match column {
+            BasicColumn::Version => Ordering::Equal,
+            BasicColumn::Date => Ordering::Equal,
+            BasicColumn::Lts => Ordering::Equal,
+            BasicColumn::Security => Ordering::Equal,
+            BasicColumn::Installed => Ordering::Equal,
+        }
     }
 }

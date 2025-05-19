@@ -11,6 +11,7 @@ use config::Config;
 use r#use::Use;
 use root::core::NsvCore;
 use root::node::NsvCoreError;
+use view::View;
 
 #[derive(clap::Parser, Debug)]
 pub enum Commands {
@@ -29,6 +30,11 @@ pub enum Commands {
     /// 修改配置
     #[clap(name = "config", bin_name = "config", alias = "c")]
     Config(Config),
+
+
+    /// 查看 node 版本 列表
+    #[clap(name = "view", bin_name = "view", alias = "v")]
+    View(View),
 }
 impl Commands {
     pub async fn call(&self, core: &mut NsvCore) {
@@ -37,6 +43,7 @@ impl Commands {
             Self::Add(cmd) => cmd.call(core).await,
             Self::Adapt(cmd) => cmd.call(core).await,
             Self::Config(cmd) => cmd.call(core).await,
+            Self::View(cmd) => cmd.call(core).await,
         }
     }
 }

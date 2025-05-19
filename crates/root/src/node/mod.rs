@@ -188,7 +188,7 @@ impl NodeDispose for NsvCore {
             None => {
                 // 下载一下 node 版本列表
                 self.download_dist_version().await.unwrap();
-                self.view_version_list(self.context.node_version_list.clone()).await?;
+                self.view_version_list().await?;
             }
         }
 
