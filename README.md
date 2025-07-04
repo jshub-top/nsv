@@ -7,15 +7,15 @@
 - [✅] Configuration management
 - [✅] Version detection
 - [✅] Local installation
+- [✅] View verison
+- [✅] Progress indicators
 
 ### In Progress 🔄
-- [ ] Progress indicators
-- [ ] View verison
+- [ ] Auto-update feature
 
 ### Planned 🔮
 - [ ] Plugin system
 - [ ] Integration with package managers
-- [ ] Auto-update feature
 - [ ] Use corepack
 
 ## Contributing
