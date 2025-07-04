@@ -109,20 +109,22 @@ impl NodeDisposeVersion for NsvCore {
 
     async fn view_version_list(&mut self) -> Result<(), NsvCoreError> {
         let list = self.download_dist_version().await?;
+
         use crate::library::cursive_table::*;
 
         let mut siv = cursive::default();
         let mut table = TableView::<NodeVersionItem, BasicColumn>::new()
-            .column(BasicColumn::Version, "版本", |c| c.align(HAlign::Center).width(10))
-            .column(BasicColumn::Date, "发布日期", |c| {
+            .column(BasicColumn::Version, "version", |c| c.align(HAlign::Center).width(10))
+            .column(BasicColumn::Date, "date", |c| {
                 c.align(HAlign::Center).width(10)
+
             })
             .column(BasicColumn::Lts, "lts", |c| c.align(HAlign::Center).width(10))
             .column(BasicColumn::Security, "security", |c| {
-                c.align(HAlign::Center).width(10)
+                c.align(HAlign::Center).width(12)
             })
-            .column(BasicColumn::Installed, "已安装", |c| {
-                c.align(HAlign::Center).width(5)
+            .column(BasicColumn::Installed, "installed", |c| {
+                c.align(HAlign::Center).width(12)
             });
 
         table.set_items(list.to_vec());
@@ -157,7 +159,7 @@ impl NodeDisposeVersion for NsvCore {
                 }
             }),
         });
-        siv.add_layer(Dialog::around(table.with_name("table").full_height().min_width(60)).title("node 版本列表"));
+        siv.add_layer(Dialog::around(table.with_name("table").full_height().min_width(68)).title("node 版本列表"));
 
         siv.run();
 
@@ -183,13 +185,14 @@ impl TableViewItem<BasicColumn> for NodeVersionItem {
 
                 NodeLtsTarget::Bool(_val) => "".to_string(),
                 NodeLtsTarget::Str(val) => val.to_string(),
-            },
+            }
             BasicColumn::Security => match self.security {
                 true => "*".to_string(),
                 false => "".to_string(),
-            },
-            BasicColumn::Installed => {
-                "*".to_string()
+            }
+            BasicColumn::Installed => match self.is_installed {
+                true => "*".to_string(),
+                false => "".to_string(),
             }
         }
     }

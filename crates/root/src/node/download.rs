@@ -4,18 +4,17 @@ use std::{
 };
 
 use async_trait::async_trait;
+use serde_json::Value;
 use tokio::{
-    fs::{read_to_string, remove_dir_all, remove_file, rename, write},
-    spawn,
+    fs::{read, remove_dir_all, remove_file, rename, write}
 };
 
 use crate::{
-    core::NsvCore,
-    util::{
+    core::NsvCore, node::NodeLtsTarget, util::{
         dir::ensure_dir,
         download::{unzip_file, write_file},
         http::get,
-    },
+    }
 };
 
 use super::{NodeVersionItem, NsvCoreError};
@@ -33,6 +32,9 @@ pub trait NodeDisposeDownload {
 
     // 解压node文件
     async fn unzip_node_file(&self, version: &str) -> Result<(), NsvCoreError>;
+
+    // 解压node文件
+    fn transform_version_json(&self,  version_json_bytes: &[u8]) -> Result<Vec<NodeVersionItem>, NsvCoreError>;
 }
 
 #[async_trait]
@@ -98,6 +100,8 @@ impl NodeDisposeDownload for NsvCore {
 
         let dist_version_path = self.context.nsv_home.join("version.json");
 
+        let mut version_json_bytes = None;
+
         // 如果 本地存在 就用本地的
         if dist_version_path.exists() {
             let file_meta = dist_version_path.metadata().unwrap();
@@ -112,29 +116,73 @@ impl NodeDisposeDownload for NsvCore {
                 <= Duration::from_secs(self.config.get("index_json_file_effect_time"));
 
             if is_recent {
-                let file_content = read_to_string(dist_version_path).await.unwrap();
-                let version_list =
-                    serde_json::from_str::<Vec<NodeVersionItem>>(&file_content).unwrap();
-                let json_arc = Arc::new(version_list);
-                self.context.node_version_list = json_arc.clone();
-                return Ok(json_arc.clone());
+                let bug = read(&dist_version_path).await.unwrap();
+                version_json_bytes = Some(bug);
             }
         }
 
-        let url = format!("{}/index.json", self.config.get::<String>("origin"));
-        let resp = reqwest::get(url).await.unwrap();
-        // 缓存到本地
-        let resp_byt = resp.bytes().await.unwrap();
-        let resp_json = serde_json::from_slice(&resp_byt).unwrap();
-        self.context.node_version_list = Arc::new(resp_json);
+        if version_json_bytes.is_none() {
+            let url = format!("{}/index.json", self.config.get::<String>("origin"));
+            let resp = reqwest::get(url).await.unwrap();
+            let resp_byt = resp.bytes().await.unwrap();
+            version_json_bytes = Some(resp_byt.to_vec());
 
-        let defer = async move || {
+            // 缓存到本地
             let _ = remove_file(&dist_version_path).await;
             write(&dist_version_path, resp_byt).await.unwrap();
-        };
+        }
 
-        spawn(defer());
+        if version_json_bytes.is_none() {
+            return Err(NsvCoreError::Str("download_dist_version error"));
+        }
+
+        let version_json_bytes = version_json_bytes.unwrap();
+
+        self.context.node_version_list = Arc::new(self.transform_version_json(&version_json_bytes)?);
 
         Ok(self.context.node_version_list.clone())
+    }
+
+    fn transform_version_json(&self, version_json_bytes: &[u8]) -> Result<Vec<NodeVersionItem>, NsvCoreError> {
+        let resp_json: Value = serde_json::from_slice(&version_json_bytes).unwrap();
+        let version_list = resp_json.as_array().unwrap();
+        let installed_version = self.context.local_version.clone();
+        let version_list = version_list.iter().map(|item| {
+
+            // 版本
+            let version = item["version"].as_str().unwrap().to_string();
+
+            // 发布日期
+            let date = item["date"].as_str().unwrap().to_string();
+
+            // lts
+            let lts = match item["lts"].as_bool() {
+                Some(true) => NodeLtsTarget::Bool(true),
+                Some(false) => NodeLtsTarget::Bool(false),
+                None =>  NodeLtsTarget::Str(item["lts"].as_str().unwrap().to_string()),
+            };
+
+            // 安全版本
+            let security = item["security"].as_bool().unwrap();
+
+            // 是否安装
+            let is_installed = installed_version.contains(&version);
+
+
+            return NodeVersionItem {
+                version,
+                date,
+                lts,
+                security,
+                is_installed,
+                module: item["module"].as_str().map(|s| s.to_string()),
+                openssl: item["openssl"].as_str().map(|s| s.to_string()),
+                zlib: item["zlib"].as_str().map(|s| s.to_string()),
+                uv: item["uv"].as_str().map(|s| s.to_string()),
+                v8: item["v8"].as_str().map(|s| s.to_string()),
+                npm: item["npm"].as_str().map(|s| s.to_string()),
+            };
+        }).collect();
+        Ok(version_list)
     }
 }

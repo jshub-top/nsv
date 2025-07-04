@@ -25,6 +25,11 @@ pub enum NsvCoreError {
     String(String),
 
     /**
+     * 自定义报错信息
+     */
+    Str(&'static str),
+
+    /**
      * 空值
      */
     Empty,
@@ -216,6 +221,27 @@ pub struct NodeVersionItem {
 
     /// 安全版本
     pub security: bool,
+
+    /// 本地是否已安装
+    pub is_installed: bool,
+
+    /// module
+    pub module: Option<String>,
+
+    /// openssl版本
+    pub openssl: Option<String>,
+
+    /// zlib 版本
+    pub zlib: Option<String>,
+
+    /// uv 版本
+    pub uv: Option<String>,
+
+    /// v8 版本
+    pub v8: Option<String>,
+
+    /// npm 版本
+    pub npm: Option<String>,
 }
 
 #[derive(Clone, Debug)]

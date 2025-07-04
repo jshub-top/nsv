@@ -11,6 +11,6 @@ use root::core::{init::Init, NsvCore};
 async fn main() {
     let cli = parse();
     let mut nsv_core = NsvCore::build(parse_config().await);
-    nsv_core.init().await;
+    let _ = nsv_core.init().await;
     cli.subcommand.call(&mut nsv_core).await;
 }
