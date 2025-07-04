@@ -1,3 +1,4 @@
+
 use crate::node::{NodeVersionItem, VersionTarget};
 use std::env::current_dir;
 use std::path::PathBuf;
@@ -47,6 +48,9 @@ pub struct Context {
 
     /// 适配 版本 reg
     pub adapt_version_reg: String,
+
+    /// 本地已安装 node 版本
+    pub local_version: Vec<String>,
 }
 
 impl Context {
@@ -75,14 +79,14 @@ impl Context {
         let nsv_home = env::var("NSV_HOME").expect("environment variables NSV_HOME not found");
         let nsv_home = PathBuf::from(nsv_home);
 
-        let mut temp = nsv_home.clone();
-        temp.push("temp");
+        // 临时文件夹
+        let temp = nsv_home.join("temp");
 
-        let mut node_file = nsv_home.clone();
-        node_file.push("node_file");
+        // node 压缩包
+        let node_file = nsv_home.join("node_file");
 
-        let mut node_dir = nsv_home.clone();
-        node_dir.push("node_dir");
+        // node 解压完成路径
+        let node_dir = nsv_home.join("node_dir");
 
         let shell_matefile_env = env::var("NSV_MATEFILE").unwrap_or_else(|_e| {
             println!("nsv: NSV_MATEFILE environment variables not found");
@@ -106,6 +110,7 @@ impl Context {
             node_version_list: Default::default(),
             shell_matefile_env,
             adapt_version_reg,
+            local_version: vec![],
         }
     }
 }
