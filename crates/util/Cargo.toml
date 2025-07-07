@@ -10,10 +10,13 @@ tokio = { workspace = true }
 reqwest = { workspace = true }
 indicatif = { workspace = true }
 futures-util = { workspace = true }
+anyhow = { workspace = true }
+
 
 
 [target.'cfg(windows)'.dependencies]
 sevenz-rust = { workspace = true }
+is_elevated = { workspace = true }
 
 [target.'cfg(unix)'.dependencies]
 tar = { workspace = true }

@@ -1,4 +1,4 @@
-use util::dir::ensure_dir;
+use util::fs::ensure_dir;
 
 use super::NsvCore;
 use anyhow::Result;

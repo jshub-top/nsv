@@ -4,7 +4,7 @@ use download::NodeDisposeDownload;
 use semver::Version;
 use serde::Deserialize;
 use std::path::PathBuf;
-use util::dir::remove_symlink_dir;
+use util::fs::remove_symlink_dir;
 use version::NodeDisposeVersion;
 
 pub mod download;

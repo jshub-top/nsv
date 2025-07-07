@@ -10,8 +10,8 @@ use tokio::{
 };
 
 use util::{
-    dir::ensure_dir,
-    http::{get, unzip_file, write_file},
+    fs::ensure_dir,
+    net::{get, unzip_file, write_file},
 };
 
 use crate::{
