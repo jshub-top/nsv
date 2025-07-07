@@ -2,11 +2,7 @@ use std::cmp::Ordering;
 
 use async_trait::async_trait;
 use cursive::{
-    align::HAlign,
-    theme::{BorderStyle, Palette},
-    view::{Nameable, Resizable},
-    views::Dialog,
-    With,
+    align::HAlign, theme::{BorderStyle, Palette}, view::{Nameable, Resizable}, views::{Dialog, TextView}, Cursive, With
 };
 use tokio::fs::read_dir;
 
@@ -159,6 +155,7 @@ impl NodeDisposeVersion for NsvCore {
                 }
             }),
         });
+
         siv.add_layer(Dialog::around(table.with_name("table").full_height().min_width(68)).title("node 版本列表"));
 
         siv.run();
@@ -197,16 +194,16 @@ impl TableViewItem<BasicColumn> for NodeVersionItem {
         }
     }
 
-    fn cmp(&self, _other: &Self, column: BasicColumn) -> Ordering
+    fn cmp(&self, other: &Self, column: BasicColumn) -> Ordering
     where
         Self: Sized,
     {
         match column {
             BasicColumn::Version => Ordering::Equal,
-            BasicColumn::Date => Ordering::Equal,
+            BasicColumn::Date => other.date.cmp(&self.date),
             BasicColumn::Lts => Ordering::Equal,
-            BasicColumn::Security => Ordering::Equal,
-            BasicColumn::Installed => Ordering::Equal,
+            BasicColumn::Security => other.security.cmp(&self.security),
+            BasicColumn::Installed => other.is_installed.cmp(&self.is_installed),
         }
     }
 }
