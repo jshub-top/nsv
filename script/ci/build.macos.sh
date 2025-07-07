@@ -4,9 +4,14 @@ rustup target add aarch64-apple-darwin
 wait
 
 cargo build --bin nsv --release --target x86_64-apple-darwin &
-cargo build --bin nsv --release --target aarch64-apple-darwin
+cargo build --bin nsv --release --target aarch64-apple-darwin &
+cargo build --bin install --release --target x86_64-apple-darwin &
+cargo build --bin install --release --target aarch64-apple-darwin
 
 wait
 
 mv target/x86_64-apple-darwin/release/nsv target/nsv-x64-macos
 mv target/aarch64-apple-darwin/release/nsv target/nsv-arm64-macos
+
+mv target/x86_64-apple-darwin/release/install target/install-x64-macos
+mv target/aarch64-apple-darwin/release/install target/install-arm64-macos
