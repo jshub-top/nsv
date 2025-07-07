@@ -1,15 +1,18 @@
 
 
+
+$VERSION="0.1.2"
 $ErrorActionPreference = 'Stop'
-$is_admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
-if ($is_admin) {
-    Write-Host "user is Administrator"
-}
+# $is_admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+# if ($is_admin) {
+#     Write-Host "user is Administrator"
+# }
 
 # nsv home
+# if NSV_HOME is not set, use the current directory as the nsv home
 $NSV_HOME= $ENV:NSV_HOME
 if($null -eq $NSV_HOME) {
-    $NSV_HOME = "$USERPROFILE\.nsv"
+    $NSV_HOME = "$((Get-Location).path)\.nsv"
 }
 
 # log file dir
@@ -44,36 +47,41 @@ function Set-Profile-Content {
     if(!(Test-Path -Path $NSV_PROFILE_PS1)) {
         New-Item -ItemType File -Path $NSV_PROFILE_PS1 -Force | Out-File -FilePath $log_file -Append
     }
+
+    if(!(Test-Path -Path $NSV_PROFILE_BAT)) {
+        New-Item -ItemType File -Path $NSV_PROFILE_BAT -Force | Out-File -FilePath $log_file -Append
+    }
+
+
     $nsv_ps1_profile_content = @(
         '$timestamp=Get-Date -UFormat %s'
         '$Env:NSV_MATEFILE="$Env:NSV_HOME\temp\$timestamp"'
         '$Env:Path="$Env:NSV_MATEFILE;$Env:NSV_HOME\temp\default;$Env:NSV_HOME;$Env:Path"'
         "nsv adapt"
     )
-    Add-Content -Path $NSV_PROFILE_PS1 -Value  $nsv_ps1_profile_content
+    Set-Content -Path $NSV_PROFILE_PS1 -Value $nsv_ps1_profile_content
     Add-Content -Path $log_file -Value "add nsv profile content"
     Add-Content -Path $log_file -Value $nsv_ps1_profile_content
 
-    $is_admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+
+    $nsv_bat_profile_content = @(
+        '@echo off'
+        'set timestamp=%date:~10,4%%date:~4,2%%date:~7,2%%time:~0,2%%time:~3,2%%time:~6,2%'
+        'set NSV_MATEFILE=%NSV_HOME%\temp%timestamp%'
+        'set PATH=%NSV_MATEFILE%;%NSV_HOME%\temp\default;%NSV_HOME%;%PATH%;'
+        "nsv adapt"
+    )
+    Set-Content -Path $NSV_PROFILE_BAT -Value $nsv_bat_profile_content
+    Add-Content -Path $log_file -Value "add nsv bat profile content"
+    Add-Content -Path $log_file -Value $nsv_bat_profile_content
+
+    # $is_admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
     # Administrator use set command profile
-    if ($is_admin) {
-        if(!(Test-Path -Path $NSV_PROFILE_BAT)) {
-            New-Item -ItemType File -Path $NSV_PROFILE_BAT -Force | Out-File -FilePath $log_file -Append
-        }
-        $nsv_bat_profile_content = @(
-            '@echo off'
-            'set timestamp=%date:~10,4%%date:~4,2%%date:~7,2%%time:~0,2%%time:~3,2%%time:~6,2%'
-            'set NSV_MATEFILE=%NSV_HOME%\temp%timestamp%'
-            'set PATH=%NSV_MATEFILE%;%NSV_HOME%\temp\default;%NSV_HOME%;%PATH%;'
-            "nsv adapt"
-        )
-        Add-Content -Path $NSV_PROFILE_BAT -Value $nsv_bat_profile_content
-        Add-Content -Path $log_file -Value "add nsv bat profile content"
-        Add-Content -Path $log_file -Value $nsv_bat_profile_content
-        Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Command Processor" -Name "AutoRun" -Value "%USERPROFILE%\Documents\WindowsPowerShell\nsv_profile.bat"
-        Add-Content -Path $log_file -Value "set HKLM:\SOFTWARE\Microsoft\Command Processor"
-        Add-Content -Path $log_file -Value $NSV_PROFILE_BAT
-    }
+    # if ($is_admin) {
+    #     Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Command Processor" -Name "AutoRun" -Value "%USERPROFILE%\Documents\WindowsPowerShell\nsv_profile.bat"
+    #     Add-Content -Path $log_file -Value "set HKLM:\SOFTWARE\Microsoft\Command Processor"
+    #     Add-Content -Path $log_file -Value $NSV_PROFILE_BAT
+    # }
 }
 
 function Set-EnvironmentVariable {
@@ -148,8 +156,8 @@ Set-Profile-Content
 
 # add to user environment variables
 # with NSV_PROFILE, NSV_HOME
-Set-EnvironmentVariable -Name 'NSV_PROFILE_PS1' -Value $NSV_PROFILE_PS1
-Set-EnvironmentVariable -Name 'NSV_HOME' -Value $NSV_HOME
+# Set-EnvironmentVariable -Name 'NSV_PROFILE_PS1' -Value $NSV_PROFILE_PS1
+# Set-EnvironmentVariable -Name 'NSV_HOME' -Value $NSV_HOME
 
 
 
