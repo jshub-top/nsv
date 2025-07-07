@@ -1,11 +1,11 @@
+use crate::core::NsvCore;
 use async_trait::async_trait;
 use download::NodeDisposeDownload;
 use semver::Version;
 use serde::Deserialize;
 use std::path::PathBuf;
+use util::dir::remove_symlink_dir;
 use version::NodeDisposeVersion;
-
-use crate::{core::NsvCore, util::dir::remove_symlink_dir};
 
 pub mod download;
 pub mod version;
@@ -142,7 +142,11 @@ impl NodeDispose for NsvCore {
         Ok(())
     }
 
-    async fn add_node(&mut self, version: &str, option: NsvAddNodeOption, ) -> Result<(), NsvCoreError> {
+    async fn add_node(
+        &mut self,
+        version: &str,
+        option: NsvAddNodeOption,
+    ) -> Result<(), NsvCoreError> {
         // 转换成正常版本号
         let vers = self.formatter_version(version).await?;
         // 看一下本地有没有
@@ -185,7 +189,7 @@ impl NodeDispose for NsvCore {
                 let node_version_list = self.context.node_version_list.clone();
                 let item = node_version_list.iter().find(|item| item.version == vers);
                 if item.is_none() {
-                    return Err(NsvCoreError::IllegalityVersion(vers))
+                    return Err(NsvCoreError::IllegalityVersion(vers));
                 }
                 let item = item.unwrap();
                 self.view_version_detail(item).await?;

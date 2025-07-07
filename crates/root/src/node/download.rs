@@ -9,12 +9,13 @@ use tokio::{
     fs::{read, remove_dir_all, remove_file, rename, write}
 };
 
+use util::{
+    dir::ensure_dir,
+    http::{get, unzip_file, write_file},
+};
+
 use crate::{
-    core::NsvCore, node::NodeLtsTarget, util::{
-        dir::ensure_dir,
-        download::{unzip_file, write_file},
-        http::get,
-    }
+    core::NsvCore, node::NodeLtsTarget
 };
 
 use super::{NodeVersionItem, NsvCoreError};

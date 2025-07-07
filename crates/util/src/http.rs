@@ -1,24 +1,16 @@
-use futures_util::StreamExt;
-use reqwest::Response;
 use std::path::Path;
-use tokio::fs::File;
-use tokio::{fs::create_dir_all, io::AsyncWriteExt};
+use futures_util::StreamExt;
 
-use super::progress::Progress;
+use reqwest::{Client, Error, IntoUrl, Response};
+use tokio::{fs::{create_dir_all, File}, io::AsyncWriteExt};
 
-pub async fn download_file(url: &str, path: &Path) -> Result<(), Box<dyn std::error::Error>> {
-    let mut file = File::create(path).await?;
-    let res = reqwest::get(url).await?;
-    if res.status().as_str() != "200" {
-        return Err(format!("{}", res.status().as_str()).into());
-    }
-    let mut stream = res.bytes_stream();
-    while let Some(chunk_result) = stream.next().await {
-        let chunk = chunk_result?;
-        file.write_all(&chunk).await?;
-    }
-    file.flush().await?;
-    Ok(())
+use crate::progress::Progress;
+
+pub async fn get(url: impl IntoUrl) -> Result<Response, Error> {
+    Ok(Client::new()
+        .get(url)
+        .send()
+        .await?)
 }
 
 pub async fn write_file(res: Response, path: &Path) -> Result<(), Box<dyn std::error::Error>> {

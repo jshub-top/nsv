@@ -1,12 +1,12 @@
-use crate::util::dir::ensure_dir;
+use util::dir::ensure_dir;
 
 use super::NsvCore;
 use anyhow::Result;
 use async_trait::async_trait;
 use futures;
+use std::future::Future;
 use std::io;
 use std::pin::Pin;
-use std::future::Future;
 use tokio::fs::read_dir;
 
 #[async_trait]
@@ -33,9 +33,8 @@ impl Init for NsvCore {
         futures::future::join_all(dir_futures).await;
 
         // 初始化之后运行
-        let dir_futures: Vec<Pin<Box<dyn Future<Output = Result<()>> + Send>>> = vec![
-            Box::pin(self.set_local_version()),
-        ];
+        let dir_futures: Vec<Pin<Box<dyn Future<Output = Result<()>> + Send>>> =
+            vec![Box::pin(self.set_local_version())];
         futures::future::join_all(dir_futures).await;
 
         Ok(())

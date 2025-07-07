@@ -19,10 +19,4 @@ rust-ini = { workspace = true }
 indicatif = { workspace = true }
 sevenz-rust = { workspace = true }
 cursive = { workspace = true }
-
-
-[target.'cfg(windows)'.dependencies]
-
-[target.'cfg(unix)'.dependencies]
-tar = { workspace = true }
-xz2 = { workspace = true }
+util= { workspace = true }
