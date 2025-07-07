@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 
 use async_trait::async_trait;
 use cursive::{
-    align::HAlign, theme::{BorderStyle, Palette}, view::{Nameable, Resizable}, views::{Dialog, TextView}, Cursive, With
+    align::HAlign, theme::{BorderStyle, Palette}, view::{Nameable, Resizable, Scrollable}, views::{Dialog, ListView, TextView}, Cursive, With
 };
 use tokio::fs::read_dir;
 
@@ -125,6 +125,37 @@ impl NodeDisposeVersion for NsvCore {
 
         table.set_items(list.to_vec());
 
+        let node_version_list = self.context.node_version_list.clone();
+
+        table.set_on_submit(move |siv: &mut Cursive, _row, index: usize| {
+            let item = node_version_list.get(index).unwrap();
+
+            siv.add_layer(
+                Dialog::new()
+                    .title(format!("{} detail", item.version))
+                    .button("Close", |s| {s.pop_layer();})
+                    .content(
+                        ListView::new()
+                            .child("verison", TextView::new(&item.version))
+                            .child("date", TextView::new(&item.date))
+                            .child("lts", match &item.lts {
+                                NodeLtsTarget::Bool(val) => TextView::new(val.to_string()),
+                                NodeLtsTarget::Str(val) => TextView::new(val.to_string()),
+                            })
+                            .child("security", TextView::new(item.security.to_string()))
+                            .child("module", TextView::new(item.module.clone().unwrap_or("".to_string())))
+                            .child("openssl", TextView::new(item.openssl.clone().unwrap_or("".to_string())))
+                            .child("zlib", TextView::new(item.zlib.clone().unwrap_or("".to_string())))
+                            .child("uv", TextView::new(item.uv.clone().unwrap_or("".to_string())))
+                            .child("v8", TextView::new(item.v8.clone().unwrap_or("".to_string())))
+                            .child("npm", TextView::new(item.npm.clone().unwrap_or("".to_string())))
+                            .delimiter()
+                            .child("installed", TextView::new(item.is_installed.to_string()))
+                            .scrollable()
+                    ))
+        });
+
+
         siv.set_theme(cursive::theme::Theme {
             shadow: true,
             borders: BorderStyle::Simple,
@@ -156,7 +187,7 @@ impl NodeDisposeVersion for NsvCore {
             }),
         });
 
-        siv.add_layer(Dialog::around(table.with_name("table").full_height().min_width(68)).title("node 版本列表"));
+        siv.add_layer(Dialog::around(table.with_name("table").full_height().min_width(68)).title("version list"));
 
         siv.run();
 
