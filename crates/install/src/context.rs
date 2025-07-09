@@ -2,6 +2,8 @@ use std::path::PathBuf;
 
 use util::platform::{get_arch, get_is_admin, get_os, Arch, Env::{get_shell, Shell}, OS};
 
+use crate::shell::get_nsv_config_path;
+
 
 pub struct Context {
 
@@ -19,6 +21,13 @@ pub struct Context {
 
     /// 当前shell
     pub shell: Shell,
+
+    /// version
+    pub version: String,
+
+    /// nsv config path
+    pub nsv_config_path: PathBuf,
+
 }
 
 impl Context {
@@ -28,7 +37,7 @@ impl Context {
         let arch = get_arch().unwrap();
         let shell = get_shell().unwrap();
 
-
+        let nsv_config_path = get_nsv_config_path();
 
         Self {
             os,
@@ -36,49 +45,8 @@ impl Context {
             pwd: std::env::current_dir().unwrap(),
             admin: get_is_admin(),
             shell,
+            version: env!("CARGO_PKG_VERSION").to_string(),
+            nsv_config_path,
         }
     }
-
-    pub fn get_nsv_profile_content(&self) -> &'static str {
-
-        match self.shell {
-
-            Shell::Bash | Shell::Zsh | Shell::Sh => {
-                r#"
-timestamp=$(date +%s%3N)
-export NSV_HOME=$NSV_HOME
-export NSV_MATEFILE=$NSV_HOME/temp/$timestamp
-export PATH=$NSV_MATEFILE:$NSV_HOME/temp/default:$NSV_HOME:$PATH
-nsv adapt
-                "#
-            },
-            Shell::Fish => {
-                r#"
-set timestamp (date +%s%3N)
-set -gx NSV_HOME $NSV_HOME
-set -gx NSV_MATEFILE $NSV_HOME/temp/$timestamp
-set -gx PATH $NSV_MATEFILE $NSV_HOME/temp/default $NSV_HOME $PATH
-nsv adapt
-                "#
-            },
-            Shell::Powershell => {
-                r#"
-$timestamp=Get-Date -UFormat %s
-$Env:NSV_MATEFILE="$Env:NSV_HOME\temp\$timestamp"
-$Env:Path="$Env:NSV_MATEFILE;$Env:NSV_HOME\temp\default;$Env:NSV_HOME;$Env:Path"
-nsv adapt
-                "#
-            },
-            Shell::Cmd => {
-                r#"
-@echo off
-set timestamp=%date:~10,4%%date:~4,2%%date:~7,2%%time:~0,2%%time:~3,2%%time:~6,2%
-set NSV_MATEFILE=%NSV_HOME%\temp%timestamp%
-set PATH=%NSV_MATEFILE%;%NSV_HOME%\temp\default;%NSV_HOME%;%PATH%
-nsv adapt
-                "#
-            }
-        }
-    }
-
 }

@@ -21,3 +21,4 @@ is_elevated = { workspace = true }
 [target.'cfg(unix)'.dependencies]
 tar = { workspace = true }
 xz2 = { workspace = true }
+nix = { workspace = true}
