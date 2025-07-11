@@ -70,5 +70,6 @@
     "testing.automaticallyOpenTestResults": "neverOpen",
     "[toml]": {
         "editor.defaultFormatter": "tamasfe.even-better-toml"
-    }
+    },
+    "editor.minimap.enabled": true,
 }

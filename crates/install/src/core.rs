@@ -1,7 +1,8 @@
 use std::{env, path::PathBuf, process::Command};
 
 use anyhow::Result;
-use tokio::fs::write;
+use regex::Regex;
+use tokio::fs::{read_to_string, write};
 use util::{fs::ensure_dir, platform::Env::Shell};
 
 use crate::{config::Config, context::Context, shell::get_shell_profile_path};
@@ -27,7 +28,8 @@ impl Main {
 
         self.set_nsv_profile().await?;
 
-        let shell_profile_path = get_shell_profile_path(&self.context.shell);
+        self.set_shell_profile(true).await?;
+
 
         Ok(())
     }
@@ -35,17 +37,22 @@ impl Main {
     pub async fn set_nsv_profile(&self) -> Result<()> {
         let nsv_profile_path = self.get_nsv_profile_path();
         let content = self.get_nsv_profile_content();
-        println!("content: {:?}", content);
         ensure_dir(nsv_profile_path.parent().unwrap()).await?;
         write(&nsv_profile_path, content).await?;
         Ok(())
     }
 
-    pub async fn set_shell_profile(&self) -> Result<()> {
-        let shell_profile_path = get_shell_profile_path(&self.context.shell);
+    pub async fn set_shell_profile(&self, update: bool) -> Result<()> {
+        let shell_profile_path = self.get_shell_profile_path();
         let content = self.get_shell_profile_content(&shell_profile_path);
         ensure_dir(shell_profile_path.parent().unwrap()).await?;
-        write(&shell_profile_path, content).await?;
+        if self.exists_nsv_profile_running().await? {
+            if !update {
+                return Ok(());
+            }
+            self.remove_nsv_profile_running().await?;
+        }
+        self.append_to_file(&shell_profile_path, &content).await?;
         Ok(())
     }
 
@@ -108,8 +115,10 @@ $nsv_profile_path = ~/.config/nsv/config.sh
             .to_string(),
             Shell::Fish => r#"
 # nsv
-$nsv_profile_path = ~/.config/nsv/config.fish
-[[ -f $nsv_profile_path ]] && . $nsv_profile_path
+set nsv_profile_path ~/.config/nsv/config.fish
+if test -f $nsv_profile_path
+    . $nsv_profile_path
+end
 # nsv end
             "#
             .to_string(),
@@ -128,7 +137,7 @@ if(Test-Path -Path $nsv_profile_path) {{
         }
     }
 
-    pub fn get_shell_profile_path(self) -> PathBuf {
+    pub fn get_shell_profile_path(&self) -> PathBuf {
         match self.context.shell {
             Shell::Bash => PathBuf::from(env::var("HOME").unwrap()).join(".bashrc"),
             Shell::Zsh => PathBuf::from(env::var("HOME").unwrap()).join(".zshrc"),
@@ -155,5 +164,32 @@ if(Test-Path -Path $nsv_profile_path) {{
         false
     }
 
-    // pub fn get_
+    /// Append content to the end of a file
+    pub async fn append_to_file(&self, path: &PathBuf, content: &str) -> Result<()> {
+        use tokio::fs::OpenOptions;
+        use tokio::io::AsyncWriteExt;
+
+        let mut file = OpenOptions::new()
+            .write(true)
+            .append(true)
+            .create(true)
+            .open(path)
+            .await?;
+
+        file.write_all(content.as_bytes()).await?;
+        Ok(())
+    }
+
+    pub async fn exists_nsv_profile_running(&self) -> Result<bool> {
+        let shell_profile_path = self.get_shell_profile_path();
+        let shell_profile_content = read_to_string(shell_profile_path).await?;
+        Ok(self.context.nsv_installed_reg.is_match(&shell_profile_content))
+    }
+    pub async fn remove_nsv_profile_running(&self) -> Result<()> {
+        let shell_profile_path = self.get_shell_profile_path();
+        let shell_profile_content = read_to_string(&shell_profile_path).await?;
+        let new_content = self.context.nsv_installed_reg.replace(&shell_profile_content, "").to_string();
+        write(&shell_profile_path, new_content).await?;
+        Ok(())
+    }
 }

@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use regex::Regex;
 use util::platform::{get_arch, get_is_admin, get_os, Arch, Env::{get_shell, Shell}, OS};
 
 use crate::shell::get_nsv_config_path;
@@ -28,6 +29,9 @@ pub struct Context {
     /// nsv config path
     pub nsv_config_path: PathBuf,
 
+    /// shell profile nsv installed reg
+    pub nsv_installed_reg: Regex,
+
 }
 
 impl Context {
@@ -47,6 +51,7 @@ impl Context {
             shell,
             version: env!("CARGO_PKG_VERSION").to_string(),
             nsv_config_path,
+            nsv_installed_reg: Regex::new(r"# nsv[\s\S]*?#\s*nsv end").unwrap(),
         }
     }
 }
