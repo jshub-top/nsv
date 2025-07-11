@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{fmt::Display, path::PathBuf};
 
 use anyhow::Result;
 
@@ -9,11 +9,33 @@ pub enum OS {
     Unknown(String),
 }
 
+impl Display for OS {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            OS::Windows => write!(f, "win"),
+            OS::Linux => write!(f, "linux"),
+            OS::MacOS => write!(f, "macos"),
+            OS::Unknown(s) => write!(f, "unknown({})", s),
+        }
+    }
+}
+
 pub enum Arch {
     X86,
     X64,
     Arm64,
     Unknown(String),
+}
+
+impl Display for Arch {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Arch::X86 => write!(f, "x86"),
+            Arch::X64 => write!(f, "x64"),
+            Arch::Arm64 => write!(f, "arm64"),
+            Arch::Unknown(s) => write!(f, "unknown({})", s),
+        }
+    }
 }
 
 pub fn get_os() -> Result<OS> {

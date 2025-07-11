@@ -32,6 +32,9 @@ pub struct Context {
     /// shell profile nsv installed reg
     pub nsv_installed_reg: Regex,
 
+    /// 组织
+    pub owner: String,
+
 }
 
 impl Context {
@@ -52,6 +55,7 @@ impl Context {
             version: env!("CARGO_PKG_VERSION").to_string(),
             nsv_config_path,
             nsv_installed_reg: Regex::new(r"# nsv[\s\S]*?#\s*nsv end").unwrap(),
+            owner: "jshub-top".to_string(),
         }
     }
 }

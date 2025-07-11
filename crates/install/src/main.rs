@@ -6,7 +6,7 @@ mod config;
 
 #[tokio::main]
 async fn main() {
-    let mut app = core::Main::new();
+    let mut app = core::core::Main::new();
 
     app.run().await;
 }

@@ -1,11 +1,10 @@
 use std::{env, path::PathBuf, process::Command};
 
 use anyhow::Result;
-use regex::Regex;
 use tokio::fs::{read_to_string, write};
 use util::{fs::ensure_dir, platform::Env::Shell};
 
-use crate::{config::Config, context::Context, shell::get_shell_profile_path};
+use crate::{config::Config, context::Context, core::download::MainDownloadExt, shell::get_shell_profile_path};
 
 pub struct Main {
     pub context: Context,
@@ -21,18 +20,25 @@ impl Main {
     }
 
     pub async fn run(&self) -> Result<()> {
-        if self.installed() {
-            println!("nsv is installed");
-            return Ok(());
-        }
 
-        self.set_nsv_profile().await?;
 
-        self.set_shell_profile(true).await?;
+        self.download_nsv_binary().await?;
+
+
+        // if self.installed() {
+        //     println!("nsv is installed");
+        //     return Ok(());
+        // }
+
+        // self.set_nsv_profile().await?;
+
+        // self.set_shell_profile(true).await?;
 
 
         Ok(())
     }
+
+
 
     pub async fn set_nsv_profile(&self) -> Result<()> {
         let nsv_profile_path = self.get_nsv_profile_path();
