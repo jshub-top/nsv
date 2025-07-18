@@ -30,7 +30,7 @@ jobs:
     build-linux:
         needs: [latest_release_tag]
         name: build for linux platforms
-        runs-on: ubuntu-latest
+        runs-on: blacksmith-2vcpu-ubuntu-2404
         env:
             CARGO_TERM_COLOR: always
             GH_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
@@ -49,7 +49,7 @@ jobs:
     build-windows:
         needs: [latest_release_tag]
         name: build for windows platforms
-        runs-on: ubuntu-latest
+        runs-on: blacksmith-2vcpu-ubuntu-2404
         env:
             CARGO_TERM_COLOR: always
             GH_TOKEN: ${{ secrets.ACTIONS_TOKEN }}
